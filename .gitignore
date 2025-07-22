@@ -188,4 +188,7 @@ Desktop.ini
 # Django specific
 media/
 staticfiles/
-static/ 
+static/
+
+# Environment variables
+.env 
