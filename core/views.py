@@ -17,11 +17,9 @@ def home(request):
     return HttpResponse("<h1>¡Bienvenido a CotizaBelleza!</h1><p>El proyecto Django creado por Francisca Galaz está funcionando correctamente.</p>")
 
 class ProductoListAPIView(APIView):
-    """API View para listar productos con filtro opcional por categoría"""
     permission_classes = [AllowAny]
     
     def get(self, request):
-        """Obtiene todos los productos o filtra por categoría"""
         categoria_id = request.query_params.get('categoria')
         
         if categoria_id:
@@ -39,11 +37,9 @@ class ProductoListAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class PreciosPorProductoAPIView(APIView):
-    """API View para obtener precios de un producto específico"""
     permission_classes = [AllowAny]
     
     def get(self, request):
-        """Obtiene los precios del producto especificado"""
         producto_id = request.query_params.get('producto')
         
         if not producto_id:
@@ -63,11 +59,9 @@ class PreciosPorProductoAPIView(APIView):
             )
 
 class UsuarioCreateAPIView(APIView):
-    """API View para crear nuevos usuarios"""
     permission_classes = [AllowAny]
     
     def post(self, request):
-        """Crea un nuevo usuario con los datos del body JSON"""
         serializer = UserSerializer(data=request.data)
         
         if serializer.is_valid():

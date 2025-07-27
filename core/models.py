@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
-
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     
