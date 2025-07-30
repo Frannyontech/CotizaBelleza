@@ -65,7 +65,6 @@ class UsuarioCreateAPIView(APIView):
         serializer = UserSerializer(data=request.data)
         
         if serializer.is_valid():
-            # Verificar si el usuario ya existe
             username = serializer.validated_data.get('username')
             email = serializer.validated_data.get('email')
             
@@ -81,7 +80,6 @@ class UsuarioCreateAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Crear el usuario
             user = serializer.save()
             return Response(
                 {
