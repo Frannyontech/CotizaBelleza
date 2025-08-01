@@ -6,6 +6,10 @@ Proyecto Django para sistema de cotizaciones de belleza.
 
 - Python 3.13+
 - Django 5.2.4
+- React 19 con Vite
+- Axios para APIs
+- CSS moderno
+- Responsive design
 
 ## Instalación
 
