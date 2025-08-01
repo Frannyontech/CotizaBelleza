@@ -27,10 +27,10 @@ class Tienda(models.Model):
         return self.nombre
 
 class Producto(models.Model):
-    nombre = models.CharField(max_length=100)
-    marca = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=500)
+    marca = models.CharField(max_length=200, blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
-    imagen_url = models.URLField(max_length=255, blank=True, null=True)
+    imagen_url = models.URLField(max_length=500, blank=True, null=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     
     class Meta:
@@ -61,7 +61,7 @@ class PrecioProducto(models.Model):
     stock = models.BooleanField(default=True)
     fecha_extraccion = models.DateTimeField(auto_now_add=True)
     fecha_baja = models.DateTimeField(blank=True, null=True)
-    url_producto = models.URLField(max_length=255, blank=True, null=True)
+    url_producto = models.URLField(max_length=500, blank=True, null=True)
     
     class Meta:
         verbose_name = "Precio de Producto"

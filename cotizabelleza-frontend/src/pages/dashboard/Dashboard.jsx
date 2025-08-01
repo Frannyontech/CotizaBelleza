@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Layout,
   Input,
@@ -12,7 +12,9 @@ import {
   Tag,
   Carousel,
   Avatar,
-  Divider
+  Divider,
+  Spin,
+  message
 } from 'antd';
 import {
   SearchOutlined,
@@ -26,6 +28,7 @@ import {
   RightOutlined,
   LinkOutlined
 } from '@ant-design/icons';
+import { dashboardService, categoryService, storeService } from '../../services/api';
 import './Dashboard.css';
 
 const { Header, Content } = Layout;
@@ -35,78 +38,107 @@ const { Search } = Input;
 const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedStore, setSelectedStore] = useState('Todas');
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [stores, setStores] = useState([]);
 
-  // Mock data for categories
-  const categories = ['Todos', 'Maquillaje', 'Skincare', 'Cabello', 'Fragancias', 'Uñas', 'Accesorios'];
+  // Cargar datos del dashboard
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [dashboardResponse, categoriesResponse, storesResponse] = await Promise.all([
+          dashboardService.getDashboardData(),
+          categoryService.getCategories(),
+          storeService.getStores()
+        ]);
+
+        setDashboardData(dashboardResponse);
+        setCategories(categoriesResponse);
+        setStores(storesResponse);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        message.error('Error al cargar los datos del dashboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  // Mock data para categorías (fallback)
+  const mockCategories = ['Todos', 'Maquillaje', 'Skincare', 'Cabello', 'Fragancias', 'Uñas', 'Accesorios'];
   
-  // Mock data for stores
-  const stores = ['Todas', 'Falabella', 'Paris', 'Ripley', 'Sephora', 'Jumbo', 'Líder', 'MAC', 'Sally Beauty'];
+  // Mock data para tiendas (fallback)
+  const mockStores = ['Todas', 'Falabella', 'Paris', 'Ripley', 'Sephora', 'Jumbo', 'Líder', 'MAC', 'Sally Beauty'];
 
-  // Mock data for popular products
-  const popularProducts = [
+  // Mock data para productos populares (fallback)
+  const mockPopularProducts = [
     {
       id: 1,
-      name: 'Base de maquillaje Fit Me',
-      brand: 'Maybelline',
-      price: 8990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Falabella', 'Paris', 'Ripley']
+      nombre: 'Base de maquillaje Fit Me',
+      marca: 'Maybelline',
+      precio_min: 8990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Falabella', 'Paris', 'Ripley']
     },
     {
       id: 2,
-      name: 'Máscara de pestañas Lash Sensational',
-      brand: 'Maybelline',
-      price: 7990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Sephora', 'Falabella']
+      nombre: 'Máscara de pestañas Lash Sensational',
+      marca: 'Maybelline',
+      precio_min: 7990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Sephora', 'Falabella']
     },
     {
       id: 3,
-      name: 'Paleta de sombras Naked',
-      brand: 'Urban Decay',
-      price: 32990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Falabella', 'Jumbo', 'Líder']
+      nombre: 'Paleta de sombras Naked',
+      marca: 'Urban Decay',
+      precio_min: 32990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Falabella', 'Jumbo', 'Líder']
     },
     {
       id: 4,
-      name: 'Labial Matte Revolution',
-      brand: 'Charlotte Tilbury',
-      price: 24990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Sephora', 'MAC']
+      nombre: 'Labial Matte Revolution',
+      marca: 'Charlotte Tilbury',
+      precio_min: 24990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Sephora', 'MAC']
     },
     {
       id: 5,
-      name: 'Agua Micelar',
-      brand: 'Garnier',
-      price: 5990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Falabella', 'Paris', 'Ripley', 'Jumbo']
+      nombre: 'Agua Micelar',
+      marca: 'Garnier',
+      precio_min: 5990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Falabella', 'Paris', 'Ripley', 'Jumbo']
     },
     {
       id: 6,
-      name: 'Crema Hidratante Nivea',
-      brand: 'Nivea',
-      price: 4990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Falabella', 'Jumbo', 'Líder']
+      nombre: 'Crema Hidratante Nivea',
+      marca: 'Nivea',
+      precio_min: 4990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Falabella', 'Jumbo', 'Líder']
     },
     {
       id: 7,
-      name: 'Sérum Facial Vitamin C',
-      brand: 'The Ordinary',
-      price: 12990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Sephora', 'Falabella']
+      nombre: 'Sérum Facial Vitamin C',
+      marca: 'The Ordinary',
+      precio_min: 12990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Sephora', 'Falabella']
     },
     {
       id: 8,
-      name: 'Aretes de Plata',
-      brand: 'Accesorios Belleza',
-      price: 15990,
-      image: '/src/assets/image-not-found.png',
-      stores: ['Falabella', 'Paris']
+      nombre: 'Aretes de Plata',
+      marca: 'Accesorios Belleza',
+      precio_min: 15990,
+      imagen_url: '/src/assets/image-not-found.png',
+      tiendas_disponibles: ['Falabella', 'Paris']
     }
   ];
 
@@ -128,6 +160,42 @@ const Dashboard = () => {
       description: 'Recibe notificaciones cuando tus productos favoritos bajen de precio.'
     }
   ];
+
+  // Función para obtener la URL de imagen correcta
+  const getImageUrl = (product) => {
+    // Si no hay imagen_url o está vacía, usar la imagen por defecto
+    if (!product.imagen_url || product.imagen_url === '') {
+      return '/src/assets/image-not-found.png';
+    }
+    
+    // Si la URL es muy larga o parece ser base64, usar imagen por defecto
+    if (product.imagen_url.length > 200 || product.imagen_url.startsWith('data:')) {
+      return '/src/assets/image-not-found.png';
+    }
+    
+    return product.imagen_url;
+  };
+
+  // Usar datos reales o fallback
+  const popularProducts = dashboardData?.productos_populares || mockPopularProducts;
+  const categoriesList = categories.length > 0 ? ['Todos', ...categories.map(c => c.nombre)] : mockCategories;
+  const storesList = stores.length > 0 ? ['Todas', ...stores.map(s => s.nombre)] : mockStores;
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
+        <Spin size="large" />
+        <Text>Cargando datos del dashboard...</Text>
+      </div>
+    );
+  }
 
   return (
     <Layout className="dashboard-layout">
@@ -169,7 +237,7 @@ const Dashboard = () => {
           <div className="filter-row">
             <Text strong>Categorías:</Text>
             <Space wrap>
-              {categories.map(category => (
+              {categoriesList.map(category => (
                 <Tag
                   key={category}
                   className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
@@ -184,7 +252,7 @@ const Dashboard = () => {
           <div className="filter-row">
             <Text strong>Tienda:</Text>
             <Space wrap>
-              {stores.map(store => (
+              {storesList.map(store => (
                 <Tag
                   key={store}
                   className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
@@ -219,20 +287,28 @@ const Dashboard = () => {
                     <HeartOutlined className="favorite-icon" />
                   </div>
                   <div className="product-image">
-                    <img src={product.image} alt={product.name} />
+                    <img 
+                      src={getImageUrl(product)} 
+                      alt={product.nombre}
+                      onError={(e) => {
+                        e.target.src = '/src/assets/image-not-found.png';
+                      }}
+                    />
                   </div>
                   <div className="product-info">
-                    <Text className="product-brand">{product.brand}</Text>
-                    <Text className="product-name">{product.name}</Text>
+                    <Text className="product-brand">{product.marca}</Text>
+                    <Text className="product-name">{product.nombre}</Text>
                     <Text className="product-price">
-                      Desde ${product.price.toLocaleString()}
+                      Desde ${product.precio_min?.toLocaleString() || product.precio_min}
                     </Text>
                     <Button type="primary" size="small" className="view-more-btn">
                       Ver más <LinkOutlined />
                     </Button>
                     <div className="product-stores">
                       <Text type="secondary">Disponible en:</Text>
-                      <Text className="store-list">{product.stores.join(' ')}</Text>
+                      <Text className="store-list">
+                        {product.tiendas_disponibles?.join(' ') || 'DBS'}
+                      </Text>
                     </div>
                   </div>
                 </Card>
