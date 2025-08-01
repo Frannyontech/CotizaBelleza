@@ -1,0 +1,205 @@
+.navbar-header {
+  background: #fff !important;
+  padding: 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+}
+
+/* Brand Section */
+.brand-section {
+  flex-shrink: 0;
+}
+
+.brand-link {
+  text-decoration: none;
+}
+
+.brand-logo {
+  background: linear-gradient(135deg, #ff69b4 0%, #da70d6 100%);
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.brand-text {
+  margin: 0 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+}
+
+/* Search Section */
+.search-section {
+  flex: 1;
+  max-width: 500px;
+  margin: 0 40px;
+}
+
+.search-input {
+  border-radius: 25px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.search-input:hover,
+.search-input:focus {
+  border-color: #ff69b4;
+  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.2);
+}
+
+.search-input .ant-input {
+  border-radius: 25px;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+}
+
+.search-input .ant-input-suffix {
+  margin-right: 12px;
+}
+
+/* Navigation Icons */
+.nav-icons {
+  flex-shrink: 0;
+}
+
+.nav-icon-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-icon-item:hover {
+  background: rgba(255, 105, 180, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-icon {
+  font-size: 20px;
+  color: #6c757d;
+  transition: all 0.3s ease;
+}
+
+.nav-icon-item:hover .nav-icon {
+  color: #ff69b4;
+}
+
+.nav-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.nav-icon-item:hover .nav-label {
+  color: #ff69b4;
+}
+
+/* Badge styling */
+.ant-badge-count {
+  background: #ff69b4 !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  border-radius: 8px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navbar-container {
+    padding: 0 16px;
+  }
+  
+  .search-section {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    height: auto;
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .brand-section {
+    order: 1;
+  }
+  
+  .search-section {
+    order: 2;
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .nav-icons {
+    order: 3;
+    width: 100%;
+  }
+  
+  .nav-icons .ant-space {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .nav-icon-item {
+    padding: 12px 8px;
+  }
+  
+  .nav-icon {
+    font-size: 18px;
+  }
+  
+  .nav-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-text {
+    font-size: 1.25rem !important;
+  }
+  
+  .nav-icons .ant-space {
+    gap: 8px !important;
+  }
+  
+  .nav-icon-item {
+    padding: 8px 4px;
+  }
+  
+  .nav-icon {
+    font-size: 16px;
+  }
+  
+  .nav-label {
+    font-size: 0.65rem;
+  }
+} 

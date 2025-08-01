@@ -34,7 +34,6 @@ CATEGORIAS_BELLEZA = [
     'skincare',
     'perfumes',
     'cabello',
-    'accesorios',
 ]
 
 # Configuración de exportación
