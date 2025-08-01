@@ -1,0 +1,482 @@
+/* Main Layout */
+.dashboard-layout {
+  background: #fff;
+  min-height: 100vh;
+}
+
+/* Hero Banner Section */
+.hero-banner {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 60px 24px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23ff69b4" opacity="0.1"/><circle cx="80" cy="40" r="1.5" fill="%23ff69b4" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="%23ff69b4" opacity="0.1"/></svg>');
+  pointer-events: none;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-text {
+  flex: 1;
+  max-width: 500px;
+}
+
+.hero-title {
+  font-size: 3rem !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 16px !important;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #6c757d;
+  margin-bottom: 32px;
+  display: block;
+}
+
+.hero-button {
+  background: linear-gradient(135deg, #ff69b4 0%, #da70d6 100%) !important;
+  border: none !important;
+  height: 48px;
+  padding: 0 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+  transition: all 0.3s ease;
+}
+
+.hero-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+}
+
+.hero-products {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-placeholder {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: #6c757d;
+  font-weight: 500;
+  border: 2px dashed #ff69b4;
+}
+
+.carousel-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 2;
+}
+
+.carousel-btn {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dee2e6;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: #ff69b4;
+  transform: scale(1.2);
+}
+
+/* Filter Section */
+.filter-section {
+  background: #fff;
+  padding: 32px 24px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.filter-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-title {
+  color: #2c3e50 !important;
+  margin-bottom: 24px !important;
+  font-weight: 600 !important;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-row strong {
+  color: #495057;
+  min-width: 80px;
+}
+
+.filter-tag {
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.filter-tag:hover {
+  border-color: #ff69b4;
+  color: #ff69b4;
+}
+
+.filter-tag.active {
+  background: linear-gradient(135deg, #ff69b4 0%, #da70d6 100%);
+  color: #fff;
+  border-color: #ff69b4;
+}
+
+.clear-filters {
+  color: #6c757d !important;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+.clear-filters:hover {
+  color: #ff69b4 !important;
+}
+
+/* Products Section */
+.products-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  background: #2c3e50;
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 8px 8px 0 0;
+}
+
+.section-header h3 {
+  color: #fff !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+.view-all {
+  color: #fff !important;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.view-all:hover {
+  color: #ff69b4 !important;
+}
+
+.products-grid {
+  margin-bottom: 40px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+  border: 1px solid #e9ecef;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.product-header {
+  position: relative;
+  padding: 12px;
+}
+
+.favorite-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 18px;
+  color: #ff69b4;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorite-icon:hover {
+  transform: scale(1.1);
+  color: #da70d6;
+  background: #fff;
+}
+
+.product-image {
+  padding: 20px;
+  text-align: center;
+  background: #f8f9fa;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.product-image img {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 16px;
+}
+
+.product-brand {
+  color: #6c757d;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.product-name {
+  color: #2c3e50;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.product-price {
+  color: #ff69b4;
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.view-more-btn {
+  background: linear-gradient(135deg, #ff69b4 0%, #da70d6 100%) !important;
+  border: none !important;
+  border-radius: 20px;
+  height: 32px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.view-more-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+}
+
+.product-stores {
+  margin-top: 8px;
+}
+
+.product-stores .ant-typography {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.store-list {
+  color: #6c757d;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Benefits Section */
+.benefits-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 60px 24px;
+  margin-top: 40px;
+}
+
+.benefits-title {
+  text-align: center;
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  margin-bottom: 48px !important;
+}
+
+.benefits-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.benefit-card {
+  text-align: center;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+  background: #fff;
+}
+
+.benefit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.benefit-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff69b4 0%, #da70d6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 32px;
+  color: #fff;
+}
+
+.benefit-title {
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  margin-bottom: 16px !important;
+}
+
+.benefit-description {
+  color: #6c757d;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 32px;
+  }
+
+  .hero-title {
+    font-size: 2rem !important;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-row strong {
+    min-width: auto;
+  }
+
+  .clear-filters {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .benefits-section {
+    padding: 40px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-banner {
+    padding: 40px 16px;
+  }
+
+  .filter-section {
+    padding: 24px 16px;
+  }
+
+  .products-section {
+    padding: 0 16px 32px;
+  }
+
+  .hero-title {
+    font-size: 1.75rem !important;
+  }
+} 
