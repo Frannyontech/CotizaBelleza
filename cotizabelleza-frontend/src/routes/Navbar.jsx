@@ -6,7 +6,8 @@ import {
   AppstoreOutlined,
   HeartOutlined,
   BellOutlined,
-  UserOutlined
+  UserOutlined,
+  ShopOutlined
 } from '@ant-design/icons';
 import './Navbar.css';
 
@@ -49,6 +50,13 @@ const Navbar = () => {
               <div className="nav-icon-item">
                 <AppstoreOutlined className="nav-icon" />
                 <span className="nav-label">Categorías</span>
+              </div>
+            </Link>
+            
+            <Link to="/productos-dbs" className="nav-icon-link">
+              <div className="nav-icon-item">
+                <ShopOutlined className="nav-icon" />
+                <span className="nav-label">DBS</span>
               </div>
             </Link>
             

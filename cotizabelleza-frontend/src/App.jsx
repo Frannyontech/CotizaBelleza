@@ -12,6 +12,7 @@ import Buscador from './pages/buscador/Buscador';
 import DetalleProducto from './pages/detalle-producto/DetalleProducto';
 import Login from './pages/login/Login';
 import Perfil from './pages/perfil/Perfil';
+import DBSProductos from './components/DBSProductos';
 
 const { Content } = Layout;
 
@@ -24,6 +25,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/buscador" element={<Buscador />} />
+            <Route path="/productos-dbs" element={<DBSProductos />} />
             <Route path="/detalle-producto" element={<DetalleProducto />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<Perfil />} />

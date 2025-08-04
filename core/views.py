@@ -21,41 +21,33 @@ class DashboardAPIView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
-        """API para obtener datos del dashboard"""
         try:
-            # Estadísticas generales
             total_productos = Producto.objects.count()
             total_categorias = Categoria.objects.count()
             total_tiendas = Tienda.objects.count()
             
-            # Productos con precios
             productos_con_precios = PrecioProducto.objects.filter(
                 stock=True
             ).values('producto').distinct().count()
             
-            # Precio promedio
             precio_promedio = PrecioProducto.objects.filter(
                 stock=True
             ).aggregate(Avg('precio'))['precio__avg'] or 0
             
-            # Rango de precios
             precios = PrecioProducto.objects.filter(stock=True)
             precio_min = precios.aggregate(Min('precio'))['precio__min'] or 0
             precio_max = precios.aggregate(Max('precio'))['precio__max'] or 0
             
-            # Productos por categoría
             productos_por_categoria = Categoria.objects.annotate(
                 cantidad_productos=Count('productos')
             ).values('nombre', 'cantidad_productos')
             
-            # Productos populares (con más precios)
             productos_populares = Producto.objects.annotate(
                 num_precios=Count('precios')
             ).filter(
                 num_precios__gt=0
             ).order_by('-num_precios')[:8]
             
-            # Serializar productos populares con sus precios
             productos_populares_data = []
             for producto in productos_populares:
                 precios_producto = PrecioProducto.objects.filter(
@@ -108,7 +100,6 @@ class ProductoListAPIView(APIView):
         
         productos = Producto.objects.all()
         
-        # Filtrar por categoría
         if categoria_id:
             try:
                 productos = productos.filter(categoria_id=categoria_id)
@@ -118,17 +109,14 @@ class ProductoListAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
-        # Filtrar por búsqueda
         if search:
             productos = productos.filter(nombre__icontains=search)
         
-        # Filtrar por tienda
         if tienda_id:
             productos = productos.filter(precios__tienda_id=tienda_id)
         
-        # Incluir información de precios
         productos_data = []
-        for producto in productos[:50]:  # Limitar a 50 productos
+        for producto in productos[:50]:
             precios = PrecioProducto.objects.filter(
                 producto=producto,
                 stock=True
@@ -205,6 +193,72 @@ class PreciosPorProductoAPIView(APIView):
             return Response(
                 {"error": "ID de producto inválido"}, 
                 status=status.HTTP_400_BAD_REQUEST
+            )
+
+class DBSProductosAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        try:
+            categoria_nombre = request.query_params.get('categoria', '')
+            search = request.query_params.get('search', '')
+            marca = request.query_params.get('marca', '')
+            
+            productos = Producto.objects.filter(
+                precios__tienda__nombre='DBS'
+            ).distinct()
+            
+            if categoria_nombre:
+                productos = productos.filter(categoria__nombre=categoria_nombre)
+            
+            if search:
+                productos = productos.filter(nombre__icontains=search)
+            
+            if marca:
+                productos = productos.filter(marca__icontains=marca)
+            
+            productos_data = []
+            seen_products = set()  # Para evitar duplicados
+            
+            for producto in productos:
+                precio_dbs = PrecioProducto.objects.filter(
+                    producto=producto,
+                    tienda__nombre='DBS',
+                    stock=True
+                ).first()
+                
+                if precio_dbs:
+                    # Crear clave única para evitar duplicados
+                    product_key = f"{producto.nombre}_{producto.marca}_{precio_dbs.precio}"
+                    
+                    if product_key not in seen_products:
+                        seen_products.add(product_key)
+                        
+                        productos_data.append({
+                            'id': producto.id,
+                            'nombre': producto.nombre,
+                            'marca': producto.marca or '',
+                            'categoria': producto.categoria.nombre,
+                            'precio': float(precio_dbs.precio),
+                            'stock': precio_dbs.stock,
+                            'url_producto': precio_dbs.url_producto or '',
+                            'imagen_url': producto.imagen_url or '',
+                            'descripcion': producto.descripcion or '',
+                            'fecha_extraccion': precio_dbs.fecha_extraccion.isoformat()
+                        })
+            
+            productos_data.sort(key=lambda x: x['precio'])
+            
+            return Response({
+                'productos': productos_data,
+                'total': len(productos_data),
+                'categorias_disponibles': list(Categoria.objects.values_list('nombre', flat=True))
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener productos DBS: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 class UsuarioCreateAPIView(APIView):
