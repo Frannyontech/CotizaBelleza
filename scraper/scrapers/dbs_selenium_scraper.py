@@ -1,32 +1,26 @@
 import time
 import re
-from typing import List, Dict, Optional
-from urllib.parse import urljoin
+import os
+import json
+from typing import List, Optional, Dict
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-import json
-
 
 class DBSProduct:
-    
     def __init__(self, nombre: str, marca: str, precio: float, 
-                 categoria: str, stock: bool, estrellas: float = 0.0,
-                 url: str = "", imagen: str = ""):
+                 categoria: str, stock: str, url: str = "", imagen: str = ""):
         self.nombre = nombre
         self.marca = marca
         self.precio = precio
         self.categoria = categoria
         self.stock = stock
-        self.estrellas = estrellas
         self.url = url
         self.imagen = imagen
-    
+
     def to_dict(self) -> Dict:
         return {
             'nombre': self.nombre,
@@ -34,443 +28,618 @@ class DBSProduct:
             'precio': self.precio,
             'categoria': self.categoria,
             'stock': self.stock,
-            'estrellas': self.estrellas,
             'url': self.url,
             'imagen': self.imagen
         }
-    
+
     def __str__(self) -> str:
-        return f"{self.marca} - {self.nombre} - ${self.precio}"
+        return f"{self.nombre} - {self.marca} - ${self.precio}"
 
 class DBSSeleniumScraper:
-    
     def __init__(self, headless: bool = True):
-        self.base_url = "https://www.dbs.cl"
         self.driver = None
         self.setup_driver(headless)
-    
+        
+        # Lista de marcas conocidas para priorizar
+        self.marcas_conocidas = [
+            'KIKO MILANO', 'ESSENCE', 'CATRICE', 'NYX', 'MAYBELLINE', 
+            'L\'ORÉAL PARIS', 'BIOTHERM', 'CLINIQUE', 'KIEHL\'S',
+            'REVUELE', 'REVOX B77', 'SKIN1004', 'COSRX', 'BOVEY',
+            'APIVITA', 'BYPHASSE', 'TOCOBO', 'DBS BASICS'
+        ]
+
     def setup_driver(self, headless: bool):
-        chrome_options = Options()
-        
+        options = Options()
         if headless:
-            chrome_options.add_argument("--headless")
+            options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
         
-        # Configuraciones anti-detección
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        chrome_options.add_experimental_option('useAutomationExtension', False)
-        chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-        chrome_options.add_argument("--window-size=1920,1080")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--disable-extensions")
-        
-        try:
-            service = Service(ChromeDriverManager().install())
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
-            self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-            print("Driver de Chrome configurado correctamente")
-        except Exception as e:
-            print(f"Error al configurar el driver: {e}")
-            self.driver = None
-    
+        self.driver = webdriver.Chrome(options=options)
+
     def _get_page_with_selenium(self, url: str) -> Optional[BeautifulSoup]:
-        if not self.driver:
+        try:
+            self.driver.get(url)
+            
+            # Esperar a que los productos se carguen
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '.product-item'))
+            )
+            
+            # Esperar a que las imágenes se carguen completamente
+            WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '.product-image-photo'))
+            )
+            
+            # Scroll para cargar imágenes lazy
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(3)
+            self.driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(2)
+            
+            # Scroll adicional para asegurar que todas las imágenes se carguen
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
+            time.sleep(2)
+            
+            return BeautifulSoup(self.driver.page_source, 'html.parser')
+        except Exception as e:
+            print(f"Error cargando página: {e}")
             return None
+
+    def obtener_total_paginas(self, categoria: str) -> int:
+        url = f"https://www.dbs.cl/maquillaje/{categoria}"
         
         try:
-            print(f"Cargando página: {url}")
-            self.driver.get(url)
-            time.sleep(3)
-            
-            try:
-                WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "product"))
-                )
-                print("Elementos de productos cargados")
-            except:
-                print("No se encontraron elementos con clase 'product', continuando...")
-            
-            page_source = self.driver.page_source
-            soup = BeautifulSoup(page_source, 'html.parser')
-            print(f"Página cargada exitosamente")
-            return soup
-            
-        except Exception as e:
-            print(f"Error al cargar la página: {e}")
-            return None
-    
-    def _detectar_total_paginas(self, categoria: str) -> int:
-        try:
-            url = f"{self.base_url}/{categoria}"
             soup = self._get_page_with_selenium(url)
             
             if not soup:
                 return 1
             
-            # Buscar elementos de paginación
-            pagination_elements = soup.find_all('a', href=re.compile(r'page=\d+'))
+            # Obtener todo el texto de la página
+            all_text = soup.get_text()
             
-            if pagination_elements:
-                page_numbers = []
-                for elem in pagination_elements:
-                    href = elem.get('href', '')
-                    match = re.search(r'page=(\d+)', href)
-                    if match:
-                        page_numbers.append(int(match.group(1)))
-                
-                if page_numbers:
-                    max_page = max(page_numbers)
-                    print(f"Total de páginas detectadas para {categoria}: {max_page}")
-                    return max_page
+            # Usar el patrón que sabemos que funciona
+            pattern = r'Artículos\s*\d+-\d+\s*de\s*([\d,]+)'
+            match = re.search(pattern, all_text)
             
-            # Verificar si hay muchos productos
-            product_elements = soup.find_all(class_='product')
-            if len(product_elements) >= 120:
-                print(f"Muchos productos encontrados en {categoria}, asumiendo múltiples páginas")
-                return 5
+            if match:
+                total_productos = int(match.group(1).replace(',', ''))
+                productos_por_pagina = 24
+                total_paginas = (total_productos + productos_por_pagina - 1) // productos_por_pagina
+                print(f"Detectados {total_productos} productos en {total_paginas} páginas para {categoria}")
+                return max(1, total_paginas)
             
-            print(f"Solo 1 página detectada para {categoria}")
+            print(f"No se pudo detectar el total de páginas para {categoria}, usando 1 página")
             return 1
             
         except Exception as e:
             print(f"Error detectando páginas para {categoria}: {e}")
             return 1
-    
+
     def _extract_product_info_from_element(self, product_element) -> Optional[DBSProduct]:
         try:
-            text = product_element.get_text(strip=True)
-            if not text:
-                return None
-            
-            # Extraer precio
-            precio = self._extract_precio(product_element, text)
-            
-            # Extraer marca y nombre
-            marca, nombre = self._extract_marca_nombre(text, product_element)
-            
-            # Limpiar nombre
-            nombre = self._limpiar_nombre(nombre)
-            
-            # Extraer URL e imagen
+            nombre = self._extract_nombre(product_element)
+            marca = self._extract_marca(product_element)
+            precio = self._extract_precio(product_element)
             url = self._extract_url(product_element)
             imagen = self._extract_imagen(product_element)
-            
-            # Determinar stock y estrellas
             stock = self._determinar_stock(product_element)
-            estrellas = self._extract_estrellas(product_element)
-            
-            # Determinar categoría
             categoria = self._determinar_categoria(url)
             
-            # Crear producto si tiene nombre válido
-            if nombre and len(nombre.strip()) > 2:
-                return DBSProduct(
-                    nombre=nombre.strip(),
-                    marca=marca.strip(),
-                    precio=precio,
-                    categoria=categoria,
-                    stock=stock,
-                    estrellas=estrellas,
-                    url=url,
-                    imagen=imagen
-                )
+            if not nombre or len(nombre.strip()) < 3:
+                return None
             
-            return None
+            # Validar que no sea un elemento de filtro o navegación
+            if any(keyword in nombre.lower() for keyword in ['filtro', 'filter', 'ordenar']):
+                return None
+            
+            if precio <= 0:
+                return None
+            
+            return DBSProduct(
+                nombre=nombre.strip(),
+                marca=marca.strip(),
+                precio=precio,
+                categoria=categoria,
+                stock=stock,
+                url=url,
+                imagen=imagen
+            )
             
         except Exception as e:
             print(f"Error extrayendo producto: {e}")
             return None
-    
-    def _extract_precio(self, product_element, text: str) -> float:
-        precio = 0.0
-        price_pattern = re.compile(r'\$\s*(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)')
-        
-        # Buscar precio en el texto principal
-        price_match = price_pattern.search(text)
-        if price_match:
-            price_str = price_match.group(1).replace('.', '').replace(',', '.')
-            try:
-                precio = float(price_str)
-                return precio
-            except ValueError:
-                pass
-        
-        # Buscar en elementos pricebox
-        price_elements = product_element.find_all(class_='pricebox')
-        for price_elem in price_elements:
-            price_text = price_elem.get_text(strip=True)
-            price_match = price_pattern.search(price_text)
-            if price_match:
-                price_str = price_match.group(1).replace('.', '').replace(',', '.')
-                try:
-                    return float(price_str)
-                except ValueError:
-                    continue
-        
-        # Buscar en otros elementos de precio
-        price_elements = product_element.find_all(class_=re.compile(r'price|precio', re.IGNORECASE))
-        for price_elem in price_elements:
-            price_text = price_elem.get_text(strip=True)
-            price_match = price_pattern.search(price_text)
-            if price_match:
-                price_str = price_match.group(1).replace('.', '').replace(',', '.')
-                try:
-                    return float(price_str)
-                except ValueError:
-                    continue
-        
-        return precio
-    
-    def _extract_marca_nombre(self, text: str, product_element) -> tuple:
-        marcas_conocidas = [
-            '3INA', 'ABSOLUTE NEW YORK', 'ANASTASIA BEVERLY HILLS', 'ARDELL', 'BAG NY', 'BEAUTY CREATIONS', 
-            'BEAUTY TOOLS', 'BIOTHERM', 'BYPHASSE', 'BYS', 'CARMEX', 'CATRICE', 'CHINA GLAZE', 'CLINIQUE', 
-            'DANESSA MYRICKS', 'DBS BASICS', 'DBS COLLECTION', 'ECOTOOLS', 'ESSENCE', 'ESTÉE LAUDER', 'FLORMAR', 
-            'FRUDIA, GELIFY', 'GLAM FACTOR', 'HELLO SUNDAY', 'ICONIC LONDON', 'ILASH', 'J CAT', 'KIKO MILANO', 'KISS', 
-            'LANCÔME', 'LIP SMACKER', 'L\'ORÉAL PARIS', 'MAKEUP REVOLUTION', 'MARIO BADESCU', 'MASGLO', 'MAYBELLINE', 
-            'MISSHA', 'MIZON', 'MOIRA', 'NUDESTIX', 'NYX', 'PMU', 'OPI', 'PHYSICIANS FORMULA', 'PIXI', 'REAL TECHNIQUES', 
-            'REVLON', 'REVOX B77', 'RISQUE', 'ROM&ND', 'SALLY HANSEN', 'SIGMA', 'TESSA', 'THE BALM', 'TOCOBO', 'TONY MOLY', 
-            'TWEEZERMAN', 'UNLEASHIA', 'URBAN DECAY', 'WET N WILD', 'MOROCCANOIL', 'REDKEN', 'KIEHL\'S', 'COSRX', 'BOVEY', 
-            'REVUELE', 'REVOX', 'APIVITA', 'MARC ANTHONY', 'KÉRASTASE', 'CLOE PROFESSIONAL', 'INSIGHT', 'OUIDAD', 'TANGLE TEEZER'
+
+    def _extract_nombre(self, product_element) -> str:
+        name_selectors = [
+            '.product-name',
+            '.product-item-name',
+            'h2', 'h3', 'h4',
+            '.product-title',
+            '.item-name',
+            '.product-name a',
+            '.product-item-name a',
+            '.product-item-title',
+            '.product-item-title a',
+            'a[title]',
+            '.product-item a'
         ]
         
-        # Buscar marca conocida
-        for marca_conocida in marcas_conocidas:
-            if marca_conocida.lower() in text.lower():
-                marca_pos = text.lower().find(marca_conocida.lower())
-                if marca_pos != -1:
-                    nombre_start = marca_pos + len(marca_conocida)
-                    nombre = text[nombre_start:].strip()
-                    return marca_conocida, nombre
+        for selector in name_selectors:
+            elements = product_element.select(selector)
+            for element in elements:
+                text = element.get_text(strip=True)
+                if text and len(text) > 3:
+                    # Validar que el texto sea alfabético, no monetario
+                    if self._es_texto_alfabetico(text):
+                        return self._limpiar_nombre(text)
         
-        # Buscar en elementos HTML
-        brand_elements = product_element.find_all(class_=re.compile(r'brand|marca', re.IGNORECASE))
-        name_elements = product_element.find_all(class_=re.compile(r'name|nombre|title', re.IGNORECASE))
+        # Si no encuentra con selectores específicos, buscar en enlaces
+        links = product_element.select('a[href]')
+        for link in links:
+            text = link.get_text(strip=True)
+            href = link.get('href', '')
+            if text and len(text) > 3 and 'dbs.cl' in href:
+                if self._es_texto_alfabetico(text):
+                    return self._limpiar_nombre(text)
         
-        marca = brand_elements[0].get_text(strip=True) if brand_elements else ""
-        nombre = name_elements[0].get_text(strip=True) if name_elements else text
+        # Buscar en el atributo title de enlaces
+        for link in links:
+            title = link.get('title', '')
+            if title and len(title) > 3:
+                if self._es_texto_alfabetico(title):
+                    return self._limpiar_nombre(title)
         
-        # Patrón "MARCA - NOMBRE"
-        if not marca:
-            marca_nombre_pattern = re.compile(r'^([A-Z\s]+)\s*-\s*(.+)', re.IGNORECASE)
-            match = marca_nombre_pattern.match(text)
-            if match:
-                marca = match.group(1).strip()
-                nombre = match.group(2).strip()
-            else:
-                marca = ""
-                nombre = text
+        return ""
+
+    def _es_texto_alfabetico(self, text: str) -> bool:
+        """Valida que el texto sea alfabético, no monetario o numérico"""
+        # Eliminar espacios y caracteres especiales
+        clean_text = re.sub(r'[^\w\s]', '', text).strip()
         
-        return marca, nombre
-    
-    def _limpiar_nombre(self, nombre: str) -> str:
-        if not nombre:
-            return ""
+        # Verificar que no contenga rangos de precio
+        if re.search(r'\$\s*\d+', clean_text):
+            return False
         
-        patrones_limpieza = [
-            r'Valoración:\d+%',
-            r'Desde\$.*?Añadir al carrito',
-            r'New.*?%',
-            r'Sale.*?%',
-            r'Ganador⭐',
-            r'\$.*?Añadir al carrito',
-            r'^\s*[-]\s*'
+        # Verificar que no sea solo números
+        if clean_text.isdigit():
+            return False
+        
+        # Verificar que no contenga patrones de precio
+        if re.search(r'\d+\s*-\s*\d+', clean_text):
+            return False
+        
+        # Verificar que tenga al menos algunas letras
+        if not re.search(r'[a-zA-Z]', clean_text):
+            return False
+        
+        # Verificar que no sea un rango de precio
+        if re.search(r'\$\s*\d+\s*-\s*\$\s*\d+', text):
+            return False
+        
+        return True
+
+    def _extract_marca(self, product_element) -> str:
+        # Primero buscar en marcas conocidas
+        for marca in self.marcas_conocidas:
+            # Buscar en el texto del elemento
+            text = product_element.get_text().upper()
+            if marca.upper() in text:
+                return marca
+        
+        # Si no encuentra marca conocida, buscar en elementos específicos
+        brand_selectors = [
+            '.product-brand',
+            '.brand',
+            '.product-item-brand',
+            '.item-brand'
         ]
         
-        for patron in patrones_limpieza:
-            nombre = re.sub(patron, '', nombre).strip()
+        for selector in brand_selectors:
+            elements = product_element.select(selector)
+            for element in elements:
+                text = element.get_text(strip=True)
+                if text and len(text) > 1:
+                    return text
         
-        return nombre
-    
-    def _extract_url(self, product_element) -> str:
-        if product_element.name == 'a':
-            return urljoin(self.base_url, product_element.get('href', ''))
+        # Si no encuentra marca, retornar "DBS" por defecto
+        return "DBS"
+
+    def _extract_precio(self, product_element) -> float:
+        price_selectors = [
+            '.price',
+            '.product-price',
+            '.price-box .price',
+            '.product-item-price',
+            '.item-price',
+            '[data-price]'
+        ]
         
-        link = product_element.find('a')
-        if link:
-            return urljoin(self.base_url, link.get('href', ''))
+        for selector in price_selectors:
+            elements = product_element.select(selector)
+            for element in elements:
+                text = element.get_text(strip=True)
+                if text:
+                    # Extraer solo el primer precio (evitar rangos)
+                    precio = self._extraer_precio_unico(text)
+                    if precio > 0:
+                        return precio
         
-        return ""
-    
-    def _extract_imagen(self, product_element) -> str:
-        img_element = product_element.find('img')
-        if img_element:
-            img_src = img_element.get('src', '') or img_element.get('data-src', '') or img_element.get('data-lazy-src', '')
-            if img_src:
-                return urljoin(self.base_url, img_src)
-        return ""
-    
-    def _determinar_stock(self, product_element) -> bool:
-        stock_indicators = product_element.find_all(text=re.compile(r'no está disponible|agotado|out of stock', re.IGNORECASE))
-        return not bool(stock_indicators)
-    
-    def _extract_estrellas(self, product_element) -> float:
-        star_elements = product_element.find_all(class_=re.compile(r'star|rating|valoración', re.IGNORECASE))
-        if star_elements:
-            star_text = star_elements[0].get_text(strip=True)
-            star_match = re.search(r'(\d+(?:\.\d+)?)', star_text)
-            if star_match:
-                try:
-                    return float(star_match.group(1))
-                except ValueError:
-                    pass
         return 0.0
-    
-    def _determinar_categoria(self, url: str) -> str:
-        if "maquillaje" in url.lower():
-            return "maquillaje"
-        elif "skincare" in url.lower():
-            return "skincare"
-        return "general"
-    
-    def scrapear_pagina_dbs(self, url: str) -> List[DBSProduct]:
-        print(f"Scrapeando página: {url}")
+
+    def _extraer_precio_unico(self, text: str) -> float:
+        """Extrae un precio único, evitando rangos"""
+        # Buscar patrones de precio chileno
+        patterns = [
+            r'\$?\s*([\d,]+(?:\.[\d]{3})*(?:\.\d{2})?)',
+            r'([\d,]+(?:\.[\d]{3})*(?:\.\d{2})?)\s*pesos',
+            r'([\d,]+(?:\.[\d]{3})*(?:\.\d{2})?)\s*CLP'
+        ]
         
+        for pattern in patterns:
+            matches = re.findall(pattern, text)
+            if matches:
+                # Tomar solo el primer precio encontrado
+                precio_str = matches[0].replace(',', '').replace('.', '')
+                try:
+                    precio = float(precio_str)
+                    if precio > 0:
+                        return precio
+                except ValueError:
+                    continue
+        
+        return 0.0
+
+    def _limpiar_nombre(self, nombre: str) -> str:
+        # Eliminar patrones de precio y caracteres especiales
+        nombre = re.sub(r'\$\s*\d+', '', nombre)
+        nombre = re.sub(r'\d+\s*-\s*\d+', '', nombre)
+        nombre = re.sub(r'[^\w\s\-\.]', '', nombre)
+        nombre = re.sub(r'\s+', ' ', nombre)
+        return nombre.strip()
+
+    def _extract_url(self, product_element) -> str:
+        links = product_element.select('a[href]')
+        for link in links:
+            href = link.get('href', '')
+            if href and 'dbs.cl' in href:
+                if not href.startswith('http'):
+                    href = 'https://www.dbs.cl' + href
+                return href
+        return ""
+
+    def _extract_imagen(self, product_element) -> str:
+        # Selectores específicos basados en la estructura HTML de DBS
+        img_selectors = [
+            '.product-image-photo',
+            '.product-item-photo img',
+            '.product-image-container img',
+            '.product-image-wrapper img',
+            'img[src*="dbs.cl"]',
+            'img[data-src*="dbs.cl"]',
+            'img[srcset*="dbs.cl"]',
+            '.product-item img',
+            'a img',
+            'img',
+            '.product-image-photo img',
+            '.product-item-photo-container img',
+            '.product-item-image img',
+            '.product-item-image-container img',
+            '.product-item-info img',
+            '.product-item-details img'
+        ]
+        
+        # Primero buscar en src normal
+        for selector in img_selectors:
+            images = product_element.select(selector)
+            for img in images:
+                src = img.get('src', '')
+                if src and 'dbs.cl' in src and not src.startswith('data:image/'):
+                    if not src.startswith('http'):
+                        src = 'https://www.dbs.cl' + src
+                    return src
+        
+        # Buscar en atributos data-src (lazy loading)
+        for selector in img_selectors:
+            images = product_element.select(selector)
+            for img in images:
+                src = img.get('data-src', '')
+                if src and 'dbs.cl' in src and not src.startswith('data:image/'):
+                    if not src.startswith('http'):
+                        src = 'https://www.dbs.cl' + src
+                    return src
+        
+        # Buscar en el atributo srcset
+        for selector in img_selectors:
+            images = product_element.select(selector)
+            for img in images:
+                srcset = img.get('srcset', '')
+                if srcset and 'dbs.cl' in srcset:
+                    # Extraer la primera URL del srcset (sin parámetros de densidad)
+                    urls = re.findall(r'([^\s,]+)', srcset)
+                    for url in urls:
+                        if 'dbs.cl' in url and not url.startswith('data:image/'):
+                            # Remover parámetros de densidad (2x, 3x)
+                            clean_url = re.sub(r'\s+\d+x$', '', url)
+                            if not clean_url.startswith('http'):
+                                clean_url = 'https://www.dbs.cl' + clean_url
+                            return clean_url
+        
+        # Buscar en elementos padre que puedan contener imágenes
+        parent_elements = product_element.select('a[href*="dbs.cl"]')
+        for parent in parent_elements:
+            images = parent.select('img')
+            for img in images:
+                src = img.get('src', '')
+                if src and 'dbs.cl' in src and not src.startswith('data:image/'):
+                    if not src.startswith('http'):
+                        src = 'https://www.dbs.cl' + src
+                    return src
+        
+        # Buscar en cualquier elemento que contenga una imagen
+        all_images = product_element.find_all('img')
+        for img in all_images:
+            src = img.get('src', '')
+            if src and 'dbs.cl' in src and not src.startswith('data:image/'):
+                if not src.startswith('http'):
+                    src = 'https://www.dbs.cl' + src
+                return src
+        
+        return ""
+
+    def _determinar_stock(self, product_element) -> str:
+        # Buscar indicadores de stock
+        stock_indicators = product_element.select('.stock, .availability, .product-stock')
+        for indicator in stock_indicators:
+            text = indicator.get_text(strip=True).lower()
+            if 'agotado' in text or 'sin stock' in text or 'out of stock' in text:
+                return "Out of stock"
+        
+        return "In stock"
+
+    def _determinar_categoria(self, url: str) -> str:
+        if 'skincare' in url:
+            return 'skincare'
+        elif 'maquillaje' in url:
+            return 'maquillaje'
+        else:
+            return 'general'
+
+    def scrapear_pagina_dbs(self, url: str) -> List[DBSProduct]:
         soup = self._get_page_with_selenium(url)
         if not soup:
             return []
         
-        productos = []
+        # Usar solo selectores específicos para productos
+        product_selectors = [
+            '.product-item',
+            'li.item.product.product-item'
+        ]
         
-        # Buscar elementos de productos
-        product_elements = soup.find_all(class_='product')
-        product_links = soup.find_all('a', class_='product')
-        data_product_elements = soup.find_all(attrs={'data-product': True})
+        all_elements = []
+        for selector in product_selectors:
+            elements = soup.select(selector)
+            all_elements.extend(elements)
         
-        print(f"Elementos con clase 'product': {len(product_elements)}")
-        print(f"Enlaces con clase 'product': {len(product_links)}")
-        print(f"Elementos con data-product: {len(data_product_elements)}")
-        
-        # Combinar todos los elementos únicos
-        all_elements = list(set(product_elements + product_links + data_product_elements))
-        print(f"Total de elementos de productos encontrados: {len(all_elements)}")
-        
+        seen = set()
+        unique_elements = []
         for element in all_elements:
+            element_id = id(element)
+            if element_id not in seen:
+                seen.add(element_id)
+                unique_elements.append(element)
+        
+        filtered_elements = []
+        for element in unique_elements:
+            text = element.get_text(strip=True)
+            if not text or len(text) < 3:
+                continue
+            
+            # Filtros más estrictos para elementos no válidos
+            if any(keyword in text.lower() for keyword in ['filtro', 'filter', 'ordenar']):
+                continue
+            
+            if not element.find('a'):
+                continue
+            
+            filtered_elements.append(element)
+        
+        productos = []
+        for element in filtered_elements:
             producto = self._extract_product_info_from_element(element)
             if producto:
                 productos.append(producto)
-                print(f"Producto encontrado: {producto}")
         
-        return productos
-    
-    def scrapear_catalogo_dbs(self, urls: List[str], delay: float = 3.0) -> List[DBSProduct]:
+        # Usar nombre + url como clave única
+        productos_unicos = []
+        seen_products = set()
+        
+        for producto in productos:
+            product_key = f"{producto.nombre.lower().strip()}_{producto.url}"
+            
+            if product_key not in seen_products:
+                seen_products.add(product_key)
+                productos_unicos.append(producto)
+        
+        return productos_unicos
+
+    def scrapear_catalogo_dbs(self, categoria: str, max_paginas: int = None, delay: float = 1.0) -> List[DBSProduct]:
+        if max_paginas is None:
+            max_paginas = self.obtener_total_paginas(categoria)
+        
         todos_productos = []
         
-        for i, url in enumerate(urls, 1):
-            print(f"\nProcesando página {i}/{len(urls)}")
-            productos_pagina = self.scrapear_pagina_dbs(url)
-            todos_productos.extend(productos_pagina)
+        for pagina in range(1, max_paginas + 1):
+            url = f"https://www.dbs.cl/maquillaje/{categoria}?p={pagina}"
+            productos = self.scrapear_pagina_dbs(url)
+            todos_productos.extend(productos)
             
-            if i < len(urls):
-                print(f"Esperando {delay} segundos...")
-                time.sleep(delay)
+            # Usar WebDriverWait en lugar de time.sleep
+            if pagina < max_paginas:
+                try:
+                    WebDriverWait(self.driver, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, '.product-item'))
+                    )
+                except:
+                    time.sleep(delay)
         
-        print(f"\nTotal de productos extraídos: {len(todos_productos)}")
         return todos_productos
-    
+
     def close(self):
         if self.driver:
             self.driver.quit()
-            print("Driver cerrado")
+
+
+def obtener_info_paginacion(categoria: str, headless: bool = True) -> dict:
+    scraper = DBSSeleniumScraper(headless=headless)
+    try:
+        total_paginas = scraper.obtener_total_paginas(categoria)
+        return {
+            'categoria': categoria,
+            'total_paginas': total_paginas
+        }
+    finally:
+        scraper.close()
 
 
 def scrapear_pagina_dbs(categoria: str, pagina: int = 1, headless: bool = True) -> List[DBSProduct]:
     scraper = DBSSeleniumScraper(headless=headless)
     try:
-        url = f"https://www.dbs.cl/{categoria}" if pagina == 1 else f"https://www.dbs.cl/{categoria}?page={pagina}"
+        url = f"https://www.dbs.cl/maquillaje/{categoria}?p={pagina}"
         return scraper.scrapear_pagina_dbs(url)
     finally:
         scraper.close()
 
 
-def scrapear_catalogo_dbs(categoria: str, max_paginas: int = None, delay: float = 3.0, headless: bool = True) -> List[DBSProduct]:
+def scrapear_catalogo_dbs(categoria: str, max_paginas: int = None, delay: float = 1.0, headless: bool = True) -> List[DBSProduct]:
     scraper = DBSSeleniumScraper(headless=headless)
     try:
         if max_paginas is None:
-            print(f"Detectando total de páginas para {categoria}...")
-            max_paginas = scraper._detectar_total_paginas(categoria)
-        else:
-            print(f"Usando {max_paginas} páginas para {categoria}")
+            max_paginas = scraper.obtener_total_paginas(categoria)
         
-        urls = [f"https://www.dbs.cl/{categoria}" if pagina == 1 else f"https://www.dbs.cl/{categoria}?page={pagina}" 
-                for pagina in range(1, max_paginas + 1)]
-        
-        print(f"Iniciando scraping de {len(urls)} páginas de {categoria}")
-        return scraper.scrapear_catalogo_dbs(urls, delay)
+        urls = [f"https://www.dbs.cl/maquillaje/{categoria}?p={i}" for i in range(1, max_paginas + 1)]
+        return scraper.scrapear_catalogo_dbs(categoria, max_paginas, delay)
     finally:
         scraper.close()
 
 
-def scrapear_todas_categorias(headless: bool = True, guardar_json: bool = True) -> dict:
-    print("SCRAPING COMPLETO DE DBS")
-    print("=" * 50)
+def scrapear_todas_categorias(headless=True, max_paginas_por_categoria=5):
+    scraper = DBSSeleniumScraper(headless=headless)
     
-    categorias = ['maquillaje', 'skincare']
-    resultados = {}
-    
-    for categoria in categorias:
-        print(f"\nSCRAPING COMPLETO DE {categoria.upper()}")
-        print("-" * 40)
-        productos = scrapear_catalogo_dbs(categoria, max_paginas=None, headless=headless)
-        resultados[categoria] = productos
-        print(f"{categoria.capitalize()}: {len(productos)} productos")
-    
-    # Resumen final
-    total_productos = sum(len(productos) for productos in resultados.values())
-    print(f"\nRESUMEN FINAL:")
-    print(f"Total de productos extraídos: {total_productos}")
-    for categoria, productos in resultados.items():
-        print(f"{categoria.capitalize()}: {len(productos)} productos")
-    
-    if guardar_json:
-        guardar_resultados_json(resultados)
-    
-    return resultados
-
-
-def guardar_resultados_json(resultados: dict, nombre_archivo: str = "dbs_productos.json"):
     try:
-        total_productos = sum(len(productos) for productos in resultados.values())
+        resultados = {}
+        categorias = ['maquillaje', 'skincare']
         
-        datos_json = {
-            'fecha_extraccion': time.strftime("%Y-%m-%d %H:%M:%S"),
-            'total_productos': total_productos,
-        }
-        
-        # Agregar datos de cada categoría
-        for categoria, productos in resultados.items():
-            datos_json[categoria] = {
-                'cantidad': len(productos),
-                'productos': [producto.to_dict() for producto in productos]
+        for categoria in categorias:
+            print(f"Scrapeando categoría: {categoria}")
+            productos_categoria = scraper.scrapear_catalogo_dbs(categoria, max_paginas=max_paginas_por_categoria)
+            resultados[categoria] = {
+                'cantidad': len(productos_categoria),
+                'productos': [producto.to_dict() for producto in productos_categoria]
             }
         
-        # Guardar archivo JSON
-        with open(nombre_archivo, 'w', encoding='utf-8') as f:
-            json.dump(datos_json, f, ensure_ascii=False, indent=2)
+        from datetime import datetime
+        data_completa = {
+            'fecha_extraccion': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'total_productos': sum(cat['cantidad'] for cat in resultados.values()),
+            **resultados
+        }
         
-        print(f"\nARCHIVO JSON GUARDADO:")
-        print(f"Ubicación: {nombre_archivo}")
-        print(f"Total de productos: {datos_json['total_productos']}")
-        for categoria, datos in datos_json.items():
-            if categoria != 'fecha_extraccion' and categoria != 'total_productos':
-                print(f"{categoria.capitalize()}: {datos['cantidad']} productos")
+        guardar_resultados_json(data_completa)
+        return data_completa
         
-    except Exception as e:
-        print(f"Error al guardar JSON: {e}")
+    finally:
+        scraper.close()
 
 
-if __name__ == "__main__":
-    print("SCRAPING COMPLETO DE DBS")
-    print("=" * 50)
+def guardar_resultados_json(resultados, nombre_archivo="dbs_productos.json"):
+    os.makedirs("scraper/data", exist_ok=True)
+    ruta_archivo = os.path.join("scraper/data", nombre_archivo)
     
-    resultados = scrapear_todas_categorias(headless=True)
+    with open(ruta_archivo, 'w', encoding='utf-8') as f:
+        json.dump(resultados, f, ensure_ascii=False, indent=2)
     
-    print(f"\nEJEMPLOS DE PRODUCTOS:")
-    for categoria, productos in resultados.items():
-        print(f"\n{categoria.capitalize()} (primeros 3):")
-        for i, producto in enumerate(productos[:3], 1):
-            print(f"{i}. {producto}")
+    print(f"Datos guardados en: {ruta_archivo}")
+    return ruta_archivo
+
+
+def inspeccionar_pagina_dbs(categoria: str = "maquillaje"):
+    """Función para inspeccionar la estructura HTML de DBS"""
+    scraper = DBSSeleniumScraper(headless=False)  # headless=False para ver el navegador
     
-    print(f"\nScraping completo finalizado!") 
+    try:
+        url = f"https://www.dbs.cl/maquillaje/{categoria}"
+        soup = scraper._get_page_with_selenium(url)
+        
+        if soup:
+            print(f"=== INSPECCIÓN DE PÁGINA: {url} ===")
+            
+            # Buscar elementos de paginación
+            pagination_elements = soup.select('.pagination, .pager, .toolbar, .toolbar-text, .toolbar-info')
+            print(f"Elementos de paginación encontrados: {len(pagination_elements)}")
+            
+            for i, elem in enumerate(pagination_elements[:3]):  # Solo los primeros 3
+                print(f"Elemento {i+1}: {elem.get_text(strip=True)}")
+            
+            # Buscar productos
+            product_elements = soup.select('.product-item, .product, [data-product]')
+            print(f"Productos encontrados en esta página: {len(product_elements)}")
+            
+            # Buscar imágenes
+            img_elements = soup.select('img[src*="dbs.cl"]')
+            print(f"Imágenes con dbs.cl encontradas: {len(img_elements)}")
+            
+            if img_elements:
+                print("Primeras 3 URLs de imágenes:")
+                for i, img in enumerate(img_elements[:3]):
+                    src = img.get('src', '')
+                    print(f"  {i+1}: {src}")
+        
+        input("Presiona Enter para continuar...")
+        
+    finally:
+        scraper.close()
+
+
+def probar_deteccion_paginas(categoria: str = "maquillaje"):
+    """Función para probar la detección de páginas"""
+    scraper = DBSSeleniumScraper(headless=True)
+    
+    try:
+        url = f"https://www.dbs.cl/maquillaje/{categoria}"
+        soup = scraper._get_page_with_selenium(url)
+        
+        if soup:
+            print(f"=== PRUEBA DE DETECCIÓN: {url} ===")
+            
+            # Buscar todos los elementos que podrían contener el total
+            all_text = soup.get_text()
+            print("Texto completo de la página (primeros 1000 caracteres):")
+            print(all_text[:1000])
+            
+            # Buscar específicamente el patrón que vimos
+            import re
+            patterns = [
+                r'Artículos\s*\d+-\d+\s*de\s*([\d,]+)',
+                r'Artículos\d+-\d+de([\d,]+)',
+                r'de\s+([\d,]+)\s+productos',
+                r'(\d+)\s+productos'
+            ]
+            
+            for i, pattern in enumerate(patterns):
+                matches = re.findall(pattern, all_text)
+                print(f"Patrón {i+1}: {pattern}")
+                print(f"  Encontrados: {matches}")
+            
+            # Buscar elementos específicos
+            toolbar_elements = soup.select('.toolbar, .toolbar-text, .toolbar-info')
+            print(f"\nElementos de toolbar encontrados: {len(toolbar_elements)}")
+            for i, elem in enumerate(toolbar_elements):
+                text = elem.get_text(strip=True)
+                print(f"  Elemento {i+1}: '{text}'")
+        
+    finally:
+        scraper.close() 

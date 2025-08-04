@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { productService } from '../services/api';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -10,8 +10,8 @@ const ProductList = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await api.get('productos/');
-        setProducts(response.data);
+        const response = await productService.getProducts();
+        setProducts(response.productos || []);
         setError(null);
       } catch (err) {
         console.error('Error fetching products:', err);
@@ -52,10 +52,10 @@ const ProductList = () => {
           {products.map((product) => (
             <div key={product.id} className="product-card">
               <h3>{product.nombre}</h3>
-              <p><strong>Descripción:</strong> {product.descripcion}</p>
+              <p><strong>Marca:</strong> {product.marca}</p>
               <p><strong>Precio:</strong> ${product.precio}</p>
               <p><strong>Categoría:</strong> {product.categoria}</p>
-              <p><strong>Stock:</strong> {product.stock}</p>
+              <p><strong>Stock:</strong> {product.stock ? 'Disponible' : 'No disponible'}</p>
             </div>
           ))}
         </div>

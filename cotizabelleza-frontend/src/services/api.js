@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuración base de axios
-const API_BASE_URL = 'http://localhost:8000/api/';
+const API_BASE_URL = '/api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -65,8 +65,9 @@ export const productService = {
       if (filters.categoria) params.append('categoria', filters.categoria);
       if (filters.tienda) params.append('tienda', filters.tienda);
       if (filters.search) params.append('search', filters.search);
+      if (filters.marca) params.append('marca', filters.marca);
       
-      const response = await api.get(`productos/?${params.toString()}`);
+      const response = await api.get(`productos-dbs/?${params.toString()}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -88,7 +89,7 @@ export const productService = {
   // Buscar productos
   searchProducts: async (searchTerm) => {
     try {
-      const response = await api.get(`productos/?search=${encodeURIComponent(searchTerm)}`);
+      const response = await api.get(`productos-dbs/?search=${encodeURIComponent(searchTerm)}`);
       return response.data;
     } catch (error) {
       console.error('Error searching products:', error);
