@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './DBSProductos.css';
 
 const DBSProductos = () => {
+    const navigate = useNavigate();
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -192,7 +194,12 @@ const DBSProductos = () => {
 
                 <div className="productos-grid">
                     {productos.map(producto => (
-                        <div key={producto.id} className="producto-card">
+                        <div 
+                            key={producto.id} 
+                            className="producto-card"
+                            onClick={() => navigate(`/detalle-producto/${producto.id}`)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <div className="producto-imagen">
                                 <img 
                                     src={getImageUrl(producto)} 

@@ -8,6 +8,7 @@ urlpatterns = [
     path('dashboard/', views.DashboardAPIView.as_view(), name='dashboard'),
     path('productos/', views.ProductoListAPIView.as_view(), name='productos-list'),
     path('productos-dbs/', views.DBSProductosAPIView.as_view(), name='productos-dbs'),
+    path('productos-dbs/<int:producto_id>/', views.ProductoDetalleAPIView.as_view(), name='producto-detalle'),
     path('categorias/', views.CategoriaListAPIView.as_view(), name='categorias-list'),
     path('tiendas/', views.TiendaListAPIView.as_view(), name='tiendas-list'),
     path('precios/', views.PreciosPorProductoAPIView.as_view(), name='precios-producto'),

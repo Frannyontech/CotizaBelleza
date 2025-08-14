@@ -195,6 +195,55 @@ class PreciosPorProductoAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+class ProductoDetalleAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, producto_id):
+        try:
+            producto = Producto.objects.get(id=producto_id)
+            
+            precios_producto = PrecioProducto.objects.filter(
+                producto=producto,
+                stock=True
+            ).select_related('tienda')
+            
+            precio_min = precios_producto.aggregate(Min('precio'))['precio__min']
+            precio_max = precios_producto.aggregate(Max('precio'))['precio__max']
+            tiendas_disponibles = [p.tienda.nombre for p in precios_producto]
+            
+            # Obtener el stock del primer precio disponible
+            stock_disponible = precios_producto.filter(stock=True).exists()
+            
+            producto_data = {
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'marca': producto.marca or '',
+                'categoria': producto.categoria.nombre if producto.categoria else '',
+                'descripcion': producto.descripcion or '',
+                'precio': float(precio_min) if precio_min else 0,
+                'precio_min': float(precio_min) if precio_min else 0,
+                'precio_max': float(precio_max) if precio_max else 0,
+                'precio_original': float(precio_max) if precio_max else 0,
+                'stock': 'In stock' if stock_disponible else 'Out of stock',
+                'url': precios_producto.first().url_producto if precios_producto.exists() else '',
+                'imagen_url': producto.imagen_url or '',
+                'tiendas_disponibles': tiendas_disponibles,
+                'num_precios': precios_producto.count()
+            }
+            
+            return Response(producto_data, status=status.HTTP_200_OK)
+            
+        except Producto.DoesNotExist:
+            return Response(
+                {"error": "Producto no encontrado"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener el producto: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 class DBSProductosAPIView(APIView):
     permission_classes = [AllowAny]
     

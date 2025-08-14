@@ -67,10 +67,13 @@ export const productService = {
       if (filters.search) params.append('search', filters.search);
       if (filters.marca) params.append('marca', filters.marca);
       
+      console.log('Making API request to:', `productos-dbs/?${params.toString()}`);
       const response = await api.get(`productos-dbs/?${params.toString()}`);
+      console.log('API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
+      console.error('Error details:', error.response?.data || error.message);
       throw error;
     }
   },

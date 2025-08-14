@@ -1,13 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Layout, Input, Button, Space, Typography, Badge } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  SearchOutlined,
   AppstoreOutlined,
-  HeartOutlined,
-  BellOutlined,
-  UserOutlined,
-  ShopOutlined
+  UserOutlined
 } from '@ant-design/icons';
 import './Navbar.css';
 
@@ -17,6 +13,17 @@ const { Search } = Input;
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (value) => {
+    console.log('Search triggered with value:', value);
+    if (value && value.trim()) {
+      const searchUrl = `/search?search=${encodeURIComponent(value.trim())}`;
+      console.log('Navigating to:', searchUrl);
+      navigate(searchUrl);
+    }
+  };
 
   return (
     <Header className="navbar-header">
@@ -39,7 +46,12 @@ const Navbar = () => {
             allowClear
             size="large"
             className="search-input"
-            suffix={<SearchOutlined style={{ color: '#ff69b4' }} />}
+            value={searchTerm}
+            onChange={(e) => {
+              console.log('Search input changed:', e.target.value);
+              setSearchTerm(e.target.value);
+            }}
+            onSearch={handleSearch}
           />
         </div>
 
@@ -50,29 +62,6 @@ const Navbar = () => {
               <div className="nav-icon-item">
                 <AppstoreOutlined className="nav-icon" />
                 <span className="nav-label">Categorías</span>
-              </div>
-            </Link>
-            
-            <Link to="/productos-dbs" className="nav-icon-link">
-              <div className="nav-icon-item">
-                <ShopOutlined className="nav-icon" />
-                <span className="nav-label">DBS</span>
-              </div>
-            </Link>
-            
-            <Link to="/favoritos" className="nav-icon-link">
-              <div className="nav-icon-item">
-                <HeartOutlined className="nav-icon" />
-                <span className="nav-label">Favoritos</span>
-              </div>
-            </Link>
-            
-            <Link to="/alertas" className="nav-icon-link">
-              <div className="nav-icon-item">
-                <Badge count={3} size="small">
-                  <BellOutlined className="nav-icon" />
-                </Badge>
-                <span className="nav-label">Alertas</span>
               </div>
             </Link>
             
