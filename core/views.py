@@ -209,7 +209,17 @@ class ProductoDetalleAPIView(APIView):
             
             precio_min = precios_producto.aggregate(Min('precio'))['precio__min']
             precio_max = precios_producto.aggregate(Max('precio'))['precio__max']
-            tiendas_disponibles = [p.tienda.nombre for p in precios_producto]
+            
+            # Obtener información detallada de cada tienda
+            tiendas_detalladas = []
+            for precio in precios_producto:
+                tiendas_detalladas.append({
+                    'nombre': precio.tienda.nombre,
+                    'precio': float(precio.precio),
+                    'stock': precio.stock,
+                    'url_producto': precio.url_producto or '',
+                    'fecha_extraccion': precio.fecha_extraccion.isoformat()
+                })
             
             # Obtener el stock del primer precio disponible
             stock_disponible = precios_producto.filter(stock=True).exists()
@@ -227,7 +237,8 @@ class ProductoDetalleAPIView(APIView):
                 'stock': 'In stock' if stock_disponible else 'Out of stock',
                 'url': precios_producto.first().url_producto if precios_producto.exists() else '',
                 'imagen_url': producto.imagen_url or '',
-                'tiendas_disponibles': tiendas_disponibles,
+                'tiendas_disponibles': [p.tienda.nombre for p in precios_producto],
+                'tiendas_detalladas': tiendas_detalladas,
                 'num_precios': precios_producto.count()
             }
             
