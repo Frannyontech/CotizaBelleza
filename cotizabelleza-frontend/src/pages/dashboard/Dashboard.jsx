@@ -20,6 +20,7 @@ import {
   BellOutlined
 } from '@ant-design/icons';
 import { dashboardService, categoryService, storeService } from '../../services/api';
+import { processCategoriesForFrontend, processStoresForFrontend } from '../../utils/normalizeHelpers';
 import './Dashboard.css';
 
 const { Content } = Layout;
@@ -86,8 +87,8 @@ const Dashboard = () => {
 
   // Obtener datos procesados
   const popularProducts = dashboardData?.productos_populares || [];
-  const categoriesList = categories.length > 0 ? ['Todos', ...categories.map(cat => cat.nombre || cat)] : ['Todos'];
-  const storesList = stores.length > 0 ? ['Todas', ...stores.map(store => store.nombre || store)] : ['Todas'];
+  const categoriesList = processCategoriesForFrontend(categories);
+  const storesList = processStoresForFrontend(stores);
 
   // Datos de beneficios
   const benefits = [
