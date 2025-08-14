@@ -13,4 +13,5 @@ urlpatterns = [
     path('tiendas/', views.TiendaListAPIView.as_view(), name='tiendas-list'),
     path('precios/', views.PreciosPorProductoAPIView.as_view(), name='precios-producto'),
     path('usuarios/', views.UsuarioCreateAPIView.as_view(), name='usuario-create'),
+    path('alertas-precio/', views.AlertaPrecioCreateAPIView.as_view(), name='alerta-precio-create'),
 ] 

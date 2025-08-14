@@ -7,10 +7,10 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.db.models import Min, Max, Count, Avg
-from .models import Producto, PrecioProducto, Categoria, Tienda
+from .models import Producto, PrecioProducto, Categoria, Tienda, AlertaPrecio
 from .serializers import (
     ProductoSerializer, PrecioProductoSerializer, 
-    UserSerializer, CategoriaSerializer, TiendaSerializer
+    UserSerializer, CategoriaSerializer, TiendaSerializer, AlertaPrecioSerializer
 )
 
 
@@ -353,3 +353,50 @@ class UsuarioCreateAPIView(APIView):
             )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AlertaPrecioCreateAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        try:
+            producto_id = request.data.get('producto_id')
+            email = request.data.get('email')
+            
+            if not producto_id or not email:
+                return Response(
+                    {"error": "Se requiere producto_id y email"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Verificar que el producto existe
+            try:
+                producto = Producto.objects.get(id=producto_id)
+            except Producto.DoesNotExist:
+                return Response(
+                    {"error": "Producto no encontrado"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Verificar si ya existe una alerta para este email y producto
+            if AlertaPrecio.objects.filter(producto=producto, email=email).exists():
+                return Response(
+                    {"error": "Ya existe una alerta para este email y producto"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Crear la alerta
+            alerta = AlertaPrecio.objects.create(
+                producto=producto,
+                email=email
+            )
+            
+            return Response({
+                "message": "Alerta de precio creada exitosamente",
+                "alerta": AlertaPrecioSerializer(alerta).data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error al crear la alerta: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

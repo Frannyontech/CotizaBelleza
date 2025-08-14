@@ -21,6 +21,7 @@ import {
   ArrowDownOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
+import PriceAlertModal from '../../components/PriceAlertModal';
 import './DetalleProducto.css';
 
 const { Content } = Layout;
@@ -31,6 +32,7 @@ const DetalleProducto = () => {
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchProducto = async () => {
@@ -178,6 +180,7 @@ const DetalleProducto = () => {
                     size="large" 
                     icon={<BellOutlined />}
                     className="alert-button"
+                    onClick={() => setModalVisible(true)}
                   >
                     Activar alerta de precio
                   </Button>
@@ -265,6 +268,13 @@ const DetalleProducto = () => {
           </div>
         </div>
       </Content>
+      
+      {/* Price Alert Modal */}
+      <PriceAlertModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        producto={producto}
+      />
     </Layout>
   );
 };
