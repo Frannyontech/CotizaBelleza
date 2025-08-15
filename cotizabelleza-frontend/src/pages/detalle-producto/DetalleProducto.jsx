@@ -23,6 +23,7 @@ import {
 import axios from 'axios';
 import PriceAlertModal from '../../components/PriceAlertModal';
 import StoreComparison from '../../components/StoreComparison';
+import ProductReviews from '../../components/ProductReviews';
 import './DetalleProducto.css';
 
 const { Content } = Layout;
@@ -206,6 +207,9 @@ const DetalleProducto = () => {
           formatPrice={formatPrice}
           calculateDiscount={calculateDiscount}
         />
+
+        {/* Product Reviews Section */}
+        <ProductReviews productId={id} />
       </Content>
       
       {/* Price Alert Modal */}

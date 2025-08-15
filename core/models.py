@@ -78,6 +78,7 @@ class Resena(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
     comentario = models.TextField()
+    nombre_autor = models.CharField(max_length=100, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:

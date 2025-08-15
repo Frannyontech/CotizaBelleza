@@ -136,10 +136,7 @@ const Dashboard = () => {
               <div className="carousel-content">
                 <h2>Revisa los productos disponibles</h2>
                 <p>Ya disponibles en Chile</p>
-                <Button type="primary" size="large">
-              Ver productos
-            </Button>
-          </div>
+              </div>
             </div>
           </div>
           <div>
@@ -155,11 +152,8 @@ const Dashboard = () => {
               <div className="carousel-content">
                 <h2>Ofertas especiales</h2>
                 <p>Hasta 50% de descuento</p>
-                <Button type="primary" size="large">
-                  Ver productos
-                </Button>
-          </div>
-        </div>
+              </div>
+            </div>
           </div>
           <div>
             <div className="carousel-slide">
@@ -174,9 +168,6 @@ const Dashboard = () => {
               <div className="carousel-content">
                 <h2>Productos destacados</h2>
                 <p>Las mejores marcas de belleza</p>
-                <Button type="primary" size="large">
-                  Explorar
-                </Button>
               </div>
             </div>
         </div>

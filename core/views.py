@@ -7,10 +7,10 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.db.models import Min, Max, Count, Avg
-from .models import Producto, PrecioProducto, Categoria, Tienda, AlertaPrecio
+from .models import Producto, PrecioProducto, Categoria, Tienda, AlertaPrecio, Resena
 from .serializers import (
     ProductoSerializer, PrecioProductoSerializer, 
-    UserSerializer, CategoriaSerializer, TiendaSerializer, AlertaPrecioSerializer
+    UserSerializer, CategoriaSerializer, TiendaSerializer, AlertaPrecioSerializer, ResenaSerializer
 )
 
 
@@ -398,5 +398,138 @@ class AlertaPrecioCreateAPIView(APIView):
         except Exception as e:
             return Response(
                 {"error": f"Error al crear la alerta: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class ProductoResenasAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, producto_id):
+        try:
+            # Verificar que el producto existe
+            try:
+                producto = Producto.objects.get(id=producto_id)
+            except Producto.DoesNotExist:
+                return Response(
+                    {"error": "Producto no encontrado"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Obtener las reseñas del producto (ordenadas por fecha descendente)
+            resenas = Resena.objects.filter(producto=producto).order_by('-fecha_creacion')
+            
+            # Calcular estadísticas
+            total_resenas = resenas.count()
+            if total_resenas > 0:
+                promedio_valoracion = resenas.aggregate(promedio=Avg('valoracion'))['promedio']
+                promedio_valoracion = round(promedio_valoracion, 1) if promedio_valoracion else 0
+            else:
+                promedio_valoracion = 0
+            
+            # Serializar las 3 reseñas más recientes para la vista de detalle
+            resenas_recientes = resenas[:3]
+            resenas_serializer = ResenaSerializer(resenas_recientes, many=True)
+            
+            return Response({
+                "producto_id": producto_id,
+                "total_resenas": total_resenas,
+                "promedio_valoracion": promedio_valoracion,
+                "resenas_recientes": resenas_serializer.data,
+                "todas_resenas": ResenaSerializer(resenas, many=True).data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener las reseñas: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def post(self, request, producto_id):
+        try:
+            # Verificar que el producto existe
+            try:
+                producto = Producto.objects.get(id=producto_id)
+            except Producto.DoesNotExist:
+                return Response(
+                    {"error": "Producto no encontrado"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Obtener datos de la reseña
+            valoracion = request.data.get('valoracion')
+            comentario = request.data.get('comentario')
+            autor = request.data.get('autor')
+            
+            # Validaciones básicas
+            if not valoracion or not comentario:
+                return Response(
+                    {"error": "Se requiere valoración y comentario"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if not (1 <= valoracion <= 5):
+                return Response(
+                    {"error": "La valoración debe estar entre 1 y 5"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if len(comentario.strip()) < 10:
+                return Response(
+                    {"error": "El comentario debe tener al menos 10 caracteres"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Crear usuario anónimo si no se proporciona autor
+            if not autor:
+                # Crear o obtener un usuario anónimo genérico
+                usuario_anonimo, created = User.objects.get_or_create(
+                    username=f'anonimo_{producto_id}_{len(comentario)}',
+                    defaults={
+                        'first_name': 'Usuario',
+                        'last_name': 'Anónimo',
+                        'email': f'anonimo{producto_id}@example.com'
+                    }
+                )
+                usuario = usuario_anonimo
+            else:
+                # Crear usuario temporal con el nombre proporcionado
+                usuario_temp, created = User.objects.get_or_create(
+                    username=f'temp_{autor.replace(" ", "_").lower()}_{producto_id}',
+                    defaults={
+                        'first_name': autor.split(' ')[0] if ' ' in autor else autor,
+                        'last_name': ' '.join(autor.split(' ')[1:]) if ' ' in autor else '',
+                        'email': f'temp_{autor.replace(" ", "_").lower()}@example.com'
+                    }
+                )
+                usuario = usuario_temp
+            
+            # Verificar si ya existe una reseña de este usuario para este producto
+            resena_existente = Resena.objects.filter(producto=producto, usuario=usuario).first()
+            if resena_existente:
+                return Response(
+                    {"error": "Ya has escrito una reseña para este producto"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Crear la reseña
+            resena = Resena.objects.create(
+                producto=producto,
+                usuario=usuario,
+                valoracion=valoracion,
+                comentario=comentario.strip(),
+                nombre_autor=autor  # Guardar el nombre original del autor
+            )
+            
+            # Serializar y retornar la reseña creada
+            resena_serializer = ResenaSerializer(resena)
+            
+            return Response({
+                "message": "Reseña creada exitosamente",
+                "resena": resena_serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error al crear la reseña: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
