@@ -40,7 +40,49 @@ const DetalleProducto = () => {
     const fetchProducto = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/productos-dbs/${id}/`);
+        
+        // Detectar si es un producto de Preunic o DBS basándose en el ID
+        const isPreunicProduct = id && id.startsWith('preunic_');
+        
+        let response;
+        if (isPreunicProduct) {
+          // Para Preunic, necesitamos buscar el producto por ID
+          const searchResponse = await axios.get(`/api/productos-preunic/`);
+          const productos = searchResponse.data.productos || [];
+          const producto = productos.find(p => p.id === id);
+          
+          if (!producto) {
+            throw new Error('Producto no encontrado');
+          }
+          
+          // Adaptar el formato para que sea compatible con el resto del componente
+          response = {
+            data: {
+              id: producto.id,
+              nombre: producto.nombre,
+              marca: producto.marca || '',
+              categoria: producto.categoria,
+              precio: producto.precio,
+              stock: producto.stock,
+              url_producto: producto.url_producto,
+              imagen_url: producto.imagen_url,
+              descripcion: producto.descripcion || producto.nombre,
+              tienda: 'PREUNIC',
+              tiendas_disponibles: ['PREUNIC'],
+              tiendas_detalladas: [{
+                tienda: 'PREUNIC',
+                precio: producto.precio,
+                stock: producto.stock,
+                url_producto: producto.url_producto
+              }],
+              num_precios: 1
+            }
+          };
+        } else {
+          // Para DBS, usar la API existente
+          response = await axios.get(`/api/productos-dbs/${id}/`);
+        }
+        
         setProducto(response.data);
       } catch (error) {
         console.error('Error fetching producto:', error);
@@ -59,12 +101,17 @@ const DetalleProducto = () => {
     if (!imagenUrl || imagenUrl === '') {
       return '/image-not-found.png';
     }
-    if (imagenUrl.startsWith('http') && imagenUrl.includes('dbs.cl')) {
+    
+    // Si la URL ya es completa (incluyendo Preunic), usarla directamente
+    if (imagenUrl.startsWith('http')) {
       return imagenUrl;
     }
+    
+    // Si es una ruta relativa, agregar el dominio de DBS
     if (imagenUrl.startsWith('/')) {
       return `https://dbs.cl${imagenUrl}`;
     }
+    
     return '/image-not-found.png';
   };
 
@@ -133,7 +180,22 @@ const DetalleProducto = () => {
             {/* Product Details */}
             <Col xs={24} md={12}>
               <div className="product-details">
-                <div className="brand-name">{producto.marca}</div>
+                <div className="brand-name">
+                  {producto.marca}
+                  {producto.tienda && (
+                    <span style={{ 
+                      marginLeft: '10px', 
+                      fontSize: '12px', 
+                      backgroundColor: producto.tienda === 'PREUNIC' ? '#f6ffed' : '#e6f7ff',
+                      color: producto.tienda === 'PREUNIC' ? '#52c41a' : '#1890ff',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontWeight: 'bold'
+                    }}>
+                      {producto.tienda === 'PREUNIC' ? '🛒 Preunic' : '🛍️ DBS'}
+                    </span>
+                  )}
+                </div>
                 <Title level={2} className="product-name">{producto.nombre}</Title>
                 
                 {/* Rating */}
@@ -177,15 +239,31 @@ const DetalleProducto = () => {
 
                 {/* Action Buttons */}
                 <div className="action-buttons">
-                  <Button 
-                    type="primary" 
-                    size="large" 
-                    icon={<BellOutlined />}
-                    className="alert-button"
-                    onClick={() => setModalVisible(true)}
-                  >
-                    Activar alerta de precio
-                  </Button>
+                  {/* Solo mostrar alerta de precio para productos DBS */}
+                  {!id.startsWith('preunic_') && (
+                    <Button 
+                      type="primary" 
+                      size="large" 
+                      icon={<BellOutlined />}
+                      className="alert-button"
+                      onClick={() => setModalVisible(true)}
+                    >
+                      Activar alerta de precio
+                    </Button>
+                  )}
+                  
+                  {/* Para productos de Preunic, mostrar botón de ir a tienda */}
+                  {id.startsWith('preunic_') && producto.url_producto && (
+                    <Button 
+                      type="primary" 
+                      size="large" 
+                      className="store-button"
+                      onClick={() => window.open(producto.url_producto, '_blank')}
+                    >
+                      🛒 Ver en Preunic
+                    </Button>
+                  )}
+                  
                   <Space className="action-icons">
                     <Button 
                       type="text" 
@@ -208,16 +286,18 @@ const DetalleProducto = () => {
           calculateDiscount={calculateDiscount}
         />
 
-        {/* Product Reviews Section */}
-        <ProductReviews productId={id} />
+        {/* Product Reviews Section - Solo para productos DBS */}
+        {!id.startsWith('preunic_') && <ProductReviews productId={id} />}
       </Content>
       
-      {/* Price Alert Modal */}
-      <PriceAlertModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        producto={producto}
-      />
+      {/* Price Alert Modal - Solo para productos DBS */}
+      {!id.startsWith('preunic_') && (
+        <PriceAlertModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          producto={producto}
+        />
+      )}
     </Layout>
   );
 };

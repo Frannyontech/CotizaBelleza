@@ -40,6 +40,11 @@
   filter: brightness(1.05);
 }
 
+/* Dropdown menu styles */
+.nav-icon-item.nav-icon-link {
+  cursor: pointer;
+}
+
 /* Logo completo - visible en pantallas medianas y grandes */
 .brand-logo-full {
   height: 50px;

@@ -321,6 +321,147 @@ class DBSProductosAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+class PREUNICProductosAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        try:
+            categoria_nombre = request.query_params.get('categoria', '')
+            search = request.query_params.get('search', '')
+            marca = request.query_params.get('marca', '')
+            
+            productos = Producto.objects.filter(
+                precios__tienda__nombre='PREUNIC'
+            ).distinct()
+            
+            if categoria_nombre:
+                productos = productos.filter(categoria__nombre=categoria_nombre)
+            
+            if search:
+                productos = productos.filter(nombre__icontains=search)
+            
+            if marca:
+                productos = productos.filter(marca__icontains=marca)
+            
+            productos_data = []
+            seen_products = set()  # Para evitar duplicados
+            
+            for producto in productos:
+                precio_preunic = PrecioProducto.objects.filter(
+                    producto=producto,
+                    tienda__nombre='PREUNIC',
+                    stock=True
+                ).first()
+                
+                if precio_preunic:
+                    # Crear clave única para evitar duplicados
+                    product_key = f"{producto.nombre}_{producto.marca}_{precio_preunic.precio}"
+                    
+                    if product_key not in seen_products:
+                        seen_products.add(product_key)
+                        
+                        productos_data.append({
+                            'id': producto.id,
+                            'nombre': producto.nombre,
+                            'marca': producto.marca or '',
+                            'categoria': producto.categoria.nombre,
+                            'precio': float(precio_preunic.precio),
+                            'stock': precio_preunic.stock,
+                            'url_producto': precio_preunic.url_producto or '',
+                            'imagen_url': producto.imagen_url or '',
+                            'descripcion': producto.descripcion or '',
+                            'tienda': 'PREUNIC',
+                            'fecha_extraccion': precio_preunic.fecha_extraccion.isoformat()
+                        })
+            
+            # Obtener categorías disponibles dinámicamente
+            categorias_disponibles = list(
+                Categoria.objects.filter(
+                    productos__precios__tienda__nombre='PREUNIC'
+                ).distinct().values_list('nombre', flat=True)
+            )
+            
+            return Response({
+                'productos': productos_data,
+                'total': len(productos_data),
+                'categorias_disponibles': categorias_disponibles,
+                'tienda': 'PREUNIC'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener productos Preunic: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class PREUNICProductoDetalleAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, producto_id):
+        try:
+            producto = Producto.objects.get(id=producto_id)
+            
+            precios_producto = PrecioProducto.objects.filter(
+                producto=producto,
+                tienda__nombre='PREUNIC',
+                stock=True
+            ).select_related('tienda')
+            
+            if not precios_producto.exists():
+                return Response(
+                    {"error": "Producto no encontrado en Preunic"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            precio_min = precios_producto.aggregate(Min('precio'))['precio__min']
+            precio_max = precios_producto.aggregate(Max('precio'))['precio__max']
+            
+            # Obtener información detallada de cada tienda
+            tiendas_detalladas = []
+            for precio in precios_producto:
+                tiendas_detalladas.append({
+                    'tienda': precio.tienda.nombre,
+                    'precio': float(precio.precio),
+                    'stock': precio.stock,
+                    'url_producto': precio.url_producto or '',
+                    'fecha_extraccion': precio.fecha_extraccion.isoformat()
+                })
+            
+            # Obtener el stock del primer precio disponible
+            stock_disponible = precios_producto.filter(stock=True).exists()
+            
+            producto_data = {
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'marca': producto.marca or '',
+                'categoria': producto.categoria.nombre if producto.categoria else '',
+                'descripcion': producto.descripcion or '',
+                'precio': float(precio_min) if precio_min else 0,
+                'precio_min': float(precio_min) if precio_min else 0,
+                'precio_max': float(precio_max) if precio_max else 0,
+                'precio_original': float(precio_max) if precio_max else 0,
+                'stock': stock_disponible,
+                'url_producto': precios_producto.first().url_producto if precios_producto.exists() else '',
+                'imagen_url': producto.imagen_url or '',
+                'tienda': 'PREUNIC',
+                'tiendas_disponibles': [p.tienda.nombre for p in precios_producto],
+                'tiendas_detalladas': tiendas_detalladas,
+                'num_precios': precios_producto.count()
+            }
+            
+            return Response(producto_data, status=status.HTTP_200_OK)
+            
+        except Producto.DoesNotExist:
+            return Response(
+                {"error": "Producto no encontrado"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener producto Preunic: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 class UsuarioCreateAPIView(APIView):
     permission_classes = [AllowAny]
     

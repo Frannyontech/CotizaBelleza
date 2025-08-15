@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Layout, Input, Button, Space, Typography, Badge } from 'antd';
+import { Layout, Input, Button, Space, Typography, Badge, Dropdown, Menu } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   AppstoreOutlined,
-  UserOutlined
+  UserOutlined,
+  ShopOutlined
 } from '@ant-design/icons';
 import logoFull from '../assets/logo_cotizabelleza.png';
 import logoThumbnail from '../assets/logo_cotizabelleza_thumbnail.png';
@@ -26,6 +27,18 @@ const Navbar = () => {
       navigate(searchUrl);
     }
   };
+
+  // Menú de tiendas
+  const storeMenu = (
+    <Menu>
+      <Menu.Item key="dbs">
+        <Link to="/productos-dbs">🛍️ DBS</Link>
+      </Menu.Item>
+      <Menu.Item key="preunic">
+        <Link to="/productos-preunic">🛒 Preunic</Link>
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <Header className="navbar-header">
@@ -75,6 +88,13 @@ const Navbar = () => {
                 <span className="nav-label">Categorías</span>
               </div>
             </Link>
+            
+            <Dropdown overlay={storeMenu} placement="bottomRight">
+              <div className="nav-icon-item nav-icon-link">
+                <ShopOutlined className="nav-icon" />
+                <span className="nav-label">Tiendas</span>
+              </div>
+            </Dropdown>
             
             <Link to="/perfil" className="nav-icon-link">
               <div className="nav-icon-item">
