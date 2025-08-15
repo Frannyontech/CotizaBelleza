@@ -137,7 +137,7 @@ const Dashboard = () => {
                 <h2>Revisa los productos disponibles</h2>
                 <p>Ya disponibles en Chile</p>
                 <Button type="primary" size="large">
-              Ver oferta
+              Ver productos
             </Button>
           </div>
             </div>
@@ -156,7 +156,7 @@ const Dashboard = () => {
                 <h2>Ofertas especiales</h2>
                 <p>Hasta 50% de descuento</p>
                 <Button type="primary" size="large">
-                  Ver ofertas
+                  Ver productos
                 </Button>
           </div>
         </div>

@@ -22,6 +22,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import PriceAlertModal from '../../components/PriceAlertModal';
+import StoreComparison from '../../components/StoreComparison';
 import './DetalleProducto.css';
 
 const { Content } = Layout;
@@ -198,75 +199,13 @@ const DetalleProducto = () => {
         </div>
 
         {/* Price Comparison Section */}
-        <div className="price-comparison-section">
-          <Title level={3} className="section-title">Comparación de precios</Title>
-          
-          <div className="stores-grid">
-            {producto.tiendas_detalladas?.map((tienda, index) => (
-              <Card key={index} className="store-card" hoverable>
-                <div className="store-info">
-                  <div className="store-header">
-                    <Text strong className="store-name">{tienda.nombre}</Text>
-                    <Tag 
-                      color={tienda.stock ? 'green' : 'red'}
-                      className="stock-tag"
-                    >
-                      {tienda.stock ? 'En stock' : 'Sin stock'}
-                    </Tag>
-                  </div>
-                  
-                  <div className="store-price">
-                    <Text className="current-price">{formatPrice(tienda.precio)}</Text>
-                    {producto.precio_original && producto.precio_original > tienda.precio && (
-                      <div className="discount-info">
-                        <Text className="original-price" delete>{formatPrice(producto.precio_original)}</Text>
-                        <Tag color="red" className="discount-tag">
-                          -{calculateDiscount(producto.precio_original, tienda.precio)}%
-                        </Tag>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <Button 
-                    type="primary" 
-                    className="go-to-store-btn"
-                    disabled={!tienda.stock}
-                    onClick={() => tienda.url_producto && window.open(tienda.url_producto, '_blank')}
-                  >
-                    Ir a tienda
-                  </Button>
-                </div>
-              </Card>
-            )) || (
-              <Card className="store-card" hoverable>
-                <div className="store-info">
-                  <div className="store-header">
-                    <Text strong className="store-name">DBS</Text>
-                    <Tag 
-                      color={producto.stock === 'In stock' ? 'green' : 'red'}
-                      className="stock-tag"
-                    >
-                      {producto.stock === 'In stock' ? 'En stock' : 'Sin stock'}
-                    </Tag>
-                  </div>
-                  
-                  <div className="store-price">
-                    <Text className="current-price">{formatPrice(producto.precio)}</Text>
-                  </div>
-                  
-                  <Button 
-                    type="primary" 
-                    className="go-to-store-btn"
-                    disabled={producto.stock !== 'In stock'}
-                    onClick={() => window.open(producto.url, '_blank')}
-                  >
-                    Ir a tienda
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
-        </div>
+        <StoreComparison
+          offers={producto.tiendas_detalladas || []}
+          productName={producto.nombre}
+          loading={loading}
+          formatPrice={formatPrice}
+          calculateDiscount={calculateDiscount}
+        />
       </Content>
       
       {/* Price Alert Modal */}

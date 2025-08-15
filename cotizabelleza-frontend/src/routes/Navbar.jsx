@@ -5,6 +5,8 @@ import {
   AppstoreOutlined,
   UserOutlined
 } from '@ant-design/icons';
+import logoFull from '../assets/logo_cotizabelleza.png';
+import logoThumbnail from '../assets/logo_cotizabelleza_thumbnail.png';
 import './Navbar.css';
 
 const { Header } = Layout;
@@ -32,9 +34,18 @@ const Navbar = () => {
         <div className="brand-section">
           <Link to="/" className="brand-link">
             <div className="brand-logo">
-              <Title level={3} className="brand-text">
-                CotizaBelleza
-              </Title>
+              {/* Logo completo para pantallas medianas y grandes */}
+              <img 
+                src={logoFull} 
+                alt="CotizaBelleza" 
+                className="brand-logo-full"
+              />
+              {/* Logo thumbnail para dispositivos móviles */}
+              <img 
+                src={logoThumbnail} 
+                alt="CotizaBelleza" 
+                className="brand-logo-thumbnail"
+              />
             </div>
           </Link>
         </div>

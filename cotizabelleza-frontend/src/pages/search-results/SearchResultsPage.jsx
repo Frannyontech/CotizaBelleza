@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
+import { 
+  Layout, 
+  Row, 
+  Col, 
+  Card, 
+  Typography, 
+  Select, 
+  Slider, 
+  Checkbox, 
+  Switch,
+  Image,
+  Skeleton,
+  Empty,
+  Pagination,
+  Collapse
+} from 'antd';
 
 const SearchResultsPage = () => {
   console.log('SearchResultsPage component mounted - SIMPLIFIED VERSION');
@@ -17,10 +33,10 @@ const SearchResultsPage = () => {
   const [selectedStores, setSelectedStores] = useState([]);
   const [selectedAvailability, setSelectedAvailability] = useState([]);
   
-  // Estados de filtros colapsables
-  const [priceExpanded, setPriceExpanded] = useState(true);
-  const [storesExpanded, setStoresExpanded] = useState(true);
-  const [availabilityExpanded, setAvailabilityExpanded] = useState(true);
+  // Destructuring de componentes Ant Design
+  const { Content } = Layout;
+  const { Title, Text, Paragraph } = Typography;
+  const { Option } = Select;
   
   console.log('Search params:', searchParams.toString());
 
@@ -78,14 +94,17 @@ const SearchResultsPage = () => {
     return '/image-not-found.png';
   };
 
-  // Manejar favoritos
-  const toggleFavorite = (productId) => {
-    setFavorites(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-  };
+  // Filtros como opciones para checkboxes
+  const storeOptions = [
+    { label: 'MAC Chile', value: 'MAC Chile' },
+    { label: 'Falabella', value: 'Falabella' },
+    { label: 'Paris', value: 'Paris' },
+    { label: 'NYX', value: 'NYX' },
+    { label: 'Revlon', value: 'Revlon' },
+    { label: 'Clinique', value: 'Clinique' },
+    { label: 'Dior', value: 'Dior' },
+    { label: 'Chanel', value: 'Chanel' }
+  ];
 
   // Ordenar productos
   const sortedProducts = [...products].sort((a, b) => {
@@ -108,16 +127,8 @@ const SearchResultsPage = () => {
   const currentProducts = sortedProducts.slice(startIndex, endIndex);
   const totalPages = Math.ceil(sortedProducts.length / pageSize);
 
-  // Opciones de tiendas
-  const storeOptions = [
-    'MAC Chile', 'Falabella', 'Paris', 'NYX', 'Revlon', 'Clinique', 'Dior', 'Chanel'
-  ];
-
-  // Opciones de disponibilidad
-  const availabilityOptions = [
-    { label: 'Disponible', value: 'disponible' },
-    { label: 'No disponible', value: 'no-disponible' }
-  ];
+  // Obtener query de búsqueda
+  const searchQuery = searchParams.get('search') || '';
 
   if (error) {
     return (
@@ -145,239 +156,195 @@ const SearchResultsPage = () => {
   }
   
   return (
-    <div className="search-results-layout">
-      {/* Sidebar de filtros */}
-      <div className="search-sider">
-        <div className="filters-container">
-          <h4 className="filters-title">Filtros</h4>
-          
-          {/* Filtro de Precio */}
-          <div className="filter-section">
-            <div 
-              className="filter-header"
-              onClick={() => setPriceExpanded(!priceExpanded)}
+    <Content style={{ background: '#f0f2f5' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 16px' }}>
+        <Row gutter={24}>
+          {/* Sidebar de filtros */}
+          <Col xs={24} lg={6}>
+            <Card 
+              title="Filtros" 
+              size="small" 
+              style={{ position: 'sticky', top: 88 }}
             >
-              <span style={{ fontWeight: 'bold' }}>Precio</span>
-              <span className={`filter-arrow ${priceExpanded ? 'expanded' : ''}`}>
-                ▼
-              </span>
-            </div>
-            {priceExpanded && (
-              <div className="filter-content">
-                <div className="price-range">
-                  <div className="price-labels">
-                    <span>$0</span>
-                    <span>$100.000</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100000"
-                    step="1000"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="price-slider"
+              {/* Filtro de Precio */}
+              <div style={{ marginBottom: 24 }}>
+                <Text strong>Precio</Text>
+                <div style={{ marginTop: 12 }}>
+                  <Slider
+                    range
+                    min={0}
+                    max={100000}
+                    step={1000}
+                    value={priceRange}
+                    onChange={setPriceRange}
+                    tooltip={{
+                      formatter: (value) => `$${value?.toLocaleString()}`
+                    }}
                   />
-                  <div className="price-inputs">
-                    <span>{priceRange[0]}</span>
-                    <span>{priceRange[1]}</span>
-                  </div>
+                  <Row justify="space-between" style={{ marginTop: 8 }}>
+                    <Text type="secondary">${priceRange[0]?.toLocaleString()}</Text>
+                    <Text type="secondary">${priceRange[1]?.toLocaleString()}</Text>
+                  </Row>
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Filtro de Tiendas */}
-          <div className="filter-section">
-            <div 
-              className="filter-header"
-              onClick={() => setStoresExpanded(!storesExpanded)}
-            >
-              <span style={{ fontWeight: 'bold' }}>Tiendas</span>
-              <span className={`filter-arrow ${storesExpanded ? 'expanded' : ''}`}>
-                ▼
-              </span>
-            </div>
-            {storesExpanded && (
-              <div className="filter-content">
-                <div className="store-checkboxes">
-                  {storeOptions.map(store => (
-                    <label key={store} style={{ display: 'block', marginBottom: '8px' }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedStores.includes(store)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedStores([...selectedStores, store]);
-                          } else {
-                            setSelectedStores(selectedStores.filter(s => s !== store));
-                          }
-                        }}
-                        style={{ marginRight: '8px' }}
-                      />
-                      {store}
-                    </label>
-                  ))}
+              {/* Filtro de Tiendas */}
+              <div style={{ marginBottom: 24 }}>
+                <Text strong>Tiendas</Text>
+                <div style={{ marginTop: 12 }}>
+                  <Checkbox.Group
+                    options={storeOptions}
+                    value={selectedStores}
+                    onChange={setSelectedStores}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+                  />
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Filtro de Disponibilidad */}
-          <div className="filter-section">
-            <div 
-              className="filter-header"
-              onClick={() => setAvailabilityExpanded(!availabilityExpanded)}
-            >
-              <span style={{ fontWeight: 'bold' }}>Disponibilidad</span>
-              <span className={`filter-arrow ${availabilityExpanded ? 'expanded' : ''}`}>
-                ▼
-              </span>
-            </div>
-            {availabilityExpanded && (
-              <div className="filter-content">
-                <div className="availability-checkboxes">
-                  {availabilityOptions.map(option => (
-                    <label key={option.value} style={{ display: 'block', marginBottom: '8px' }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedAvailability.includes(option.value)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedAvailability([...selectedAvailability, option.value]);
-                          } else {
-                            setSelectedAvailability(selectedAvailability.filter(a => a !== option.value));
-                          }
-                        }}
-                        style={{ marginRight: '8px' }}
-                      />
-                      {option.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Contenido principal */}
-      <div className="search-content">
-        <div className="results-container">
-          {/* Header de resultados */}
-          <div className="results-header">
-            <h2 className="results-title">
-              Resultados para "{searchParams.get('search') || ''}"
-            </h2>
-            <div className="sort-controls">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="sort-select"
-              >
-                <option value="price_asc">Precio: menor a mayor</option>
-                <option value="price_desc">Precio: mayor a menor</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Estados de carga y resultados */}
-          {loading ? (
-            <div className="loading-container">
-              <div className="spinner"></div>
-              <p>Cargando resultados...</p>
-            </div>
-          ) : currentProducts.length === 0 ? (
-            <div className="no-results-container">
-              <h2>🔍</h2>
-              <p>No se encontraron productos</p>
-            </div>
-          ) : (
-            <>
-              {/* Grid de productos */}
-              <div className="products-grid">
-                {currentProducts.map(product => (
-                  <div 
-                    key={product.id} 
-                    className="product-card"
+              {/* Filtro de Disponibilidad */}
+              <div style={{ marginBottom: 24 }}>
+                <Text strong>Disponibilidad</Text>
+                <div style={{ marginTop: 12 }}>
+                  <Checkbox
+                    checked={selectedAvailability.includes('disponible')}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedAvailability(['disponible']);
+                      } else {
+                        setSelectedAvailability([]);
+                      }
+                    }}
                   >
-                    {/* Icono de favorito */}
-                    <div className="favorite-icon">
-                      {favorites.includes(product.id) ? (
-                        <span 
-                          className="heart-filled"
-                          onClick={() => toggleFavorite(product.id)}
-                        >
-                          ❤️
-                        </span>
-                      ) : (
-                        <span 
-                          className="heart-outlined"
-                          onClick={() => toggleFavorite(product.id)}
-                        >
-                          🤍
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Imagen del producto */}
-                    <div className="product-image-container">
-                      <img
-                        alt={product.nombre}
-                        src={getImageUrl(product)}
-                        className="product-image"
-                        onError={(e) => {
-                          e.target.src = '/image-not-found.png';
-                        }}
-                      />
-                    </div>
-
-                    {/* Información del producto */}
-                    <div className="product-info">
-                      <div className="product-name-section">
-                        <p className="product-brand">{product.marca || 'Sin marca'}</p>
-                        <h3 className="product-name">{product.nombre}</h3>
-                      </div>
-                      
-                      <p className="product-category">{product.categoria || 'Sin categoría'}</p>
-                      
-                      <p className="product-price">
-                        {formatPrice(product.precio || product.precio_min || 0)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Paginación */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <div className="pagination">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="pagination-btn"
-                    >
-                      ←
-                    </button>
-                    <span className="pagination-info">
-                      Página {currentPage} de {totalPages}
-                    </span>
-                    <button
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="pagination-btn"
-                    >
-                      →
-                    </button>
-                  </div>
+                    Solo productos disponibles
+                  </Checkbox>
                 </div>
-              )}
-            </>
-          )}
-        </div>
+              </div>
+            </Card>
+          </Col>
+
+          {/* Contenido principal */}
+          <Col xs={24} lg={18}>
+            {/* Header de resultados */}
+            <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+              <Col>
+                <Title level={4} style={{ margin: 0 }}>
+                  Resultados para "{searchQuery}"
+                </Title>
+              </Col>
+              <Col>
+                <Select
+                  value={sortBy}
+                  onChange={setSortBy}
+                  style={{ width: 200 }}
+                  placeholder="Ordenar por"
+                >
+                  <Option value="price_asc">Precio: menor a mayor</Option>
+                  <Option value="price_desc">Precio: mayor a menor</Option>
+                </Select>
+              </Col>
+            </Row>
+
+            {/* Estados de carga y resultados */}
+            {loading ? (
+              <Row gutter={[16, 16]}>
+                {Array.from({ length: 8 }, (_, i) => (
+                  <Col xs={24} sm={12} md={8} lg={6} key={i}>
+                    <Card 
+                      hoverable
+                      cover={<Skeleton.Image style={{ height: 200 }} />}
+                    >
+                      <Skeleton active paragraph={{ rows: 2 }} />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            ) : currentProducts.length === 0 ? (
+              <Empty 
+                description="No se encontraron productos"
+                style={{ padding: '60px 0' }}
+              />
+            ) : (
+              <>
+                {/* Grid de productos */}
+                <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+                  {currentProducts.map(product => (
+                    <Col xs={24} sm={12} md={8} lg={6} key={product.id}>
+                      <Link 
+                        to={`/detalle-producto/${product.id}`}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <Card
+                          hoverable
+                          cover={
+                            <Image
+                              alt={product.nombre}
+                              src={getImageUrl(product)}
+                              style={{ 
+                                objectFit: 'contain', 
+                                height: 200,
+                                backgroundColor: '#f5f5f5'
+                              }}
+                              fallback="/image-not-found.png"
+                              preview={false}
+                            />
+                          }
+                          style={{ height: '100%' }}
+                          bodyStyle={{ padding: 16 }}
+                        >
+                          <Text 
+                            type="secondary" 
+                            style={{ fontSize: 12, display: 'block', marginBottom: 4 }}
+                          >
+                            {product.marca || 'Sin marca'}
+                          </Text>
+                          <Paragraph 
+                            ellipsis={{ rows: 2 }} 
+                            style={{ 
+                              fontSize: 14, 
+                              fontWeight: 500, 
+                              marginBottom: 8,
+                              minHeight: 40
+                            }}
+                          >
+                            {product.nombre}
+                          </Paragraph>
+                          <Text 
+                            strong 
+                            style={{ 
+                              color: '#ff4d4f', 
+                              fontSize: 16 
+                            }}
+                          >
+                            {formatPrice(product.precio || product.precio_min || 0)}
+                          </Text>
+                        </Card>
+                      </Link>
+                    </Col>
+                  ))}
+                </Row>
+
+                {/* Paginación */}
+                {totalPages > 1 && (
+                  <Row justify="center">
+                    <Pagination
+                      current={currentPage}
+                      total={sortedProducts.length}
+                      pageSize={pageSize}
+                      onChange={setCurrentPage}
+                      showSizeChanger={false}
+                      showQuickJumper={false}
+                      showTotal={(total, range) => 
+                        `${range[0]}-${range[1]} de ${total} productos`
+                      }
+                    />
+                  </Row>
+                )}
+              </>
+            )}
+          </Col>
+        </Row>
       </div>
-    </div>
+    </Content>
   );
 };
 
