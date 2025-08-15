@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Layout,
   Button,
@@ -13,19 +14,20 @@ import {
   message
 } from 'antd';
 import {
-  HeartOutlined,
   LinkOutlined,
   DollarOutlined,
   ClockCircleOutlined,
   BellOutlined
 } from '@ant-design/icons';
 import { dashboardService, categoryService, storeService } from '../../services/api';
+import { processCategoriesForFrontend, processStoresForFrontend } from '../../utils/normalizeHelpers';
 import './Dashboard.css';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedStore, setSelectedStore] = useState('Todas');
   const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ const Dashboard = () => {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
-        
+
         // Cargar datos del dashboard
         const dashboardResponse = await dashboardService.getDashboardData();
         setDashboardData(dashboardResponse);
@@ -85,8 +87,8 @@ const Dashboard = () => {
 
   // Obtener datos procesados
   const popularProducts = dashboardData?.productos_populares || [];
-  const categoriesList = categories.length > 0 ? ['Todos', ...categories.map(cat => cat.nombre || cat)] : ['Todos'];
-  const storesList = stores.length > 0 ? ['Todas', ...stores.map(store => store.nombre || store)] : ['Todas'];
+  const categoriesList = processCategoriesForFrontend(categories);
+  const storesList = processStoresForFrontend(stores);
 
   // Datos de beneficios
   const benefits = [
@@ -134,9 +136,6 @@ const Dashboard = () => {
               <div className="carousel-content">
                 <h2>Revisa los productos disponibles</h2>
                 <p>Ya disponibles en Chile</p>
-                <Button type="primary" size="large">
-                  Ver oferta
-                </Button>
               </div>
             </div>
           </div>
@@ -153,9 +152,6 @@ const Dashboard = () => {
               <div className="carousel-content">
                 <h2>Ofertas especiales</h2>
                 <p>Hasta 50% de descuento</p>
-                <Button type="primary" size="large">
-                  Ver ofertas
-                </Button>
               </div>
             </div>
           </div>
@@ -172,48 +168,45 @@ const Dashboard = () => {
               <div className="carousel-content">
                 <h2>Productos destacados</h2>
                 <p>Las mejores marcas de belleza</p>
-                <Button type="primary" size="large">
-                  Explorar
-                </Button>
               </div>
             </div>
-          </div>
+        </div>
         </Carousel>
       </div>
 
       {/* Filter Section */}
-      <div className="filter-container">
-        <div className="filter-row">
+        <div className="filter-container">
+          <div className="filter-row">
           <Text strong>Categoría:</Text>
-          <Space wrap>
-            {categoriesList.map(category => (
-              <Tag
-                key={category}
-                className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Tag>
-            ))}
-          </Space>
-        </div>
+            <Space wrap>
+              {categoriesList.map(category => (
+                <Tag
+                  key={category}
+                  className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Tag>
+              ))}
+            </Space>
+          </div>
 
-        <div className="filter-row">
-          <Text strong>Tienda:</Text>
-          <Space wrap>
-            {storesList.map(store => (
-              <Tag
-                key={store}
-                className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
-                onClick={() => setSelectedStore(store)}
-              >
-                {store}
-              </Tag>
-            ))}
-          </Space>
-          <Button type="link" className="clear-filters">
-            Limpiar filtros
-          </Button>
+          <div className="filter-row">
+            <Text strong>Tienda:</Text>
+            <Space wrap>
+              {storesList.map(store => (
+                <Tag
+                  key={store}
+                  className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
+                  onClick={() => setSelectedStore(store)}
+                >
+                  {store}
+                </Tag>
+              ))}
+            </Space>
+            <Button type="link" className="clear-filters">
+              Limpiar filtros
+            </Button>
         </div>
       </div>
 
@@ -227,50 +220,54 @@ const Dashboard = () => {
         </div>
 
         <div className="products-grid">
-          <Row gutter={[16, 16]}>
-            {popularProducts.length > 0 ? (
-              popularProducts.map(product => (
-                <Col xs={24} sm={12} md={8} lg={6} key={product.id}>
-                  <Card className="product-card" hoverable>
-                    <div className="product-header">
-                      <HeartOutlined className="favorite-icon" />
-                    </div>
-                    <div className="product-image">
-                      <img 
-                        src={getImageUrl(product)} 
-                        alt={product.nombre}
-                        onError={(e) => {
-                          e.target.src = '/src/assets/image-not-found.png';
-                        }}
-                      />
-                    </div>
-                    <div className="product-info">
-                      <Text className="product-brand">{product.marca}</Text>
-                      <Text className="product-name">{product.nombre}</Text>
-                      <Text className="product-price">
-                        Desde ${product.precio_min?.toLocaleString() || product.precio_min}
-                      </Text>
-                      <Button type="primary" size="small" className="view-more-btn">
-                        Ver más <LinkOutlined />
-                      </Button>
-                      <div className="product-stores">
-                        <Text type="secondary">Disponible en:</Text>
-                        <Text className="store-list">
-                          {product.tiendas_disponibles?.join(', ') || 'DBS'}
-                        </Text>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-              ))
-            ) : (
-              <Col span={24}>
-                <div style={{ textAlign: 'center', padding: '40px' }}>
-                  <Text type="secondary">No hay productos disponibles</Text>
+          {popularProducts.length > 0 ? (
+            popularProducts.map(product => (
+              <div 
+                key={product.id}
+                className="product-card" 
+                onClick={() => navigate(`/detalle-producto/${product.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="product-image">
+                  <img 
+                    src={getImageUrl(product)} 
+                    alt={product.nombre}
+                    onError={(e) => {
+                      e.target.src = '/src/assets/image-not-found.png';
+                    }}
+                  />
                 </div>
-              </Col>
-            )}
-          </Row>
+                <div className="product-info">
+                  <Text className="product-brand">{product.marca}</Text>
+                  <Text className="product-name">{product.nombre}</Text>
+                  <Text className="product-price">
+                    Desde ${product.precio_min?.toLocaleString() || product.precio_min}
+                  </Text>
+                  <Button 
+                    type="primary" 
+                    size="small" 
+                    className="view-more-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/detalle-producto/${product.id}`);
+                    }}
+                  >
+                    Ver más <LinkOutlined />
+                  </Button>
+                  <div className="product-stores">
+                    <Text type="secondary">Disponible en:</Text>
+                    <Text className="store-list">
+                        {product.tiendas_disponibles?.join(', ') || 'DBS'}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-products">
+              <Text type="secondary">No hay productos disponibles</Text>
+            </div>
+          )}
         </div>
       </div>
 
@@ -279,18 +276,18 @@ const Dashboard = () => {
         <div className="benefits-container">
           <Title level={2} className="benefits-title">¿Por qué elegir CotizaBelleza?</Title>
           <Row gutter={[24, 24]}>
-            {benefits.map((benefit, index) => (
+          {benefits.map((benefit, index) => (
               <Col xs={24} sm={12} md={8} key={index}>
                 <Card className="benefit-card" hoverable>
-                  <div className="benefit-icon">
-                    {benefit.icon}
-                  </div>
+                <div className="benefit-icon">
+                  {benefit.icon}
+                </div>
                   <Title level={4} className="benefit-title">{benefit.title}</Title>
                   <Text className="benefit-description">{benefit.description}</Text>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+              </Card>
+            </Col>
+          ))}
+        </Row>
         </div>
       </div>
     </Layout>

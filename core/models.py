@@ -78,6 +78,7 @@ class Resena(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
     comentario = models.TextField()
+    nombre_autor = models.CharField(max_length=100, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -115,3 +116,20 @@ class AlertaUsuario(models.Model):
     
     def __str__(self):
         return f"Alerta de {self.usuario.username} para {self.producto.nombre}"
+
+class AlertaPrecio(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='alertas_precio')
+    email = models.EmailField(max_length=255)
+    precio_objetivo = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_ultima_notificacion = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Alerta de Precio"
+        verbose_name_plural = "Alertas de Precios"
+        unique_together = ['producto', 'email']
+        ordering = ['-fecha_creacion']
+    
+    def __str__(self):
+        return f"Alerta de {self.email} para {self.producto.nombre}"

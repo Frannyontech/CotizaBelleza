@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import (
     Producto, Categoria, Tienda, PrecioProducto, 
-    Alerta, AlertaUsuario, Resena
+    Alerta, AlertaUsuario, Resena, AlertaPrecio
 )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -55,4 +55,11 @@ class AlertaUsuarioSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AlertaUsuario
+        fields = '__all__'
+
+class AlertaPrecioSerializer(serializers.ModelSerializer):
+    producto = ProductoSerializer(read_only=True)
+    
+    class Meta:
+        model = AlertaPrecio
         fields = '__all__' 

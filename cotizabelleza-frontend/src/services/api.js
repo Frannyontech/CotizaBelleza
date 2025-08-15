@@ -67,10 +67,13 @@ export const productService = {
       if (filters.search) params.append('search', filters.search);
       if (filters.marca) params.append('marca', filters.marca);
       
+      console.log('Making API request to:', `productos-dbs/?${params.toString()}`);
       const response = await api.get(`productos-dbs/?${params.toString()}`);
+      console.log('API response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
+      console.error('Error details:', error.response?.data || error.message);
       throw error;
     }
   },
@@ -93,6 +96,32 @@ export const productService = {
       return response.data;
     } catch (error) {
       console.error('Error searching products:', error);
+      throw error;
+    }
+  },
+
+  // Obtener reseñas de producto
+  getProductReviews: async (productId) => {
+    try {
+      const response = await api.get(`productos-dbs/${productId}/resenas/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching product reviews:', error);
+      throw error;
+    }
+  },
+
+  // Crear nueva reseña de producto
+  createProductReview: async (reviewData) => {
+    try {
+      const response = await api.post(`productos-dbs/${reviewData.productId}/resenas/`, {
+        valoracion: reviewData.rating,
+        comentario: reviewData.comment,
+        autor: reviewData.author
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating product review:', error);
       throw error;
     }
   }

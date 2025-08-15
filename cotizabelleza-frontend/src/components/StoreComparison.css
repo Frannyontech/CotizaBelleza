@@ -1,0 +1,259 @@
+.store-comparison-card {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+}
+
+.store-comparison-card .ant-card-head {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-bottom: none;
+  position: relative;
+}
+
+.store-comparison-card .ant-card-head::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  pointer-events: none;
+}
+
+.store-comparison-card .ant-card-head-title {
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+}
+
+.store-comparison-item {
+  padding: 20px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+  position: relative;
+}
+
+.store-comparison-item:hover {
+  background: linear-gradient(145deg, #f8faff 0%, #f0f4ff 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+  border-left: 4px solid #667eea;
+}
+
+.store-comparison-item:last-child {
+  border-bottom: none;
+}
+
+.store-comparison-item .ant-avatar {
+  border: 3px solid #e8f4fd;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.store-comparison-item:hover .ant-avatar {
+  border-color: #667eea;
+  transform: scale(1.08);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.store-comparison-item .ant-tag {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.store-comparison-item .ant-tag.ant-tag-green {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  color: white;
+}
+
+.store-comparison-item .ant-tag.ant-tag-red {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+}
+
+.store-comparison-item .ant-btn {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  font-weight: 600;
+  height: 44px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.store-comparison-item .ant-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.store-comparison-item .ant-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.store-comparison-item .ant-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #d9d9d9 0%, #bfbfbf 100%);
+  box-shadow: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .store-comparison-item {
+    padding: 12px;
+  }
+  
+  .store-comparison-item .ant-avatar {
+    margin-bottom: 8px;
+  }
+  
+  .store-comparison-item .ant-btn {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .store-comparison-card {
+    margin-bottom: 16px;
+  }
+  
+  .store-comparison-item {
+    padding: 8px;
+  }
+  
+  .store-comparison-item .ant-typography {
+    font-size: 14px !important;
+  }
+  
+  .store-comparison-item .ant-typography.ant-typography-h4 {
+    font-size: 16px !important;
+  }
+}
+
+/* Accessibility improvements */
+.store-comparison-item:focus-within {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.store-comparison-item .ant-btn:focus {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* Typography improvements */
+.store-comparison-item .ant-typography {
+  color: #2c3e50;
+}
+
+.store-comparison-item .ant-typography.ant-typography-h4 {
+  color: #667eea;
+  text-shadow: 0 1px 2px rgba(102, 126, 234, 0.1);
+}
+
+.store-comparison-item .ant-typography.ant-typography-text {
+  color: #5a6c7d;
+}
+
+.store-comparison-item .ant-typography.ant-typography-text.ant-typography-text-secondary {
+  color: #8c9bab;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .store-comparison-card {
+    border: 2px solid #000;
+  }
+  
+  .store-comparison-item {
+    border-bottom: 2px solid #000;
+  }
+  
+  .store-comparison-item .ant-tag {
+    border: 1px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .store-comparison-item,
+  .store-comparison-item .ant-avatar,
+  .store-comparison-item .ant-btn {
+    transition: none;
+  }
+  
+  .store-comparison-item:hover {
+    transform: none;
+  }
+}
+
+/* Elegant animations and effects */
+.store-comparison-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.store-comparison-item:hover::before {
+  opacity: 1;
+}
+
+/* Glass morphism effect for cards */
+.store-comparison-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Subtle glow effect on hover */
+.store-comparison-item:hover .ant-typography.ant-typography-h4 {
+  text-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Enhanced button states */
+.store-comparison-item .ant-btn:not(:disabled):hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.store-comparison-item .ant-btn:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Improved tag styling */
+.store-comparison-item .ant-tag {
+  position: relative;
+  overflow: hidden;
+}
+
+.store-comparison-item .ant-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.store-comparison-item .ant-tag:hover::before {
+  left: 100%;
+}
