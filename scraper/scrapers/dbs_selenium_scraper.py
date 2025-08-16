@@ -548,7 +548,13 @@ def scrapear_todas_categorias(headless=True, max_paginas_por_categoria=5):
             **resultados
         }
         
-        guardar_resultados_json(data_completa)
+        # Guardar solo archivos separados por categoría
+        archivos_guardados = guardar_resultados_por_categoria(data_completa, "dbs")
+        print(f"\n=== RESUMEN DBS ===")
+        print(f"Total archivos generados: {len(archivos_guardados)}")
+        for archivo in archivos_guardados:
+            print(f"  - {archivo}")
+        
         return data_completa
         
     finally:
@@ -556,14 +562,61 @@ def scrapear_todas_categorias(headless=True, max_paginas_por_categoria=5):
 
 
 def guardar_resultados_json(resultados, nombre_archivo="dbs_productos.json"):
-    os.makedirs("scraper/data", exist_ok=True)
-    ruta_archivo = os.path.join("scraper/data", nombre_archivo)
+    # Obtener la ruta correcta al directorio data
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    data_dir = os.path.join(project_root, "data")
+    os.makedirs(data_dir, exist_ok=True)
+    ruta_archivo = os.path.join(data_dir, nombre_archivo)
     
     with open(ruta_archivo, 'w', encoding='utf-8') as f:
         json.dump(resultados, f, ensure_ascii=False, indent=2)
     
     print(f"Datos guardados en: {ruta_archivo}")
     return ruta_archivo
+
+def guardar_resultados_por_categoria(resultados, tienda_prefix="dbs"):
+    """
+    Guarda los resultados en archivos JSON separados por categoría
+    """
+    # Obtener la ruta correcta al directorio data
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    data_dir = os.path.join(project_root, "data")
+    os.makedirs(data_dir, exist_ok=True)
+    archivos_guardados = []
+    
+    # Extraer metadatos generales
+    metadatos = {
+        'fecha_extraccion': resultados.get('fecha_extraccion'),
+        'tienda': tienda_prefix.upper()
+    }
+    
+    # Guardar cada categoría en un archivo separado
+    for categoria, datos_categoria in resultados.items():
+        if categoria in ['fecha_extraccion', 'total_productos']:
+            continue  # Saltar metadatos
+            
+        # Crear estructura para archivo individual
+        estructura_categoria = {
+            **metadatos,
+            'categoria': categoria,
+            'total_productos': datos_categoria['cantidad'],
+            'productos': datos_categoria['productos']
+        }
+        
+        # Nombre del archivo: tienda_categoria.json
+        nombre_archivo = f"{tienda_prefix}_{categoria}.json"
+        ruta_archivo = os.path.join(data_dir, nombre_archivo)
+        
+        # Guardar archivo
+        with open(ruta_archivo, 'w', encoding='utf-8') as f:
+            json.dump(estructura_categoria, f, ensure_ascii=False, indent=2)
+        
+        print(f"Categoría '{categoria}' guardada en: {ruta_archivo}")
+        archivos_guardados.append(ruta_archivo)
+    
+    return archivos_guardados
 
 
 def inspeccionar_pagina_dbs(categoria: str = "maquillaje"):
@@ -642,4 +695,31 @@ def probar_deteccion_paginas(categoria: str = "maquillaje"):
                 print(f"  Elemento {i+1}: '{text}'")
         
     finally:
-        scraper.close() 
+        scraper.close()
+
+
+if __name__ == "__main__":
+    print("=== SCRAPER DBS - ARCHIVOS SEPARADOS POR CATEGORÍA ===")
+    print("Iniciando scraping de DBS con archivos separados...")
+    
+    # Configuración
+    headless = True  # Cambiar a False si quieres ver el navegador
+    max_paginas_por_categoria = 5  # Limitar para pruebas, usar None para todas las páginas
+    
+    try:
+        resultado = scrapear_todas_categorias(
+            headless=headless, 
+            max_paginas_por_categoria=max_paginas_por_categoria
+        )
+        
+        print(f"\n🎉 SCRAPING COMPLETADO")
+        print(f"Total productos extraídos: {resultado['total_productos']}")
+        
+        for categoria, datos in resultado.items():
+            if categoria not in ['fecha_extraccion', 'total_productos']:
+                print(f"  {categoria}: {datos['cantidad']} productos")
+        
+    except Exception as e:
+        print(f"❌ Error durante el scraping: {e}")
+        import traceback
+        traceback.print_exc()

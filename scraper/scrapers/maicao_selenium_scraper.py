@@ -578,17 +578,12 @@ def scrape_maicao_all_categories(headless: bool = True, max_pages_per_category: 
         
         print(f"TOTAL FINAL: {data_completa['total_productos']} productos")
         
-        # Guardar en archivo JSON
-        # Obtener la ruta absoluta desde el directorio del script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(script_dir)
-        output_path = os.path.join(project_root, "data", "maicao_productos.json")
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(data_completa, f, ensure_ascii=False, indent=2)
-        
-        print(f"\nProductos guardados en: {output_path}")
+        # Guardar solo archivos separados por categoría
+        archivos_guardados = guardar_resultados_por_categoria_maicao(data_completa, "maicao")
+        print(f"\n=== RESUMEN MAICAO ===")
+        print(f"Total archivos generados: {len(archivos_guardados)}")
+        for archivo in archivos_guardados:
+            print(f"  - {archivo}")
         
         return data_completa
         
@@ -599,18 +594,76 @@ def scrape_maicao_all_categories(headless: bool = True, max_pages_per_category: 
     finally:
         scraper.close()
 
-if __name__ == "__main__":
-    print("Iniciando scraper de Maicao...")
+def guardar_resultados_por_categoria_maicao(resultados, tienda_prefix="maicao"):
+    """
+    Guarda los resultados en archivos JSON separados por categoría para Maicao
+    """
+    # Obtener la ruta absoluta desde el directorio del script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    data_dir = os.path.join(project_root, "data")
+    os.makedirs(data_dir, exist_ok=True)
     
-    # Para pruebas, limitar a 2 páginas por categoría
-    # Para scraping completo, cambiar max_pages_per_category=None
+    archivos_guardados = []
+    
+    # Extraer metadatos generales
+    metadatos = {
+        'fecha_extraccion': resultados.get('fecha_extraccion'),
+        'tienda': tienda_prefix.upper()
+    }
+    
+    # Guardar cada categoría en un archivo separado
+    for categoria, datos_categoria in resultados.items():
+        if categoria in ['fecha_extraccion', 'total_productos']:
+            continue  # Saltar metadatos
+            
+        # Crear estructura para archivo individual
+        estructura_categoria = {
+            **metadatos,
+            'categoria': categoria,
+            'total_productos': datos_categoria['cantidad'],
+            'productos': datos_categoria['productos']
+        }
+        
+        # Nombre del archivo: tienda_categoria.json
+        nombre_archivo = f"{tienda_prefix}_{categoria}.json"
+        ruta_archivo = os.path.join(data_dir, nombre_archivo)
+        
+        # Guardar archivo
+        with open(ruta_archivo, 'w', encoding='utf-8') as f:
+            json.dump(estructura_categoria, f, ensure_ascii=False, indent=2)
+        
+        print(f"Categoría '{categoria}' guardada en: {ruta_archivo}")
+        archivos_guardados.append(ruta_archivo)
+    
+    return archivos_guardados
+
+if __name__ == "__main__":
+    print("=== SCRAPER MAICAO - ARCHIVOS SEPARADOS POR CATEGORÍA ===")
+    print("Iniciando scraping de Maicao con archivos separados...")
+    
+    # Configuración
     max_pages = 2  # Cambiar a None para scrapear todas las páginas
+    headless = True  # Cambiar a False si quieres ver el navegador
     
     if max_pages:
         print(f"MODO PRUEBA: Limitado a {max_pages} páginas por categoría")
     else:
         print("MODO COMPLETO: Scrapeando todas las páginas disponibles")
     
-    productos = scrape_maicao_all_categories(headless=True, max_pages_per_category=max_pages)
-    total = productos.get('total_productos', 0) if isinstance(productos, dict) else len(productos)
-    print(f"Scraping completado. Total de productos: {total}")
+    try:
+        resultado = scrape_maicao_all_categories(headless=headless, max_pages_per_category=max_pages)
+        
+        print(f"\n🎉 SCRAPING COMPLETADO")
+        total = resultado.get('total_productos', 0) if isinstance(resultado, dict) else len(resultado)
+        print(f"Total productos extraídos: {total}")
+        
+        if isinstance(resultado, dict):
+            for categoria, datos in resultado.items():
+                if categoria not in ['fecha_extraccion', 'total_productos']:
+                    print(f"  {categoria}: {datos['cantidad']} productos")
+        
+    except Exception as e:
+        print(f"❌ Error durante el scraping: {e}")
+        import traceback
+        traceback.print_exc()
