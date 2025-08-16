@@ -48,14 +48,32 @@ const SearchResultsPage = () => {
         const searchTerm = searchParams.get('search') || '';
         console.log('Searching for:', searchTerm);
         
-        const response = await fetch(`/api/productos-dbs/?search=${encodeURIComponent(searchTerm)}`);
-        const data = await response.json();
+        // Buscar en ambas tiendas en paralelo
+        const [dbsResponse, preunicResponse] = await Promise.all([
+          fetch(`/api/productos-dbs/?search=${encodeURIComponent(searchTerm)}`),
+          fetch(`/api/productos-preunic/?search=${encodeURIComponent(searchTerm)}`)
+        ]);
         
-        console.log('API Response:', data);
+        const dbsData = await dbsResponse.json();
+        const preunicData = await preunicResponse.json();
         
-        const productsData = data.productos || data || [];
-        console.log('Products data:', productsData);
-        setProducts(productsData);
+        console.log('DBS API Response:', dbsData);
+        console.log('Preunic API Response:', preunicData);
+        
+        // Combinar productos de ambas tiendas
+        const dbsProducts = (dbsData.productos || dbsData || []).map(product => ({
+          ...product,
+          tienda: 'DBS'
+        }));
+        
+        const preunicProducts = (preunicData.productos || preunicData || []).map(product => ({
+          ...product,
+          tienda: 'PREUNIC'
+        }));
+        
+        const allProducts = [...dbsProducts, ...preunicProducts];
+        console.log('Combined products data:', allProducts);
+        setProducts(allProducts);
         
       } catch (error) {
         console.error('Error loading data:', error);
@@ -96,18 +114,33 @@ const SearchResultsPage = () => {
 
   // Filtros como opciones para checkboxes
   const storeOptions = [
-    { label: 'MAC Chile', value: 'MAC Chile' },
-    { label: 'Falabella', value: 'Falabella' },
-    { label: 'Paris', value: 'Paris' },
-    { label: 'NYX', value: 'NYX' },
-    { label: 'Revlon', value: 'Revlon' },
-    { label: 'Clinique', value: 'Clinique' },
-    { label: 'Dior', value: 'Dior' },
-    { label: 'Chanel', value: 'Chanel' }
+    { label: '🛍️ DBS', value: 'DBS' },
+    { label: '🛒 Preunic', value: 'PREUNIC' }
   ];
 
-  // Ordenar productos
-  const sortedProducts = [...products].sort((a, b) => {
+  // Filtrar y ordenar productos
+  const filteredProducts = products.filter(product => {
+    const price = product.precio || product.precio_min || 0;
+    
+    // Filtrar por precio
+    if (price < priceRange[0] || price > priceRange[1]) {
+      return false;
+    }
+    
+    // Filtrar por tienda
+    if (selectedStores.length > 0 && !selectedStores.includes(product.tienda)) {
+      return false;
+    }
+    
+    // Filtrar por disponibilidad
+    if (selectedAvailability.includes('disponible') && !product.stock) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
     const priceA = a.precio || a.precio_min || 0;
     const priceB = b.precio || b.precio_min || 0;
     
@@ -230,6 +263,12 @@ const SearchResultsPage = () => {
                 <Title level={4} style={{ margin: 0 }}>
                   Resultados para "{searchQuery}"
                 </Title>
+                <Text type="secondary">
+                  {sortedProducts.length} productos encontrados
+                  {filteredProducts.length !== products.length && 
+                    ` (${products.length} productos en total)`
+                  }
+                </Text>
               </Col>
               <Col>
                 <Select
@@ -291,12 +330,26 @@ const SearchResultsPage = () => {
                           style={{ height: '100%' }}
                           bodyStyle={{ padding: 16 }}
                         >
-                          <Text 
-                            type="secondary" 
-                            style={{ fontSize: 12, display: 'block', marginBottom: 4 }}
-                          >
-                            {product.marca || 'Sin marca'}
-                          </Text>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                            <Text 
+                              type="secondary" 
+                              style={{ fontSize: 12 }}
+                            >
+                              {product.marca || 'Sin marca'}
+                            </Text>
+                            <Text 
+                              style={{ 
+                                fontSize: 11, 
+                                padding: '2px 6px', 
+                                borderRadius: '4px',
+                                backgroundColor: product.tienda === 'DBS' ? '#e6f7ff' : '#f6ffed',
+                                color: product.tienda === 'DBS' ? '#1890ff' : '#52c41a',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {product.tienda === 'DBS' ? '🛍️ DBS' : '🛒 Preunic'}
+                            </Text>
+                          </div>
                           <Paragraph 
                             ellipsis={{ rows: 2 }} 
                             style={{ 

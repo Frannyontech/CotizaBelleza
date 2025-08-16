@@ -19,7 +19,7 @@ import {
   ClockCircleOutlined,
   BellOutlined
 } from '@ant-design/icons';
-import { dashboardService, categoryService, storeService } from '../../services/api';
+import { dashboardService } from '../../services/api';
 import { processCategoriesForFrontend, processStoresForFrontend } from '../../utils/normalizeHelpers';
 import './Dashboard.css';
 
@@ -32,8 +32,6 @@ const Dashboard = () => {
   const [selectedStore, setSelectedStore] = useState('Todas');
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [stores, setStores] = useState([]);
 
   // Cargar datos del dashboard
   useEffect(() => {
@@ -44,14 +42,6 @@ const Dashboard = () => {
         // Cargar datos del dashboard
         const dashboardResponse = await dashboardService.getDashboardData();
         setDashboardData(dashboardResponse);
-
-        // Cargar categorías
-        const categoriesResponse = await categoryService.getCategories();
-        setCategories(categoriesResponse);
-
-        // Cargar tiendas
-        const storesResponse = await storeService.getStores();
-        setStores(storesResponse);
 
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -64,19 +54,19 @@ const Dashboard = () => {
     loadDashboardData();
   }, []);
 
-  // Función para obtener la URL de imagen correcta
+  // Función para obtener la URL de imagen correcta (compatible con DBS y Preunic)
   const getImageUrl = (product) => {
     // Si no hay imagen_url o está vacía, usar la imagen por defecto
     if (!product.imagen_url || product.imagen_url === '') {
       return '/image-not-found.png';
     }
     
-    // Si es una URL válida de DBS, usarla directamente
-    if (product.imagen_url.startsWith('http') && product.imagen_url.includes('dbs.cl')) {
+    // Si la URL ya es completa (incluyendo Preunic), usarla directamente
+    if (product.imagen_url.startsWith('http')) {
       return product.imagen_url;
     }
     
-    // Si es una URL relativa, agregar el dominio de DBS
+    // Si es una ruta relativa, agregar el dominio de DBS
     if (product.imagen_url.startsWith('/')) {
       return `https://dbs.cl${product.imagen_url}`;
     }
@@ -86,9 +76,34 @@ const Dashboard = () => {
   };
 
   // Obtener datos procesados
-  const popularProducts = dashboardData?.productos_populares || [];
-  const categoriesList = processCategoriesForFrontend(categories);
-  const storesList = processStoresForFrontend(stores);
+  const allPopularProducts = dashboardData?.productos_populares || [];
+  
+  // Extraer categorías y tiendas disponibles directamente de los productos
+  const categorias_unicas = [...new Set(allPopularProducts.map(product => product.categoria))];
+  const tiendas_unicas = [...new Set(allPopularProducts.flatMap(product => 
+    product.tiendas_disponibles || []
+  ))];
+  
+  const categoriesList = processCategoriesForFrontend(categorias_unicas);
+  const storesList = processStoresForFrontend(tiendas_unicas);
+
+  // Aplicar filtros a los productos populares
+  const popularProducts = allPopularProducts.filter(product => {
+    // Filtro por categoría
+    if (selectedCategory !== 'Todos' && product.categoria !== selectedCategory) {
+      return false;
+    }
+    
+    // Filtro por tienda
+    if (selectedStore !== 'Todas') {
+      // Verificar si el producto está disponible en la tienda seleccionada
+      if (!product.tiendas_disponibles || !product.tiendas_disponibles.includes(selectedStore)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
 
   // Datos de beneficios
   const benefits = [
@@ -204,7 +219,14 @@ const Dashboard = () => {
                 </Tag>
               ))}
             </Space>
-            <Button type="link" className="clear-filters">
+            <Button 
+              type="link" 
+              className="clear-filters"
+              onClick={() => {
+                setSelectedCategory('Todos');
+                setSelectedStore('Todas');
+              }}
+            >
               Limpiar filtros
             </Button>
         </div>
@@ -233,7 +255,7 @@ const Dashboard = () => {
                     src={getImageUrl(product)} 
                     alt={product.nombre}
                     onError={(e) => {
-                      e.target.src = '/src/assets/image-not-found.png';
+                      e.target.src = '/image-not-found.png';
                     }}
                   />
                 </div>

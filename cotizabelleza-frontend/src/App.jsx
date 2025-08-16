@@ -14,6 +14,7 @@ import Login from './pages/login/Login';
 import Perfil from './pages/perfil/Perfil';
 import DBSProductos from './components/DBSProductos';
 import SearchResultsPage from './pages/search-results/SearchResultsPage';
+import PreunicProductos from './components/PreunicProductos';
 
 const { Content } = Layout;
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/buscador" element={<Buscador />} />
             <Route path="/productos-dbs" element={<DBSProductos />} />
+                              <Route path="/productos-preunic" element={<PreunicProductos />} />
             <Route path="/detalle-producto/:id" element={<DetalleProducto />} />
             <Route path="/login" element={<Login />} />
             <Route path="/perfil" element={<Perfil />} />
