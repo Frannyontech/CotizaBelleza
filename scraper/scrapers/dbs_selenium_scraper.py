@@ -90,7 +90,7 @@ class DBSSeleniumScraper:
             return None
 
     def obtener_total_paginas(self, categoria: str) -> int:
-        url = f"https://www.dbs.cl/maquillaje/{categoria}"
+        url = f"https://dbs.cl/{categoria}"
         
         try:
             soup = self._get_page_with_selenium(url)
@@ -119,7 +119,7 @@ class DBSSeleniumScraper:
             print(f"Error detectando páginas para {categoria}: {e}")
             return 1
 
-    def _extract_product_info_from_element(self, product_element) -> Optional[DBSProduct]:
+    def _extract_product_info_from_element(self, product_element, categoria_pagina: str = "general") -> Optional[DBSProduct]:
         try:
             nombre = self._extract_nombre(product_element)
             marca = self._extract_marca(product_element)
@@ -127,7 +127,7 @@ class DBSSeleniumScraper:
             url = self._extract_url(product_element)
             imagen = self._extract_imagen(product_element)
             stock = self._determinar_stock(product_element)
-            categoria = self._determinar_categoria(url)
+            categoria = categoria_pagina  # Usar la categoría de la página en lugar de determinarla por URL
             
             if not nombre or len(nombre.strip()) < 3:
                 return None
@@ -400,18 +400,19 @@ class DBSSeleniumScraper:
         
         return "In stock"
 
-    def _determinar_categoria(self, url: str) -> str:
-        if 'skincare' in url:
-            return 'skincare'
-        elif 'maquillaje' in url:
-            return 'maquillaje'
-        else:
-            return 'general'
+
 
     def scrapear_pagina_dbs(self, url: str) -> List[DBSProduct]:
         soup = self._get_page_with_selenium(url)
         if not soup:
             return []
+        
+        # Determinar categoría basada en la URL de la página
+        categoria_pagina = "general"
+        if '/skincare' in url:
+            categoria_pagina = 'skincare'
+        elif '/maquillaje' in url:
+            categoria_pagina = 'maquillaje'
         
         # Usar solo selectores específicos para productos
         product_selectors = [
@@ -449,7 +450,7 @@ class DBSSeleniumScraper:
         
         productos = []
         for element in filtered_elements:
-            producto = self._extract_product_info_from_element(element)
+            producto = self._extract_product_info_from_element(element, categoria_pagina)
             if producto:
                 productos.append(producto)
         
@@ -473,7 +474,7 @@ class DBSSeleniumScraper:
         todos_productos = []
         
         for pagina in range(1, max_paginas + 1):
-            url = f"https://www.dbs.cl/maquillaje/{categoria}?p={pagina}"
+            url = f"https://dbs.cl/{categoria}?p={pagina}"
             productos = self.scrapear_pagina_dbs(url)
             todos_productos.extend(productos)
             
@@ -493,58 +494,48 @@ class DBSSeleniumScraper:
             self.driver.quit()
 
 
-def obtener_info_paginacion(categoria: str, headless: bool = True) -> dict:
-    scraper = DBSSeleniumScraper(headless=headless)
-    try:
-        total_paginas = scraper.obtener_total_paginas(categoria)
-        return {
-            'categoria': categoria,
-            'total_paginas': total_paginas
-        }
-    finally:
-        scraper.close()
-
-
-def scrapear_pagina_dbs(categoria: str, pagina: int = 1, headless: bool = True) -> List[DBSProduct]:
-    scraper = DBSSeleniumScraper(headless=headless)
-    try:
-        url = f"https://www.dbs.cl/maquillaje/{categoria}?p={pagina}"
-        return scraper.scrapear_pagina_dbs(url)
-    finally:
-        scraper.close()
-
-
-def scrapear_catalogo_dbs(categoria: str, max_paginas: int = None, delay: float = 1.0, headless: bool = True) -> List[DBSProduct]:
-    scraper = DBSSeleniumScraper(headless=headless)
-    try:
-        if max_paginas is None:
-            max_paginas = scraper.obtener_total_paginas(categoria)
-        
-        urls = [f"https://www.dbs.cl/maquillaje/{categoria}?p={i}" for i in range(1, max_paginas + 1)]
-        return scraper.scrapear_catalogo_dbs(categoria, max_paginas, delay)
-    finally:
-        scraper.close()
 
 
 def scrapear_todas_categorias(headless=True, max_paginas_por_categoria=5):
     scraper = DBSSeleniumScraper(headless=headless)
     
     try:
-        resultados = {}
+        # Scrapear todas las categorías y recopilar todos los productos
+        todos_productos = []
         categorias = ['maquillaje', 'skincare']
         
         for categoria in categorias:
             print(f"Scrapeando categoría: {categoria}")
             productos_categoria = scraper.scrapear_catalogo_dbs(categoria, max_paginas=max_paginas_por_categoria)
+            # Agregar todos los productos con su categoría detectada
+            for producto in productos_categoria:
+                todos_productos.append(producto)
+        
+        print(f"\nTotal productos extraídos: {len(todos_productos)}")
+        
+        # Deduplicar productos usando URL como clave única (lógica de Maicao)
+        productos_unicos = {}  # url -> producto
+        for producto in todos_productos:
+            if producto.url not in productos_unicos:
+                productos_unicos[producto.url] = producto
+        
+        productos_finales = list(productos_unicos.values())
+        print(f"Productos únicos después de deduplicación: {len(productos_finales)}")
+        
+        # Organizar productos por categoría final
+        resultados = {}
+        for categoria in categorias:
+            productos_categoria = [p for p in productos_finales if p.categoria == categoria]
             resultados[categoria] = {
                 'cantidad': len(productos_categoria),
                 'productos': [producto.to_dict() for producto in productos_categoria]
             }
+            print(f"Categoría '{categoria}': {len(productos_categoria)} productos únicos")
         
         from datetime import datetime
         data_completa = {
             'fecha_extraccion': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'total_productos': sum(cat['cantidad'] for cat in resultados.values()),
+            'total_productos': len(productos_finales),
             **resultados
         }
         
@@ -561,19 +552,7 @@ def scrapear_todas_categorias(headless=True, max_paginas_por_categoria=5):
         scraper.close()
 
 
-def guardar_resultados_json(resultados, nombre_archivo="dbs_productos.json"):
-    # Obtener la ruta correcta al directorio data
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)
-    data_dir = os.path.join(project_root, "data")
-    os.makedirs(data_dir, exist_ok=True)
-    ruta_archivo = os.path.join(data_dir, nombre_archivo)
-    
-    with open(ruta_archivo, 'w', encoding='utf-8') as f:
-        json.dump(resultados, f, ensure_ascii=False, indent=2)
-    
-    print(f"Datos guardados en: {ruta_archivo}")
-    return ruta_archivo
+
 
 def guardar_resultados_por_categoria(resultados, tienda_prefix="dbs"):
     """
@@ -619,83 +598,6 @@ def guardar_resultados_por_categoria(resultados, tienda_prefix="dbs"):
     return archivos_guardados
 
 
-def inspeccionar_pagina_dbs(categoria: str = "maquillaje"):
-    """Función para inspeccionar la estructura HTML de DBS"""
-    scraper = DBSSeleniumScraper(headless=False)  # headless=False para ver el navegador
-    
-    try:
-        url = f"https://www.dbs.cl/maquillaje/{categoria}"
-        soup = scraper._get_page_with_selenium(url)
-        
-        if soup:
-            print(f"=== INSPECCIÓN DE PÁGINA: {url} ===")
-            
-            # Buscar elementos de paginación
-            pagination_elements = soup.select('.pagination, .pager, .toolbar, .toolbar-text, .toolbar-info')
-            print(f"Elementos de paginación encontrados: {len(pagination_elements)}")
-            
-            for i, elem in enumerate(pagination_elements[:3]):  # Solo los primeros 3
-                print(f"Elemento {i+1}: {elem.get_text(strip=True)}")
-            
-            # Buscar productos
-            product_elements = soup.select('.product-item, .product, [data-product]')
-            print(f"Productos encontrados en esta página: {len(product_elements)}")
-            
-            # Buscar imágenes
-            img_elements = soup.select('img[src*="dbs.cl"]')
-            print(f"Imágenes con dbs.cl encontradas: {len(img_elements)}")
-            
-            if img_elements:
-                print("Primeras 3 URLs de imágenes:")
-                for i, img in enumerate(img_elements[:3]):
-                    src = img.get('src', '')
-                    print(f"  {i+1}: {src}")
-        
-        input("Presiona Enter para continuar...")
-        
-    finally:
-        scraper.close()
-
-
-def probar_deteccion_paginas(categoria: str = "maquillaje"):
-    """Función para probar la detección de páginas"""
-    scraper = DBSSeleniumScraper(headless=True)
-    
-    try:
-        url = f"https://www.dbs.cl/maquillaje/{categoria}"
-        soup = scraper._get_page_with_selenium(url)
-        
-        if soup:
-            print(f"=== PRUEBA DE DETECCIÓN: {url} ===")
-            
-            # Buscar todos los elementos que podrían contener el total
-            all_text = soup.get_text()
-            print("Texto completo de la página (primeros 1000 caracteres):")
-            print(all_text[:1000])
-            
-            # Buscar específicamente el patrón que vimos
-            import re
-            patterns = [
-                r'Artículos\s*\d+-\d+\s*de\s*([\d,]+)',
-                r'Artículos\d+-\d+de([\d,]+)',
-                r'de\s+([\d,]+)\s+productos',
-                r'(\d+)\s+productos'
-            ]
-            
-            for i, pattern in enumerate(patterns):
-                matches = re.findall(pattern, all_text)
-                print(f"Patrón {i+1}: {pattern}")
-                print(f"  Encontrados: {matches}")
-            
-            # Buscar elementos específicos
-            toolbar_elements = soup.select('.toolbar, .toolbar-text, .toolbar-info')
-            print(f"\nElementos de toolbar encontrados: {len(toolbar_elements)}")
-            for i, elem in enumerate(toolbar_elements):
-                text = elem.get_text(strip=True)
-                print(f"  Elemento {i+1}: '{text}'")
-        
-    finally:
-        scraper.close()
 
 
 if __name__ == "__main__":

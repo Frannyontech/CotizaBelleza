@@ -1,5 +1,5 @@
 {
-  "fecha_extraccion": "2025-08-16 19:09:01",
+  "fecha_extraccion": "2025-08-16 19:41:16",
   "tienda": "DBS",
   "categoria": "maquillaje",
   "total_productos": 120,
@@ -8,7 +8,7 @@
       "nombre": "3D Hydra Lip Gloss",
       "marca": "KIKO MILANO",
       "precio": 15990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/3d-hydra-lipgloss-km-60403-0",
       "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-60403-3_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -17,7 +17,7 @@
       "nombre": "8H Matte Comfort Perfilador De Labios",
       "marca": "ESSENCE",
       "precio": 2990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/8h-matte-comfort-perfilador-de-labios-ee-38435-0",
       "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38435.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -26,7 +26,7 @@
       "nombre": "Delineador De Labios Plumping",
       "marca": "CATRICE",
       "precio": 3990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/delineador-de-labios-plumping-ca-27669-0",
       "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27669.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -35,7 +35,7 @@
       "nombre": "Corrector True Skin High Cover",
       "marca": "CATRICE",
       "precio": 5990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/corrector-true-skin-high-cover-ca-27708-0",
       "imagen": "https://dbs.cl/media/catalog/product/4/0/4059729285980_image_front_view_full_open_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -44,7 +44,7 @@
       "nombre": "Brillo de Labios Extreme Shine",
       "marca": "ESSENCE",
       "precio": 3990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/brillo-de-labios-extreme-shine-101-milky-way-ee-30289-0",
       "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-30289-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -53,7 +53,7 @@
       "nombre": "Lasting Precision Automatic Eyeliner And Khol",
       "marca": "KIKO MILANO",
       "precio": 3290.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/lasting-precision-automatic-eyeliner-and-khol-km-61641-0",
       "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-61641_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -62,7 +62,7 @@
       "nombre": "Sombra Líquida Luminous Eye Tint Shimmering Taupe",
       "marca": "ESSENCE",
       "precio": 790.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-shimmering-taupe-ee-40517",
       "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40517-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -71,7 +71,7 @@
       "nombre": "Lip Iv Hydrating Gloss",
       "marca": "NYX",
       "precio": 10990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/lip-iv-hydrating-gloss-nx-26700-0",
       "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-26700.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -80,7 +80,7 @@
       "nombre": "Rubor En Polvo Buttermelt",
       "marca": "NYX",
       "precio": 11990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/rubor-en-polvo-buttermelt-nx-25765-0",
       "imagen": "https://dbs.cl/media/catalog/product/n/y/nyxpmu-nx-25765.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -89,7 +89,7 @@
       "nombre": "Smart Fusion Lip Pencil",
       "marca": "KIKO MILANO",
       "precio": 5990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/smart-fusion-lip-pencil-km-98585-0",
       "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98585_8.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -107,7 +107,7 @@
       "nombre": "Perfilador De Labios Soft Precise",
       "marca": "ESSENCE",
       "precio": 1490.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/perfilador-de-labios-soft-precise-ee-33981-0",
       "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-33997_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -116,7 +116,7 @@
       "nombre": "Labial Super Stay Teddy Tint",
       "marca": "MAYBELLINE",
       "precio": 10990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/labial-super-stay-teddy-tint-my-14680-0",
       "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-14680.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -143,7 +143,7 @@
       "nombre": "Brillo Labial Fat Oil",
       "marca": "NYX",
       "precio": 10990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/brillo-labial-nyx-pmu-fat-oil-lip-drip-nx-23391-0",
       "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-23393_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -152,7 +152,7 @@
       "nombre": "Esmalte De Uñas Shine Last And Go",
       "marca": "ESSENCE",
       "precio": 1990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/esmalte-de-u-as-shine-last-and-go-ee-34872-0",
       "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-34877-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -161,7 +161,7 @@
       "nombre": "Bronceador En Barra Baby Got Bronze",
       "marca": "ESSENCE",
       "precio": 3990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/bronceador-en-barra-baby-got-bronze-ee-39464-0",
       "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39463-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -179,7 +179,7 @@
       "nombre": "Smart Fusion Lipstick",
       "marca": "KIKO MILANO",
       "precio": 7490.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/smart-fusion-lipstick-km-02623-0",
       "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-02623_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -188,7 +188,7 @@
       "nombre": "Máscara De Pestañas Panorama - Black Waterproof",
       "marca": "L'ORÉAL PARIS",
       "precio": 14990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/mascara-de-pesta-as-panorama-black-waterproof-lo-68100",
       "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-68100.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -197,7 +197,7 @@
       "nombre": "Juicy Bomb Brillo De Labios",
       "marca": "ESSENCE",
       "precio": 1240.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/juicy-bomb-brillo-de-labios-ee-39459-0",
       "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39459-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -206,7 +206,7 @@
       "nombre": "Corrector Fit Me Concealer",
       "marca": "MAYBELLINE",
       "precio": 5490.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
       "url": "https://dbs.cl/my-47701-0-corrector-fit-me-concealer",
       "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-47701_7.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
@@ -221,868 +221,868 @@
       "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27722.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "3D Hydra Lip Gloss",
+      "nombre": "Sombra Líquida Luminous Eye Tint Dazzling Rose",
+      "marca": "ESSENCE",
+      "precio": 1190.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-dazzling-rose-ee-40509",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40509-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Barra Multiuso Para Labios Y Mejillas Pink Bomb",
+      "marca": "DBS",
+      "precio": 1990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/barra-multiuso-para-labios-y-mejillas-pink-bomb-gf-df045-mpi",
+      "imagen": "https://dbs.cl/media/catalog/product/g/l/glam-factor-gf-df045-mpi_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Base Líquida De Maquillaje True Skin Hydrating Warm Vanilla",
+      "marca": "CATRICE",
+      "precio": 4990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ca-28202-base-liquida-de-maquillaje-true-skin-hydrating-warm-vanilla",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-28202.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Delineador De Ojos Long-Lasting Eye Pencil",
+      "marca": "ESSENCE",
+      "precio": 2990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/delineador-de-ojos-long-lasting-eye-pencil-ee-00499-1",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-22226_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Esmalte De Uñas Iconails Gel",
+      "marca": "CATRICE",
+      "precio": 990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/esmalte-de-u-as-iconnails-gel-bloody-mary-to-go-ca-24185-1",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-23810_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sombra Líquida Luminous Eye Tint Gleaming Charm",
+      "marca": "ESSENCE",
+      "precio": 1190.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-gleaming-charm-ee-40513",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40513-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Blush Crush",
+      "marca": "ESSENCE",
+      "precio": 3990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/blush-crush-ee-44681-0",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-44681-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Polvos Compactos Matificantes All About Matt",
+      "marca": "ESSENCE",
+      "precio": 4990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ee-73554-polvos-compactos-matificantes-all-about-matt",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-73554_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Prebase En Barra Para Contorno De Ojos Jelly Grip",
+      "marca": "ESSENCE",
+      "precio": 3990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-contorno-de-ojos-prebase-en-barra-para-contorno-de-ojos-jelly-grip",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49097-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Máscara De Pestañas Great Lash A Prueba De Agua Negro",
+      "marca": "MAYBELLINE",
+      "precio": 5990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/my-26964-mascara-de-pestanas-great-lash-a-prueba-de-agua-negro",
+      "imagen": "https://dbs.cl/media/catalog/product/m/y/my-26964.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Máscara De Pestañas Paradise Big Deal Waterproof",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 14990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-ojos-mascaras-de-pesta-as-mascara-de-pesta-as-paradise-big-deal-waterproof",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-69098_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Brillo Labial Lifter Gloss",
+      "marca": "MAYBELLINE",
+      "precio": 8990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/brillo-labial-lip-lifter-gloss-my-58385-0",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-58385.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Super Stay Vinyl Ink",
+      "marca": "MAYBELLINE",
+      "precio": 11990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/super-stay-vinyl-ink-my-07095-0",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-07095.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Iluminador More Than Glow",
+      "marca": "CATRICE",
+      "precio": 5990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ca-26823-0-iluminador-more-than-glow",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-26823.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tinte Labial Hidratante Tinted Kiss Mauvelous",
+      "marca": "ESSENCE",
+      "precio": 2240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tinte-labial-hidratante-tinted-kiss-mauvelous-ee-40744",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40744-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Encrespador de Pestañas Catrice",
+      "marca": "CATRICE",
+      "precio": 5990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ca-54372-encrespador-de-pestanas",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-54372_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bare With Me Concealer Sérum",
+      "marca": "NYX",
+      "precio": 13990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bare-with-me-concealer-serum-nx-12977-0",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-nx-12977_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Long Lasting Colour Lip Marker",
       "marca": "KIKO MILANO",
       "precio": 15990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/3d-hydra-lipgloss-km-60403-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-60403-3_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/long-lasting-colour-lip-marker-km-60908-0",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-60908_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "8H Matte Comfort Perfilador De Labios",
+      "nombre": "Polvos Sueltos Fix Last 14H",
       "marca": "ESSENCE",
-      "precio": 2990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/8h-matte-comfort-perfilador-de-labios-ee-38435-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38435.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Delineador De Labios Plumping",
-      "marca": "CATRICE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/delineador-de-labios-plumping-ca-27669-0",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27669.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector True Skin High Cover",
-      "marca": "CATRICE",
       "precio": 5990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/corrector-true-skin-high-cover-ca-27708-0",
-      "imagen": "https://dbs.cl/media/catalog/product/4/0/4059729285980_image_front_view_full_open_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/polvos-sueltos-fix-last-14h-ee-38266",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38266.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Brillo de Labios Extreme Shine",
+      "nombre": "Aceite De Labios Hydra Kiss",
       "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
+      "precio": 4990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/brillo-de-labios-extreme-shine-101-milky-way-ee-30289-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-30289-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/aceite-de-labios-hydra-kiss-ee-42193-0",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-42193-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Lasting Precision Automatic Eyeliner And Khol",
+      "nombre": "True Match Tinted Serum",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 13990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/true-match-serum-lo-98990-1",
+      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal_-_lo-98990.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Delineador A Prueba De Agua Lash Princess",
+      "marca": "ESSENCE",
+      "precio": 1740.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/delineador-a-prueba-de-agua-lash-princess-ee-34155",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-34155-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Unlimited Double Touch",
       "marca": "KIKO MILANO",
-      "precio": 3290.0,
-      "categoria": "general",
+      "precio": 16990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/lasting-precision-automatic-eyeliner-and-khol-km-61641-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-61641_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/unlimited-double-touch-km-62331-0",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-62331_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Sombra Líquida Luminous Eye Tint Shimmering Taupe",
+      "nombre": "Labial Glossy Glaze",
       "marca": "ESSENCE",
-      "precio": 790.0,
-      "categoria": "general",
+      "precio": 3290.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-shimmering-taupe-ee-40517",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40517-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-labios-labiales-labial-glossy-glaze",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-52097-2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Lip Iv Hydrating Gloss",
+      "nombre": "Fijador De Maquillaje Marshmellow Setting Spray",
       "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
+      "precio": 12990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/lip-iv-hydrating-gloss-nx-26700-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-26700.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/fijador-de-maquillaje-marshmellow-setting-spray-nx-25507",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-25507.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Rubor En Polvo Buttermelt",
+      "nombre": "Tinte Para Labios Y Mejillas What A Tint",
+      "marca": "ESSENCE",
+      "precio": 4990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tinte-para-labios-y-mejillas-what-a-tint-ee-38241",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38241.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lip Jam Brillo De Labios Hidratante",
+      "marca": "CATRICE",
+      "precio": 2240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lip-jam-brillo-de-labios-hidratante-ca-37957-0",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-37957.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Primer Reductor De Poros Poreless Partner",
+      "marca": "ESSENCE",
+      "precio": 2240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/primer-reductor-de-poros-poreless-partner-ee-37189",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-37189.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Buttermelt Highlighter",
       "marca": "NYX",
       "precio": 11990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/rubor-en-polvo-buttermelt-nx-25765-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyxpmu-nx-25765.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-rostro-iluminadores-buttermelt-highlighter",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-nx-26890-2_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Smart Fusion Lip Pencil",
+      "nombre": "Kohl Kajal Resistente Al Agua",
+      "marca": "CATRICE",
+      "precio": 2990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/kohl-kajal-resistente-al-agua-ca-35623-0",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-35623-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Iluminador Lumi Glotion All In Glow 40Ml",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 10990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-rostro-iluminadores-base-de-maquillaje-lumi-glotion-all-in-glow-40ml",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-15056.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lip Volume",
       "marca": "KIKO MILANO",
-      "precio": 5990.0,
-      "categoria": "general",
+      "precio": 10990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lip-pencil-km-98585-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98585_8.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/lip-volume-km-64516-0",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-64516_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Gel Fijador De Cejas Fix It Like A Pro",
+      "nombre": "Polvo Traslúcido Nude Illusion",
+      "marca": "CATRICE",
+      "precio": 6990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ca-53151-polvo-traslucido-nude-illusion",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-53151_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Base De Maquillaje Super Stay Lumi Matte",
+      "marca": "MAYBELLINE",
+      "precio": 12990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/base-de-maquillaje-super-stay-lumi-matte-my-97010-0",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-97010.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bálsamo Labial Care In Colours",
+      "marca": "CATRICE",
+      "precio": 4790.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/balsamo-labial-care-in-colours-ca-44537-0",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-44537-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Máscara Para Cejas Fijadora Thick Wow 04 Espresso Brown",
+      "marca": "ESSENCE",
+      "precio": 2240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/mascara-para-cejas-fijadora-thick-wow-brunette-brown-ee-39479",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39479-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Brillo Labial Megaslicks",
+      "marca": "DBS",
+      "precio": 2740.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/brillo-labial-megaslicks",
+      "imagen": "https://dbs.cl/media/catalog/product/w/e/wetnwild-ww-55440_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Delineador De Ojos Kajal Pencil",
+      "marca": "ESSENCE",
+      "precio": 2490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/delineador-de-ojos-kajal-pencil-ee-20071-1",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-20074_1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tratamiento De Labios The Super Peptide Gloss",
       "marca": "ESSENCE",
       "precio": 3790.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-cejas-fijadores-gel-fijador-de-cejas-fix-it-like-a-pro",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-48592-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-labios-balsamos-labiales-tratamiento-de-labios-the-super-peptide-gloss-02-pinkified-1",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-51862-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Perfilador De Labios Soft Precise",
-      "marca": "ESSENCE",
-      "precio": 1490.0,
-      "categoria": "general",
+      "nombre": "Corrector Infaillible More Than Concealer",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 8990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/perfilador-de-labios-soft-precise-ee-33981-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-33997_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/corrector-infaillible-more-than-concealer-lo-02600-1",
+      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-17341-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Labial Super Stay Teddy Tint",
+      "nombre": "Máscara Para Cejas Fijadora Thick Wow 03 Brunette Brown",
+      "marca": "ESSENCE",
+      "precio": 2240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/mascara-para-cejas-fijadora-thick-wow-ash-brown-ee-39478",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39478-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Corrector True Match Radiant Serum",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 7990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/corrector-true-match-radiant-serum-lo-18824-0",
+      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-paris-lo-18824.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bálsamo Labial Heartcore Bold Blackberry",
+      "marca": "ESSENCE",
+      "precio": 1240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/balsamo-labial-heartcore-bold-blackberry-ee-42195",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-42195-2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Creamy Colour Comfort Lip Liner",
+      "marca": "KIKO MILANO",
+      "precio": 9990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/creamy-colour-comfort-lip-liner-km-98765-0",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98765_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Barra Y Perfilador De Labios Mate Lip Artist",
+      "marca": "CATRICE",
+      "precio": 4490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-labios-labiales-barra-y-perfilador-de-labios-mate-lip-artist",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-51598-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Delineador De Labios Lifter Liner",
       "marca": "MAYBELLINE",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/labial-super-stay-teddy-tint-my-14680-0",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-14680.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Spray Fijador Del Maquillaje Matificante",
-      "marca": "ESSENCE",
-      "precio": 2740.0,
+      "precio": 6990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/ee-22016-spray-fijador-del-maquillaje-matificante",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-22016.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-labios-delineadores-de-labios-delineador-de-labios-lifter-liner",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-69210.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Bálsamo Labial Brillante Juicy Bomb",
+      "nombre": "Baby Got Blush",
       "marca": "ESSENCE",
-      "precio": 3190.0,
+      "precio": 4990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-balsamos-labiales-balsamo-labial-brillante-juicy-bomb",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49048-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/baby-got-blush-ee-38101-0",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38101-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Brillo Labial Fat Oil",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-labial-nyx-pmu-fat-oil-lip-drip-nx-23391-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-23393_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Esmalte De Uñas Shine Last And Go",
-      "marca": "ESSENCE",
-      "precio": 1990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/esmalte-de-u-as-shine-last-and-go-ee-34872-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-34877-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Bronceador En Barra Baby Got Bronze",
-      "marca": "ESSENCE",
+      "nombre": "The Hydrator Plump Fresh Prebase Hidratante",
+      "marca": "CATRICE",
       "precio": 3990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/bronceador-en-barra-baby-got-bronze-ee-39464-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39463-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/the-hydrator-plump-fresh-prebase-hidratante-ca-35786",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-35786.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Plump Ambition Hyaluron Lip Oil",
+      "nombre": "Barra Multiuso Para Labios Y Mejillas Peach Bomb",
+      "marca": "DBS",
+      "precio": 1990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/barra-multiuso-para-labios-y-mejillas-peach-bomb-gf-df046-mpi",
+      "imagen": "https://dbs.cl/media/catalog/product/g/l/glam-factor-gf-df046-mpi_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Rubor Líquido Lumi Le Liquid Blush",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 7990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/rubor-liquido-lumi-le-liquid-blush-lo-18850-0",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-18850_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lumi Le Glass Stick",
       "marca": "L'ORÉAL PARIS",
       "precio": 9990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-voluminizadores-de-labios-plump-ambition-hyaluron-lip-oil",
-      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-17271-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-rostro-iluminadores-lumi-le-glass-stick",
+      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-19255-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Smart Fusion Lipstick",
-      "marca": "KIKO MILANO",
-      "precio": 7490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lipstick-km-02623-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-02623_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Máscara De Pestañas Panorama - Black Waterproof",
-      "marca": "L'ORÉAL PARIS",
-      "precio": 14990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/mascara-de-pesta-as-panorama-black-waterproof-lo-68100",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-68100.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Juicy Bomb Brillo De Labios",
-      "marca": "ESSENCE",
-      "precio": 1240.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/juicy-bomb-brillo-de-labios-ee-39459-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39459-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector Fit Me Concealer",
+      "nombre": "Primer Fit Me Matte Poreless",
       "marca": "MAYBELLINE",
-      "precio": 5490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/my-47701-0-corrector-fit-me-concealer",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-47701_7.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Base Líquida De Maquillaje True Skin Hydrating Neutral Sand",
-      "marca": "CATRICE",
-      "precio": 4990.0,
+      "precio": 6990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/ca-27722-base-liquida-de-maquillaje-true-skin-hydrating-neutral-sand",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27722.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/primer-fit-me-matte-poreless-my-63138",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-face-fit-me-mattifying-primer-matte-_-poreless-3600531631383-av11.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "3D Hydra Lip Gloss",
+      "nombre": "3D Hydra Lip Oil",
       "marca": "KIKO MILANO",
-      "precio": 15990.0,
-      "categoria": "general",
+      "precio": 16990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/3d-hydra-lipgloss-km-60403-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-60403-3_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-labios-brillos-labiales-3d-hydra-lip-oil",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-02070.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "8H Matte Comfort Perfilador De Labios",
+      "nombre": "Primer De Pestañas",
       "marca": "ESSENCE",
-      "precio": 2990.0,
-      "categoria": "general",
+      "precio": 1490.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/8h-matte-comfort-perfilador-de-labios-ee-38435-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38435.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/ee-00567-primer-de-pestanas",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-00567_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Delineador De Labios Plumping",
-      "marca": "CATRICE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/delineador-de-labios-plumping-ca-27669-0",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27669.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector True Skin High Cover",
-      "marca": "CATRICE",
-      "precio": 5990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/corrector-true-skin-high-cover-ca-27708-0",
-      "imagen": "https://dbs.cl/media/catalog/product/4/0/4059729285980_image_front_view_full_open_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Brillo de Labios Extreme Shine",
-      "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-de-labios-extreme-shine-101-milky-way-ee-30289-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-30289-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Lasting Precision Automatic Eyeliner And Khol",
-      "marca": "KIKO MILANO",
-      "precio": 3290.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/lasting-precision-automatic-eyeliner-and-khol-km-61641-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-61641_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Sombra Líquida Luminous Eye Tint Shimmering Taupe",
-      "marca": "ESSENCE",
-      "precio": 790.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-shimmering-taupe-ee-40517",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40517-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Lip Iv Hydrating Gloss",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/lip-iv-hydrating-gloss-nx-26700-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-26700.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Rubor En Polvo Buttermelt",
+      "nombre": "Bronzer En Polvo Buttermelt",
       "marca": "NYX",
       "precio": 11990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/rubor-en-polvo-buttermelt-nx-25765-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyxpmu-nx-25765.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Smart Fusion Lip Pencil",
-      "marca": "KIKO MILANO",
-      "precio": 5990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lip-pencil-km-98585-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98585_8.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Gel Fijador De Cejas Fix It Like A Pro",
-      "marca": "ESSENCE",
-      "precio": 3790.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-cejas-fijadores-gel-fijador-de-cejas-fix-it-like-a-pro",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-48592-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/bronzer-en-polvo-buttermelt-nx-25473-0",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyxpmu-nx-25473.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Perfilador De Labios Soft Precise",
-      "marca": "ESSENCE",
-      "precio": 1490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/perfilador-de-labios-soft-precise-ee-33981-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-33997_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Labial Super Stay Teddy Tint",
-      "marca": "MAYBELLINE",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/labial-super-stay-teddy-tint-my-14680-0",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-14680.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Spray Fijador Del Maquillaje Matificante",
-      "marca": "ESSENCE",
-      "precio": 2740.0,
+      "nombre": "Sombra De Ojos Chroma Light",
+      "marca": "DBS",
+      "precio": 7990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/ee-22016-spray-fijador-del-maquillaje-matificante",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-22016.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/sombra-de-ojos-chroma-light-mo-30928-0",
+      "imagen": "https://dbs.cl/media/catalog/product/m/o/moira-mo-30928-0.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Bálsamo Labial Brillante Juicy Bomb",
+      "nombre": "Trío Polvos Sueltos Flawless Skin",
       "marca": "ESSENCE",
-      "precio": 3190.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-balsamos-labiales-balsamo-labial-brillante-juicy-bomb",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49048-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Brillo Labial Fat Oil",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-labial-nyx-pmu-fat-oil-lip-drip-nx-23391-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-23393_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Esmalte De Uñas Shine Last And Go",
-      "marca": "ESSENCE",
-      "precio": 1990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/esmalte-de-u-as-shine-last-and-go-ee-34872-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-34877-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Bronceador En Barra Baby Got Bronze",
-      "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/bronceador-en-barra-baby-got-bronze-ee-39464-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39463-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Plump Ambition Hyaluron Lip Oil",
-      "marca": "L'ORÉAL PARIS",
-      "precio": 9990.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-voluminizadores-de-labios-plump-ambition-hyaluron-lip-oil",
-      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-17271-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Smart Fusion Lipstick",
-      "marca": "KIKO MILANO",
-      "precio": 7490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lipstick-km-02623-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-02623_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Máscara De Pestañas Panorama - Black Waterproof",
-      "marca": "L'ORÉAL PARIS",
-      "precio": 14990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/mascara-de-pesta-as-panorama-black-waterproof-lo-68100",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-68100.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Juicy Bomb Brillo De Labios",
-      "marca": "ESSENCE",
-      "precio": 1240.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/juicy-bomb-brillo-de-labios-ee-39459-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39459-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector Fit Me Concealer",
-      "marca": "MAYBELLINE",
-      "precio": 5490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/my-47701-0-corrector-fit-me-concealer",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-47701_7.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Base Líquida De Maquillaje True Skin Hydrating Neutral Sand",
-      "marca": "CATRICE",
       "precio": 4990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/ca-27722-base-liquida-de-maquillaje-true-skin-hydrating-neutral-sand",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27722.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-rostro-polvos-trio-polvos-sueltos-flawless-skin",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49047-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "3D Hydra Lip Gloss",
-      "marca": "KIKO MILANO",
-      "precio": 15990.0,
-      "categoria": "general",
+      "nombre": "Lip Booster Labial Plump It Up",
+      "marca": "CATRICE",
+      "precio": 4490.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/3d-hydra-lipgloss-km-60403-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-60403-3_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/lip-booster-labial-plump-it-up-ca-40142-0",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-40142-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "8H Matte Comfort Perfilador De Labios",
+      "nombre": "Labial Super Lustrous",
+      "marca": "DBS",
+      "precio": 6990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/labial-super-lustrous",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revlon-rv-50839_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lash Glue Pegamento Para Pestañas",
       "marca": "ESSENCE",
       "precio": 2990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/8h-matte-comfort-perfilador-de-labios-ee-38435-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38435.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Delineador De Labios Plumping",
-      "marca": "CATRICE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/delineador-de-labios-plumping-ca-27669-0",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27669.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector True Skin High Cover",
-      "marca": "CATRICE",
-      "precio": 5990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/corrector-true-skin-high-cover-ca-27708-0",
-      "imagen": "https://dbs.cl/media/catalog/product/4/0/4059729285980_image_front_view_full_open_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Brillo de Labios Extreme Shine",
-      "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-de-labios-extreme-shine-101-milky-way-ee-30289-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-30289-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Lasting Precision Automatic Eyeliner And Khol",
-      "marca": "KIKO MILANO",
-      "precio": 3290.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/lasting-precision-automatic-eyeliner-and-khol-km-61641-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-61641_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Sombra Líquida Luminous Eye Tint Shimmering Taupe",
-      "marca": "ESSENCE",
-      "precio": 790.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-shimmering-taupe-ee-40517",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40517-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Lip Iv Hydrating Gloss",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/lip-iv-hydrating-gloss-nx-26700-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-26700.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Rubor En Polvo Buttermelt",
-      "marca": "NYX",
-      "precio": 11990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/rubor-en-polvo-buttermelt-nx-25765-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyxpmu-nx-25765.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Smart Fusion Lip Pencil",
-      "marca": "KIKO MILANO",
-      "precio": 5990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lip-pencil-km-98585-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98585_8.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Gel Fijador De Cejas Fix It Like A Pro",
-      "marca": "ESSENCE",
-      "precio": 3790.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-cejas-fijadores-gel-fijador-de-cejas-fix-it-like-a-pro",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-48592-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/lash-glue-pegamento-para-pestanas-ee-32368",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-32368.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Perfilador De Labios Soft Precise",
+      "nombre": "Rubor Líquido Baby Got Blush",
       "marca": "ESSENCE",
-      "precio": 1490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/perfilador-de-labios-soft-precise-ee-33981-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-33997_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Labial Super Stay Teddy Tint",
-      "marca": "MAYBELLINE",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/labial-super-stay-teddy-tint-my-14680-0",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-14680.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Spray Fijador Del Maquillaje Matificante",
-      "marca": "ESSENCE",
-      "precio": 2740.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/ee-22016-spray-fijador-del-maquillaje-matificante",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-22016.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Bálsamo Labial Brillante Juicy Bomb",
-      "marca": "ESSENCE",
-      "precio": 3190.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-balsamos-labiales-balsamo-labial-brillante-juicy-bomb",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49048-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Brillo Labial Fat Oil",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-labial-nyx-pmu-fat-oil-lip-drip-nx-23391-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-23393_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Esmalte De Uñas Shine Last And Go",
-      "marca": "ESSENCE",
-      "precio": 1990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/esmalte-de-u-as-shine-last-and-go-ee-34872-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-34877-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Bronceador En Barra Baby Got Bronze",
-      "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/bronceador-en-barra-baby-got-bronze-ee-39464-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39463-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Plump Ambition Hyaluron Lip Oil",
-      "marca": "L'ORÉAL PARIS",
-      "precio": 9990.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-voluminizadores-de-labios-plump-ambition-hyaluron-lip-oil",
-      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-17271-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Smart Fusion Lipstick",
-      "marca": "KIKO MILANO",
-      "precio": 7490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lipstick-km-02623-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-02623_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Máscara De Pestañas Panorama - Black Waterproof",
-      "marca": "L'ORÉAL PARIS",
-      "precio": 14990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/mascara-de-pesta-as-panorama-black-waterproof-lo-68100",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-68100.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Juicy Bomb Brillo De Labios",
-      "marca": "ESSENCE",
-      "precio": 1240.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/juicy-bomb-brillo-de-labios-ee-39459-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39459-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector Fit Me Concealer",
-      "marca": "MAYBELLINE",
-      "precio": 5490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/my-47701-0-corrector-fit-me-concealer",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-47701_7.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Base Líquida De Maquillaje True Skin Hydrating Neutral Sand",
-      "marca": "CATRICE",
       "precio": 4990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/ca-27722-base-liquida-de-maquillaje-true-skin-hydrating-neutral-sand",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27722.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/rubor-liquido-baby-got-blush-ee-44735-0",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-44735-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "3D Hydra Lip Gloss",
-      "marca": "KIKO MILANO",
-      "precio": 15990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/3d-hydra-lipgloss-km-60403-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-60403-3_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "8H Matte Comfort Perfilador De Labios",
+      "nombre": "Barra De Labios Nude Hidratante",
       "marca": "ESSENCE",
       "precio": 2990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/8h-matte-comfort-perfilador-de-labios-ee-38435-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38435.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Delineador De Labios Plumping",
-      "marca": "CATRICE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/delineador-de-labios-plumping-ca-27669-0",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27669.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Corrector True Skin High Cover",
-      "marca": "CATRICE",
-      "precio": 5990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/corrector-true-skin-high-cover-ca-27708-0",
-      "imagen": "https://dbs.cl/media/catalog/product/4/0/4059729285980_image_front_view_full_open_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Brillo de Labios Extreme Shine",
-      "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-de-labios-extreme-shine-101-milky-way-ee-30289-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-30289-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Lasting Precision Automatic Eyeliner And Khol",
-      "marca": "KIKO MILANO",
-      "precio": 3290.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/lasting-precision-automatic-eyeliner-and-khol-km-61641-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-61641_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Sombra Líquida Luminous Eye Tint Shimmering Taupe",
-      "marca": "ESSENCE",
-      "precio": 790.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/sombra-liquida-luminous-eye-tint-shimmering-taupe-ee-40517",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40517-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Lip Iv Hydrating Gloss",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/lip-iv-hydrating-gloss-nx-26700-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-26700.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Rubor En Polvo Buttermelt",
-      "marca": "NYX",
-      "precio": 11990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/rubor-en-polvo-buttermelt-nx-25765-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyxpmu-nx-25765.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Smart Fusion Lip Pencil",
-      "marca": "KIKO MILANO",
-      "precio": 5990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lip-pencil-km-98585-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98585_8.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Gel Fijador De Cejas Fix It Like A Pro",
-      "marca": "ESSENCE",
-      "precio": 3790.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-cejas-fijadores-gel-fijador-de-cejas-fix-it-like-a-pro",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-48592-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/barra-de-labios-nude-hidratante-heavenly-ee-32365-0",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-32365-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Perfilador De Labios Soft Precise",
-      "marca": "ESSENCE",
-      "precio": 1490.0,
-      "categoria": "general",
+      "nombre": "Esmalte De Uñas Tradicional",
+      "marca": "DBS",
+      "precio": 2990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/perfilador-de-labios-soft-precise-ee-33981-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-33997_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/china-glaze-esmalte-de-unas-tradicional",
+      "imagen": "https://dbs.cl/media/catalog/product/c/h/china-glaze-cg-70255_4_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Labial Super Stay Teddy Tint",
+      "nombre": "Delineador 24hr Ever Ink",
+      "marca": "ESSENCE",
+      "precio": 2990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ee-25436-delineador-24hr-ever-ink",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-25436-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Máscara de Pestañas Waterproof Lash Sensational Sky High",
       "marca": "MAYBELLINE",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/labial-super-stay-teddy-tint-my-14680-0",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-14680.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Spray Fijador Del Maquillaje Matificante",
-      "marca": "ESSENCE",
-      "precio": 2740.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/ee-22016-spray-fijador-del-maquillaje-matificante",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-22016.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Bálsamo Labial Brillante Juicy Bomb",
-      "marca": "ESSENCE",
-      "precio": 3190.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-balsamos-labiales-balsamo-labial-brillante-juicy-bomb",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49048-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Brillo Labial Fat Oil",
-      "marca": "NYX",
-      "precio": 10990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/brillo-labial-nyx-pmu-fat-oil-lip-drip-nx-23391-0",
-      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-23393_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Esmalte De Uñas Shine Last And Go",
-      "marca": "ESSENCE",
-      "precio": 1990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/esmalte-de-u-as-shine-last-and-go-ee-34872-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-34877-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Bronceador En Barra Baby Got Bronze",
-      "marca": "ESSENCE",
-      "precio": 3990.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/bronceador-en-barra-baby-got-bronze-ee-39464-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39463-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Plump Ambition Hyaluron Lip Oil",
-      "marca": "L'ORÉAL PARIS",
-      "precio": 9990.0,
-      "categoria": "maquillaje",
-      "stock": "In stock",
-      "url": "https://dbs.cl/maquillaje-labios-voluminizadores-de-labios-plump-ambition-hyaluron-lip-oil",
-      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-17271-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Smart Fusion Lipstick",
-      "marca": "KIKO MILANO",
-      "precio": 7490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/smart-fusion-lipstick-km-02623-0",
-      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-02623_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Máscara De Pestañas Panorama - Black Waterproof",
-      "marca": "L'ORÉAL PARIS",
       "precio": 14990.0,
-      "categoria": "general",
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/mascara-de-pesta-as-panorama-black-waterproof-lo-68100",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maquillaje-loreal-lo-68100.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/mascara-de-pesta-as-waterproof-lash-sensational-sky-high-my-59091",
+      "imagen": "https://dbs.cl/media/catalog/product/l/a/lash.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Juicy Bomb Brillo De Labios",
+      "nombre": "Spray Fijador De Maquillaje Fix Last Instant Matte",
       "marca": "ESSENCE",
-      "precio": 1240.0,
-      "categoria": "general",
+      "precio": 3990.0,
+      "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/juicy-bomb-brillo-de-labios-ee-39459-0",
-      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39459-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-rostro-fijadores-spray-fijador-de-maquillaje-fix-last-instant-matte",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49044-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     },
     {
-      "nombre": "Corrector Fit Me Concealer",
-      "marca": "MAYBELLINE",
-      "precio": 5490.0,
-      "categoria": "general",
-      "stock": "In stock",
-      "url": "https://dbs.cl/my-47701-0-corrector-fit-me-concealer",
-      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-47701_7.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
-    },
-    {
-      "nombre": "Base Líquida De Maquillaje True Skin Hydrating Neutral Sand",
-      "marca": "CATRICE",
+      "nombre": "Gotas Bronceadoras Drop Of Sunshine",
+      "marca": "ESSENCE",
       "precio": 4990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
-      "url": "https://dbs.cl/ca-27722-base-liquida-de-maquillaje-true-skin-hydrating-neutral-sand",
-      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-27722.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+      "url": "https://dbs.cl/maquillaje-rostro-bronzers-gotas-bronceadoras-drop-of-sunshine",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49056-2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lápiz Delineador De Labios Line Loud Lip Liner",
+      "marca": "NYX",
+      "precio": 9990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lapiz-delineador-de-labios-line-loud-lip-liner-nx-22162-0",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-22162.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Coloured Balm",
+      "marca": "KIKO MILANO",
+      "precio": 9990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/coloured-balm-km-97952-0",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-97952-3_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Base Fit Me Matte",
+      "marca": "MAYBELLINE",
+      "precio": 5940.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/base-fit-me-matte-120-classic-ivory-my-40900-1",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-40900_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Prebase Jelly Grip Hydrating",
+      "marca": "ESSENCE",
+      "precio": 4990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/prebase-jelly-grip-hydrating-ee-46624",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-46624-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Liquid Highlighter Gold",
+      "marca": "DBS",
+      "precio": 3490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/liquid-highlighter-gold-dbs-df2268-mp",
+      "imagen": "https://dbs.cl/media/catalog/product/d/b/dbs-cosmetics-dbs-df2268-mp.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Labial Líquido 8H Matte",
+      "marca": "ESSENCE",
+      "precio": 3990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/labial-liquido-8h-matte-ee-37169-0",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-37169-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Máscara Para Cejas Fijadora Thick Wow 02 Ash Brown",
+      "marca": "ESSENCE",
+      "precio": 2240.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/mascara-para-cejas-fijadora-thick-wow-caramel-blonde-ee-39477",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-39477-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Rubor Liquido Sunkisser Blush",
+      "marca": "MAYBELLINE",
+      "precio": 8990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-rostro-rubores-rubor-liquido-sunkisser-blush",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-66841_1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lápiz Labial Mate Intense Matte",
+      "marca": "CATRICE",
+      "precio": 4490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lapiz-labial-mate-intense-matte-ca-40138-0",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-40138-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mini Brush Set",
+      "marca": "DBS",
+      "precio": 16990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-sets-mini-brush-set",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/real-techniques-rh-04285-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Brillo Labial Fat Oil Click",
+      "marca": "NYX",
+      "precio": 12990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/brillo-labial-fat-oil-click-nx-24950-0",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-24954_6.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Corrector De Ojeras Super Stay Active Wear 30H",
+      "marca": "MAYBELLINE",
+      "precio": 8490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/corrector-de-ojeras-super-stay-active-wear-30h-my-64792-0",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-64792.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tinte Para Labios Y Mejillas What A Tint",
+      "marca": "ESSENCE",
+      "precio": 4990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tinte-para-labios-y-mejillas-what-a-tint-ee-38242",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-38241_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Corrector Instant Age Eraser Concealer",
+      "marca": "MAYBELLINE",
+      "precio": 9990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/corrector-instant-age-eraser-concealer",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/maybelline-my-33859_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Soft Nude Eyeshadow Palette 02 Warm Tones",
+      "marca": "KIKO MILANO",
+      "precio": 12990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/soft-nude-eyeshadow-palette-02-warm-tones-km-00058",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-00058_4.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Esmalte Tradicional",
+      "marca": "DBS",
+      "precio": 4490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/mg-53001-esmalte-tradicional-1",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/masglo-mg-53060_1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Eyeshadow Palette Tiana",
+      "marca": "DBS",
+      "precio": 9990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/eyeshadow-palette-tiana-btc-85325",
+      "imagen": "https://dbs.cl/media/catalog/product/b/e/beautycreations-btc-85325-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Labial Líquido Infaillible Le Matte Resistance",
+      "marca": "L'ORÉAL PARIS",
+      "precio": 10990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/labial-liquido-infallible-le-matte-resistance-lo-67482-0",
+      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-67482.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Gel Para Cejas The Brow Glue",
+      "marca": "NYX",
+      "precio": 11990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/gel-para-cejas-the-brow-glue-nx-00377",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-pmu-nx-00377.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Esmalte Semipermanente Gel Evolution",
+      "marca": "DBS",
+      "precio": 6990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-u-as-esmaltes-de-u-as-esmalte-semipermanente-gel-evolution",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/masglo-mg-36248-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sculpting Touch Creamy Stick Contour",
+      "marca": "KIKO MILANO",
+      "precio": 16990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/sculpting-touch-creamy-stick-contour-km-01482-0",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-01482_2_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Spray Fijador De Maquillaje De Larga Duración Fix Last 18H",
+      "marca": "ESSENCE",
+      "precio": 4490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/maquillaje-rostro-fijadores-spray-fijador-de-maquillaje-de-larga-duracion-fix-last-18h",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49043-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lápiz Ojos Jumbo Eye Pencil",
+      "marca": "NYX",
+      "precio": 7990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lapiz-ojos-jumbo-eye-pencil-nx-40127-1",
+      "imagen": "https://dbs.cl/media/catalog/product/n/y/nyx-nx-40127_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Delineador De Ojos Tattoo Studio Ink Pen Black",
+      "marca": "MAYBELLINE",
+      "precio": 5990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/delineador-de-ojos-tattoo-studio-ink-pen-black-my-84491",
+      "imagen": "https://dbs.cl/media/catalog/product/m/n/mny-my-84491.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Under Eye Brightener Iluminador Para La Ojera 010 Light Rose",
+      "marca": "CATRICE",
+      "precio": 4490.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/under-eye-brightener-iluminador-para-la-ojera-ca-37575",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-37575.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Top Coat De Larga Duración Longlasting Matt",
+      "marca": "CATRICE",
+      "precio": 990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/top-coat-de-larga-duracion-longlasting-matt-ca-35655",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-35655.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lápiz Delineador de Ojos Gel",
+      "marca": "DBS",
+      "precio": 3990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lapiz-delineador-de-ojos-gel",
+      "imagen": "https://dbs.cl/media/catalog/product/d/b/dbs-cosmetics-dbs-sch7081-mp.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Set De Polvos Para Cejas Light Medium",
+      "marca": "ESSENCE",
+      "precio": 1990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/set-de-polvos-para-cejas-light-medium-ee-27120",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-27120.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Brighten Up Polvos Banana",
+      "marca": "ESSENCE",
+      "precio": 3990.0,
+      "categoria": "maquillaje",
+      "stock": "In stock",
+      "url": "https://dbs.cl/brighten-up-polvos-banana-ee-40472",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-40472-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
     }
   ]
 }
