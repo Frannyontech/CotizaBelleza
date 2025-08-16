@@ -21,6 +21,7 @@ import {
   ArrowDownOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
+import { productService } from '../../services/api';
 import PriceAlertModal from '../../components/PriceAlertModal';
 import StoreComparison from '../../components/StoreComparison';
 import ProductReviews from '../../components/ProductReviews';
@@ -35,14 +36,17 @@ const DetalleProducto = () => {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [reviewsData, setReviewsData] = useState(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
     const fetchProducto = async () => {
       try {
         setLoading(true);
         
-        // Detectar si es un producto de Preunic o DBS basándose en el ID
+        // Detectar el tipo de producto basándose en el ID
         const isPreunicProduct = id && id.startsWith('preunic_');
+        const isMaicaoProduct = id && id.startsWith('maicao_');
         
         let response;
         if (isPreunicProduct) {
@@ -78,17 +82,68 @@ const DetalleProducto = () => {
               num_precios: 1
             }
           };
+        } else if (isMaicaoProduct) {
+          // Para Maicao, necesitamos buscar el producto por ID
+          const searchResponse = await axios.get(`/api/productos-maicao/`);
+          const productos = searchResponse.data.productos || [];
+          const producto = productos.find(p => p.id === id);
+          
+          if (!producto) {
+            throw new Error('Producto no encontrado');
+          }
+          
+          // Adaptar el formato para que sea compatible con el resto del componente
+          response = {
+            data: {
+              id: producto.id,
+              nombre: producto.nombre,
+              marca: producto.marca || '',
+              categoria: producto.categoria,
+              precio: producto.precio,
+              stock: producto.stock,
+              url_producto: producto.url_producto,
+              imagen_url: producto.imagen_url,
+              descripcion: producto.descripcion || producto.nombre,
+              tienda: 'MAICAO',
+              tiendas_disponibles: ['MAICAO'],
+              tiendas_detalladas: [{
+                tienda: 'MAICAO',
+                precio: producto.precio,
+                stock: producto.stock,
+                url_producto: producto.url_producto
+              }],
+              num_precios: 1
+            }
+          };
         } else {
           // Para DBS, usar la API existente
           response = await axios.get(`/api/productos-dbs/${id}/`);
         }
         
         setProducto(response.data);
+        
+        // Obtener reseñas solo para productos DBS (que tienen ID numérico)
+        if (!isPreunicProduct && !isMaicaoProduct) {
+          await fetchReviews(id);
+        }
       } catch (error) {
         console.error('Error fetching producto:', error);
         message.error('Error al cargar el producto');
       } finally {
         setLoading(false);
+      }
+    };
+    
+    const fetchReviews = async (productId) => {
+      try {
+        setReviewsLoading(true);
+        const reviews = await productService.getProductReviews(productId);
+        setReviewsData(reviews);
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        // No mostrar error al usuario ya que las reseñas son opcionales
+      } finally {
+        setReviewsLoading(false);
       }
     };
 
@@ -198,16 +253,20 @@ const DetalleProducto = () => {
                 </div>
                 <Title level={2} className="product-name">{producto.nombre}</Title>
                 
-                {/* Rating */}
-                <div className="rating-section">
-                  <Rate 
-                    disabled 
-                    defaultValue={4.7} 
-                    allowHalf 
-                    className="product-rating"
-                  />
-                  <Text className="rating-text">4.7 (324 reseñas)</Text>
-                </div>
+                {/* Rating - Solo mostrar si hay reseñas reales */}
+                {reviewsData && reviewsData.total_resenas > 0 && (
+                  <div className="rating-section">
+                    <Rate 
+                      disabled 
+                      value={reviewsData.promedio_valoracion} 
+                      allowHalf 
+                      className="product-rating"
+                    />
+                    <Text className="rating-text">
+                      {reviewsData.promedio_valoracion.toFixed(1)} ({reviewsData.total_resenas} {reviewsData.total_resenas === 1 ? 'reseña' : 'reseñas'})
+                    </Text>
+                  </div>
+                )}
 
                 {/* Price Information */}
                 <div className="price-section">
@@ -240,7 +299,7 @@ const DetalleProducto = () => {
                 {/* Action Buttons */}
                 <div className="action-buttons">
                   {/* Solo mostrar alerta de precio para productos DBS */}
-                  {!id.startsWith('preunic_') && (
+                  {!id.startsWith('preunic_') && !id.startsWith('maicao_') && (
                     <Button 
                       type="primary" 
                       size="large" 
@@ -261,6 +320,18 @@ const DetalleProducto = () => {
                       onClick={() => window.open(producto.url_producto, '_blank')}
                     >
                       🛒 Ver en Preunic
+                    </Button>
+                  )}
+                  
+                  {/* Para productos de Maicao, mostrar botón de ir a tienda */}
+                  {id.startsWith('maicao_') && producto.url_producto && (
+                    <Button 
+                      type="primary" 
+                      size="large" 
+                      className="store-button"
+                      onClick={() => window.open(producto.url_producto, '_blank')}
+                    >
+                      💄 Ver en Maicao
                     </Button>
                   )}
                   
@@ -287,11 +358,11 @@ const DetalleProducto = () => {
         />
 
         {/* Product Reviews Section - Solo para productos DBS */}
-        {!id.startsWith('preunic_') && <ProductReviews productId={id} />}
+        {!id.startsWith('preunic_') && !id.startsWith('maicao_') && <ProductReviews productId={id} />}
       </Content>
       
       {/* Price Alert Modal - Solo para productos DBS */}
-      {!id.startsWith('preunic_') && (
+      {!id.startsWith('preunic_') && !id.startsWith('maicao_') && (
         <PriceAlertModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
