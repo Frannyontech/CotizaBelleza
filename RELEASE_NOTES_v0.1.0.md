@@ -1,4 +1,4 @@
-# CotizaBelleza v0.4.0 — 2025-08-15
+# CotizaBelleza v0.1.0 — 2025-08-15
 
 ## 🎉 Highlights
 
@@ -15,9 +15,9 @@
 
 | Sprint | Alcance | Estado |
 |--------|---------|---------|
-| 1-3 | Scrapers DBS/Preunic + unificación base | ✅ Listo |
-| 4 | Interfaz productos/buscador | 🚧 En progreso |
-| 5 | Alertas/Reseñas (frontend) | 🚧 En progreso |
+| 1-3 | Scrapers DBS/Preunic + unificación base | 🚧 Listo |
+| 4 | Interfaz productos/buscador | ✅ En progreso |
+| 5 | Alertas/Reseñas (frontend) | ✅ En progreso |
 | 6 | Integración/QA | ⏳ Pendiente |
 
 ## 📝 Changelog Detallado
@@ -87,14 +87,13 @@ Ningún breaking change en esta versión. La API mantiene compatibilidad hacia a
    npm test
    ```
 
-## 🚀 Next Milestones (v0.5.0)
+## 🚀 Next Milestones (v0.2.0)
 
 - **Integración completa**: Finalización de la conexión backend-frontend para todas las funcionalidades
 - **Sistema de notificaciones**: Implementación de envío de emails para alertas de precio
 - **Análisis de tendencias**: Gráficos de evolución de precios históricos
 - **Optimización de performance**: Caching de resultados de scrapers y mejoras de velocidad
 - **API avanzada**: Endpoints para estadísticas y análisis de productos
-- **Mobile app**: Aplicación móvil para iOS y Android
 
 ---
 
