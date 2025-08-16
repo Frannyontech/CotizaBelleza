@@ -131,6 +131,37 @@ export const productService = {
     }
   },
 
+  // Obtener productos de Maicao
+  getMaicaoProducts: async (filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+      
+      if (filters.categoria) params.append('categoria', filters.categoria);
+      if (filters.search) params.append('search', filters.search);
+      if (filters.marca) params.append('marca', filters.marca);
+      
+      console.log('Making API request to:', `productos-maicao/?${params.toString()}`);
+      const response = await api.get(`productos-maicao/?${params.toString()}`);
+      console.log('Maicao API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching Maicao products:', error);
+      console.error('Error details:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // Buscar productos en Maicao
+  searchMaicaoProducts: async (searchTerm) => {
+    try {
+      const response = await api.get(`productos-maicao/?search=${encodeURIComponent(searchTerm)}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error searching Maicao products:', error);
+      throw error;
+    }
+  },
+
   // Obtener reseñas de producto
   getProductReviews: async (productId) => {
     try {
