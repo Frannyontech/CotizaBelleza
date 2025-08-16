@@ -191,4 +191,10 @@ staticfiles/
 static/
 
 # Environment variables
-.env 
+.env
+
+# Scraper specific
+test_*.py
+*_test.py
+scraper/scrapers/scraper/
+*.tmp 

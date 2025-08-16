@@ -15,6 +15,13 @@ from .preunic_selenium_scraper import (
     main_scraper_preunic
 )
 
+# Maicao Scraper
+from .maicao_selenium_scraper import (
+    MaicaoProduct,
+    MaicaoSeleniumScraper,
+    scrape_maicao_all_categories
+)
+
 __all__ = [
     'DBSProduct',
     'DBSSeleniumScraper', 
@@ -22,5 +29,8 @@ __all__ = [
     'scrapear_catalogo_dbs',
     'scrapear_todas_categorias_dbs',
     'scrape_preunic_list',
-    'main_scraper_preunic'
+    'main_scraper_preunic',
+    'MaicaoProduct',
+    'MaicaoSeleniumScraper',
+    'scrape_maicao_all_categories'
 ] 

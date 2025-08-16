@@ -18,11 +18,17 @@ scraper/
 ├── __init__.py                 # Módulo principal
 ├── config.py                   # Configuraciones y constantes
 ├── utils.py                    # Utilidades y funciones auxiliares
-├── example_usage.py           # Ejemplos de uso
+├── unify_products.py          # Script de unificación de datos
 ├── README.md                  # Esta documentación
+├── data/                      # Datos extraídos
+│   ├── dbs_productos.json     # Productos DBS
+│   ├── preunic_productos.json # Productos Preunic
+│   └── maicao_productos.json  # Productos Maicao
 └── scrapers/
-    ├── __init__.py            # Submódulo scrapers
-    └── dbs_scraper.py        # Scraper específico para DBS
+    ├── __init__.py               # Submódulo scrapers
+    ├── dbs_selenium_scraper.py   # Scraper DBS (Selenium)
+    ├── preunic_selenium_scraper.py # Scraper Preunic (Selenium)
+    └── maicao_selenium_scraper.py  # Scraper Maicao (Selenium)
 ```
 
 ## 🛠️ Instalación
@@ -30,7 +36,15 @@ scraper/
 ### Dependencias
 
 ```bash
-pip install requests beautifulsoup4
+pip install requests beautifulsoup4 selenium
+```
+
+### Dependencias del sistema
+
+```bash
+# ChromeDriver para Selenium (debe estar en PATH)
+# O usar webdriver-manager para instalación automática:
+pip install webdriver-manager
 ```
 
 ### Dependencias opcionales
@@ -41,10 +55,26 @@ pip install pandas openpyxl  # Para exportación a Excel
 
 ## 📖 Uso Básico
 
-### Scraping de una página
+### Scraper de Maicao (Selenium con Paginación)
 
 ```python
-from scraper.scrapers.dbs_scraper import scrapear_pagina_dbs
+from scraper.scrapers.maicao_selenium_scraper import scrape_maicao_all_categories
+
+# Scraping completo de todas las categorías
+productos = scrape_maicao_all_categories(headless=True)
+
+# Scraping limitado (solo primeras páginas para pruebas)
+productos = scrape_maicao_all_categories(headless=True, max_pages_per_category=3)
+
+# Ejecutar directamente
+cd scraper/scrapers
+python maicao_selenium_scraper.py
+```
+
+### Scraping de DBS
+
+```python
+from scraper.scrapers.dbs_selenium_scraper import scrapear_pagina_dbs
 
 # Scraping de una página de categoría
 url = "https://www.dbs.cl/maquillaje"
@@ -64,7 +94,6 @@ from scraper.scrapers.dbs_scraper import scrapear_catalogo_dbs
 urls = [
     "https://www.dbs.cl/maquillaje",
     "https://www.dbs.cl/skincare",
-    "https://www.dbs.cl/cabello"
 ]
 
 # Scraping con delay entre requests
@@ -290,6 +319,32 @@ CSS_SELECTORS['nuevo_sitio'] = {
     # ...
 }
 ```
+
+## 🏪 Tiendas Soportadas
+
+| Tienda | Scraper | Tecnología | Categorías | Estado |
+|--------|---------|------------|------------|--------|
+| **DBS** | `dbs_selenium_scraper.py` | Selenium + BeautifulSoup | `maquillaje`, `skincare` | ✅ Funcional |
+| **Preunic** | `preunic_selenium_scraper.py` | Selenium + BeautifulSoup | `maquillaje`, `skincare` | ✅ Funcional |
+| **Maicao** | `maicao_selenium_scraper.py` | Selenium + Paginación | `maquillaje`, `skincare` | ✅ Funcional |
+
+### Características por Scraper
+
+#### Maicao Scraper
+- ✅ **Paginación avanzada** (detección automática de páginas)
+- ✅ **Extracción de precios desde detalle** si no se encuentra en lista
+- ✅ **Scroll infinito reemplazado** por navegación correcta
+- ✅ **Estructura JSON estandarizada** con otras tiendas
+
+#### DBS Scraper
+- ✅ **Navegación por páginas** numeradas
+- ✅ **Detección automática de total de páginas**
+- ✅ **Extracción de imágenes lazy-loading**
+
+#### Preunic Scraper
+- ✅ **Scroll infinito** hasta carga completa
+- ✅ **Manejo de productos sin precio**
+- ✅ **Extracción de marcas inteligente**
 
 ## 📄 Licencia
 
