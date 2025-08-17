@@ -304,7 +304,8 @@ class DBSProductosAPIView(APIView):
                             'url_producto': precio_dbs.url_producto or '',
                             'imagen_url': producto.imagen_url or '',
                             'descripcion': producto.descripcion or '',
-                            'fecha_extraccion': precio_dbs.fecha_extraccion.isoformat()
+                            'fecha_extraccion': precio_dbs.fecha_extraccion.isoformat(),
+                            'tienda': 'DBS'
                         })
             
             productos_data.sort(key=lambda x: x['precio'])

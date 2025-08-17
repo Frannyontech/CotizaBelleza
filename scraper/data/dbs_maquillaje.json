@@ -1,5 +1,5 @@
 {
-  "fecha_extraccion": "2025-08-16 19:41:16",
+  "fecha_extraccion": "2025-08-16 21:18:15",
   "tienda": "DBS",
   "categoria": "maquillaje",
   "total_productos": 120,
@@ -231,7 +231,7 @@
     },
     {
       "nombre": "Barra Multiuso Para Labios Y Mejillas Pink Bomb",
-      "marca": "DBS",
+      "marca": "Glam",
       "precio": 1990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -546,7 +546,7 @@
     },
     {
       "nombre": "Brillo Labial Megaslicks",
-      "marca": "DBS",
+      "marca": "Wet",
       "precio": 2740.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -654,7 +654,7 @@
     },
     {
       "nombre": "Barra Multiuso Para Labios Y Mejillas Peach Bomb",
-      "marca": "DBS",
+      "marca": "Glam",
       "precio": 1990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -717,7 +717,7 @@
     },
     {
       "nombre": "Sombra De Ojos Chroma Light",
-      "marca": "DBS",
+      "marca": "Moira",
       "precio": 7990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -744,7 +744,7 @@
     },
     {
       "nombre": "Labial Super Lustrous",
-      "marca": "DBS",
+      "marca": "Revlon",
       "precio": 6990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -780,7 +780,7 @@
     },
     {
       "nombre": "Esmalte De Uñas Tradicional",
-      "marca": "DBS",
+      "marca": "China",
       "precio": 2990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -861,7 +861,7 @@
     },
     {
       "nombre": "Liquid Highlighter Gold",
-      "marca": "DBS",
+      "marca": "DBS COLLECTION",
       "precio": 3490.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -906,7 +906,7 @@
     },
     {
       "nombre": "Mini Brush Set",
-      "marca": "DBS",
+      "marca": "REAL TECHNIQUES",
       "precio": 16990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -960,7 +960,7 @@
     },
     {
       "nombre": "Esmalte Tradicional",
-      "marca": "DBS",
+      "marca": "Masglo",
       "precio": 4490.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -969,7 +969,7 @@
     },
     {
       "nombre": "Eyeshadow Palette Tiana",
-      "marca": "DBS",
+      "marca": "Beauty",
       "precio": 9990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -996,7 +996,7 @@
     },
     {
       "nombre": "Esmalte Semipermanente Gel Evolution",
-      "marca": "DBS",
+      "marca": "Masglo",
       "precio": 6990.0,
       "categoria": "maquillaje",
       "stock": "In stock",
@@ -1059,7 +1059,7 @@
     },
     {
       "nombre": "Lápiz Delineador de Ojos Gel",
-      "marca": "DBS",
+      "marca": "DBS COLLECTION",
       "precio": 3990.0,
       "categoria": "maquillaje",
       "stock": "In stock",

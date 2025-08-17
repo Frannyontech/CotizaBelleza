@@ -45,7 +45,16 @@ class DBSSeleniumScraper:
             'KIKO MILANO', 'ESSENCE', 'CATRICE', 'NYX', 'MAYBELLINE', 
             'L\'ORÉAL PARIS', 'BIOTHERM', 'CLINIQUE', 'KIEHL\'S',
             'REVUELE', 'REVOX B77', 'SKIN1004', 'COSRX', 'BOVEY',
-            'APIVITA', 'BYPHASSE', 'TOCOBO', 'DBS BASICS'
+            'APIVITA', 'BYPHASSE', 'TOCOBO', 'DBS BASICS', 'DBS COLLECTION',
+            'MARIO BADESCU', 'GARNIER', 'URBAN DECAY', 'REAL TECHNIQUES',
+            'PIXI', 'ANASTASIA BEVERLY HILLS', 'MORPHE', 'FENTY BEAUTY',
+            'RARE BEAUTY', 'GLOSSIER', 'TARTE', 'BENEFIT', 'MAC',
+            'NARS', 'CHARLOTTE TILBURY', 'DIOR', 'YSL', 'CHANEL',
+            'TOM FORD', 'MARC JACOBS', 'ESTÉE LAUDER', 'LANCÔME',
+            'SHISEIDO', 'SK-II', 'LA MER', 'TATCHA', 'DRUNK ELEPHANT',
+            'THE ORDINARY', 'PAULA\'S CHOICE', 'CERAVE', 'NEUTROGENA',
+            'OLAY', 'AVEENO', 'EUCERIN', 'LA ROCHE-POSAY', 'VICHY',
+            'BIORÉ', 'NIVEA', 'POND\'S', 'VASELINE', 'JERGENS'
         ]
 
     def setup_driver(self, headless: bool):
@@ -223,19 +232,34 @@ class DBSSeleniumScraper:
         return True
 
     def _extract_marca(self, product_element) -> str:
-        # Primero buscar en marcas conocidas
-        for marca in self.marcas_conocidas:
-            # Buscar en el texto del elemento
-            text = product_element.get_text().upper()
-            if marca.upper() in text:
-                return marca
+        # Intentar extraer marca del título/nombre del producto
+        nombre_element = product_element.select_one('a[title], .product-name, .product-title, h3, h2')
+        if nombre_element:
+            nombre_text = nombre_element.get_text(strip=True).upper()
+            # Buscar marcas conocidas en el nombre del producto
+            for marca in self.marcas_conocidas:
+                if marca.upper() in nombre_text:
+                    return marca
+            
+            # Extraer primera palabra del nombre como posible marca
+            primera_palabra = nombre_text.split()[0] if nombre_text.split() else ""
+            if len(primera_palabra) > 2 and primera_palabra.isalpha():
+                # Verificar que no sea una palabra genérica
+                palabras_genericas = ["SET", "KIT", "PACK", "CREMA", "SERUM", "MASCARA", "LABIAL", "BASE"]
+                if primera_palabra not in palabras_genericas:
+                    return primera_palabra.title()
         
-        # Si no encuentra marca conocida, buscar en elementos específicos
+        # Buscar en enlaces de marca específicos
+        brand_links = product_element.select('a[href*="/marca"], a[href*="/brand"], a[href*="/marcas"]')
+        for link in brand_links:
+            marca_text = link.get_text(strip=True)
+            if marca_text and len(marca_text) > 1:
+                return marca_text
+        
+        # Buscar en elementos con clases de marca
         brand_selectors = [
-            '.product-brand',
-            '.brand',
-            '.product-item-brand',
-            '.item-brand'
+            '.product-brand', '.brand', '.product-item-brand', '.item-brand',
+            '.manufacturer', '.marca', '.brand-name'
         ]
         
         for selector in brand_selectors:
@@ -245,8 +269,14 @@ class DBSSeleniumScraper:
                 if text and len(text) > 1:
                     return text
         
-        # Si no encuentra marca, retornar "DBS" por defecto
-        return "DBS"
+        # Buscar en todo el texto del elemento como último recurso
+        full_text = product_element.get_text().upper()
+        for marca in self.marcas_conocidas:
+            if marca.upper() in full_text:
+                return marca
+        
+        # Si no encuentra marca específica, usar "GENÉRICA" en lugar de "DBS"
+        return "GENÉRICA"
 
     def _extract_precio(self, product_element) -> float:
         price_selectors = [

@@ -43,6 +43,53 @@ class Command(BaseCommand):
             return text[:max_length-3] + "..."
         return text
 
+    def _procesar_producto(self, producto_data, categoria_model, tienda, tienda_config):
+        """Procesa un producto individual y retorna (producto_creado, precio_creado)"""
+        # Truncar datos si son demasiado largos
+        nombre = self.truncate_text(producto_data['nombre'], 500)
+        marca = self.truncate_text(producto_data.get('marca', ''), 200)
+        imagen_url = self.truncate_text(producto_data.get('imagen', ''), 500)
+        url_producto = self.truncate_text(producto_data.get('url', ''), 500)
+
+        # Crear o actualizar producto
+        producto, created_producto = Producto.objects.get_or_create(
+            nombre=nombre,
+            marca=marca,
+            defaults={
+                'descripcion': nombre,
+                'imagen_url': imagen_url,
+                'categoria': categoria_model
+            }
+        )
+
+        # Si el producto ya existía, actualizar la imagen si está vacía
+        if not created_producto and (not producto.imagen_url or producto.imagen_url == ''):
+            producto.imagen_url = imagen_url
+            producto.save()
+            self.stdout.write(f'Imagen actualizada para: {nombre}')
+
+        # Crear precio del producto
+        created_precio = False
+        if producto_data.get('precio', 0) > 0:
+            # Manejar diferentes formatos de stock
+            stock_value = producto_data.get('stock', True)
+            if isinstance(stock_value, str):
+                stock_bool = tienda_config['stock_mapping'].get(stock_value, True)
+            else:
+                stock_bool = bool(stock_value)
+
+            precio, created_precio = PrecioProducto.objects.get_or_create(
+                producto=producto,
+                tienda=tienda,
+                defaults={
+                    'precio': Decimal(str(producto_data['precio'])),
+                    'stock': stock_bool,
+                    'url_producto': url_producto
+                }
+            )
+
+        return created_producto, created_precio
+
     def get_tienda_config(self, tienda_nombre):
         """Configuración específica por tienda"""
         configs = {
@@ -127,67 +174,49 @@ class Command(BaseCommand):
                 productos_creados = 0
                 precios_creados = 0
 
-                # Procesar datos del JSON
-                for categoria_key, categoria_data in data.items():
-                    if categoria_key in ['fecha_extraccion', 'total_productos']:
-                        continue
+                # Procesar datos del JSON - detectar formato automáticamente
+                if 'categoria' in data and 'productos' in data:
+                    # Formato de archivo separado: {categoria: "maquillaje", productos: [...]}
+                    categoria_key = data['categoria']
+                    productos_list = data['productos']
                     
-                    # Solo procesar categorías especificadas
-                    if categoria_key not in categorias_a_procesar:
-                        continue
+                    # Solo procesar si la categoría está en las especificadas
+                    if categoria_key in categorias_a_procesar:
+                        categoria_model = categorias_creadas.get(categoria_key)
+                        if categoria_model:
+                            self.stdout.write(f'Procesando categoría (archivo separado): {categoria_key}')
+                            
+                            for producto_data in productos_list:
+                                created_producto, created_precio = self._procesar_producto(
+                                    producto_data, categoria_model, tienda, tienda_config
+                                )
+                                if created_producto:
+                                    productos_creados += 1
+                                if created_precio:
+                                    precios_creados += 1
+                else:
+                    # Formato unificado: {maquillaje: {productos: [...]}, skincare: {productos: [...]}}
+                    for categoria_key, categoria_data in data.items():
+                        if categoria_key in ['fecha_extraccion', 'total_productos', 'tienda']:
+                            continue
+                        
+                        # Solo procesar categorías especificadas
+                        if categoria_key not in categorias_a_procesar:
+                            continue
 
-                    categoria_model = categorias_creadas.get(categoria_key)
-                    if not categoria_model:
-                        continue
+                        categoria_model = categorias_creadas.get(categoria_key)
+                        if not categoria_model:
+                            continue
 
-                    self.stdout.write(f'Procesando categoría: {categoria_key}')
+                        self.stdout.write(f'Procesando categoría (archivo unificado): {categoria_key}')
 
-                    for producto_data in categoria_data.get('productos', []):
-                        # Truncar datos si son demasiado largos
-                        nombre = self.truncate_text(producto_data['nombre'], 500)
-                        marca = self.truncate_text(producto_data.get('marca', ''), 200)
-                        imagen_url = self.truncate_text(producto_data.get('imagen', ''), 500)
-                        url_producto = self.truncate_text(producto_data.get('url', ''), 500)
-
-                        # Crear o actualizar producto
-                        producto, created = Producto.objects.get_or_create(
-                            nombre=nombre,
-                            marca=marca,
-                            defaults={
-                                'descripcion': nombre,
-                                'imagen_url': imagen_url,
-                                'categoria': categoria_model
-                            }
-                        )
-
-                        # Si el producto ya existía, actualizar la imagen si está vacía
-                        if not created and (not producto.imagen_url or producto.imagen_url == ''):
-                            producto.imagen_url = imagen_url
-                            producto.save()
-                            self.stdout.write(f'Imagen actualizada para: {nombre}')
-
-                        if created:
-                            productos_creados += 1
-
-                        # Crear precio del producto
-                        if producto_data.get('precio', 0) > 0:
-                            # Manejar diferentes formatos de stock
-                            stock_value = producto_data.get('stock', True)
-                            if isinstance(stock_value, str):
-                                stock_bool = tienda_config['stock_mapping'].get(stock_value, True)
-                            else:
-                                stock_bool = bool(stock_value)
-
-                            precio, created = PrecioProducto.objects.get_or_create(
-                                producto=producto,
-                                tienda=tienda,
-                                defaults={
-                                    'precio': Decimal(str(producto_data['precio'])),
-                                    'stock': stock_bool,
-                                    'url_producto': url_producto
-                                }
+                        for producto_data in categoria_data.get('productos', []):
+                            created_producto, created_precio = self._procesar_producto(
+                                producto_data, categoria_model, tienda, tienda_config
                             )
-                            if created:
+                            if created_producto:
+                                productos_creados += 1
+                            if created_precio:
                                 precios_creados += 1
 
                 self.stdout.write(
