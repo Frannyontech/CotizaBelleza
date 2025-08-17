@@ -11,4 +11,9 @@ django-cors-headers==4.7.0
 # Dependencias para scraping
 requests==2.31.0
 beautifulsoup4==4.12.2
-lxml==4.9.3 
+lxml==4.9.3
+
+# Dependencias para normalización de productos
+rapidfuzz==3.6.1
+scikit-learn==1.4.0
+unidecode==1.3.7 
