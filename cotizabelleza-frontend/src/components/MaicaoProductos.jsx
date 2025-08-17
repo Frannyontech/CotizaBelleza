@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../services/api';
-import './DBSProductos.css';
+import './MaicaoProductos.css';
 
-const DBSProductos = () => {
+const MaicaoProductos = () => {
   const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
   const [filtros, setFiltros] = useState({
@@ -24,12 +24,12 @@ const DBSProductos = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await productService.getDBSProducts(nuevosFiltros);
+      const response = await productService.getMaicaoProducts(nuevosFiltros);
       setProductos(response.productos || []);
       setTotal(response.total || 0);
     } catch (error) {
-      console.error('Error cargando productos de DBS:', error);
-      setError('Error al cargar los productos de DBS');
+      console.error('Error cargando productos de Maicao:', error);
+      setError('Error al cargar los productos de Maicao');
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ const DBSProductos = () => {
   };
 
   const manejarClickProducto = (producto) => {
-    const productId = `dbs_${producto.id}`;
+    const productId = `maicao_${producto.id}`;
     navigate(`/detalle-producto/${productId}`);
   };
 
@@ -60,10 +60,10 @@ const DBSProductos = () => {
 
   if (loading) {
     return (
-      <div className="dbs-productos-container">
+      <div className="maicao-productos-container">
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Cargando productos de DBS...</p>
+          <p>Cargando productos de Maicao...</p>
         </div>
       </div>
     );
@@ -71,7 +71,7 @@ const DBSProductos = () => {
 
   if (error) {
     return (
-      <div className="dbs-productos-container">
+      <div className="maicao-productos-container">
         <div className="error-container">
           <p className="error-message">{error}</p>
           <button onClick={() => cargarProductos()} className="retry-button">
@@ -83,11 +83,11 @@ const DBSProductos = () => {
   }
 
   return (
-    <div className="dbs-productos-container">
+    <div className="maicao-productos-container">
       {/* Header */}
-      <div className="dbs-header">
-        <h1>🛍️ Productos DBS</h1>
-        <p>Encuentra los mejores productos de belleza en DBS</p>
+      <div className="maicao-header">
+        <h1>💄 Productos Maicao</h1>
+        <p>Descubre los mejores productos de belleza en Maicao</p>
       </div>
 
       {/* Filtros */}
@@ -144,7 +144,7 @@ const DBSProductos = () => {
                   e.target.src = '/image-not-found.png';
                 }}
               />
-              <div className="producto-tienda">🛍️ DBS</div>
+              <div className="producto-tienda">💄 Maicao</div>
             </div>
             
             <div className="producto-info">
@@ -172,4 +172,4 @@ const DBSProductos = () => {
   );
 };
 
-export default DBSProductos;
+export default MaicaoProductos;

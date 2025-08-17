@@ -16,6 +16,7 @@ import {
   Pagination,
   Collapse
 } from 'antd';
+import { resolveImageUrl, getDefaultThumbnail } from '../../utils/image';
 
 const SearchResultsPage = () => {
   console.log('SearchResultsPage component mounted - SIMPLIFIED VERSION');
@@ -48,30 +49,44 @@ const SearchResultsPage = () => {
         const searchTerm = searchParams.get('search') || '';
         console.log('Searching for:', searchTerm);
         
-        // Buscar en ambas tiendas en paralelo
-        const [dbsResponse, preunicResponse] = await Promise.all([
+        // Buscar en todas las tiendas en paralelo
+        const [dbsResponse, preunicResponse, maicaoResponse] = await Promise.all([
           fetch(`/api/productos-dbs/?search=${encodeURIComponent(searchTerm)}`),
-          fetch(`/api/productos-preunic/?search=${encodeURIComponent(searchTerm)}`)
+          fetch(`/api/productos-preunic/?search=${encodeURIComponent(searchTerm)}`),
+          fetch(`/api/productos-maicao/?search=${encodeURIComponent(searchTerm)}`)
         ]);
         
         const dbsData = await dbsResponse.json();
         const preunicData = await preunicResponse.json();
+        const maicaoData = await maicaoResponse.json();
         
         console.log('DBS API Response:', dbsData);
         console.log('Preunic API Response:', preunicData);
+        console.log('Maicao API Response:', maicaoData);
         
-        // Combinar productos de ambas tiendas
+        // Combinar productos de todas las tiendas
         const dbsProducts = (dbsData.productos || dbsData || []).map(product => ({
           ...product,
-          tienda: 'DBS'
+          tienda: 'DBS',
+          storeId: 'dbs',
+          storeName: 'DBS'
         }));
         
         const preunicProducts = (preunicData.productos || preunicData || []).map(product => ({
           ...product,
-          tienda: 'PREUNIC'
+          tienda: 'PREUNIC',
+          storeId: 'preunic',
+          storeName: 'Preunic'
         }));
         
-        const allProducts = [...dbsProducts, ...preunicProducts];
+        const maicaoProducts = (maicaoData.productos || maicaoData || []).map(product => ({
+          ...product,
+          tienda: 'MAICAO',
+          storeId: 'maicao',
+          storeName: 'Maicao'
+        }));
+        
+        const allProducts = [...dbsProducts, ...preunicProducts, ...maicaoProducts];
         console.log('Combined products data:', allProducts);
         setProducts(allProducts);
         
@@ -95,27 +110,20 @@ const SearchResultsPage = () => {
     }).format(price);
   };
 
-  // Obtener imagen del producto
-  const getImageUrl = (product) => {
-    if (!product.imagen_url || product.imagen_url === '') {
-      return '/image-not-found.png';
-    }
-    
-    if (product.imagen_url.startsWith('http')) {
-      return product.imagen_url;
-    }
-    
-    if (product.imagen_url.startsWith('/')) {
-      return `https://dbs.cl${product.imagen_url}`;
-    }
-    
-    return '/image-not-found.png';
+  // Formatear precio en formato CLP sin decimales
+  const formatPriceCLP = (price) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
   // Filtros como opciones para checkboxes
   const storeOptions = [
     { label: '🛍️ DBS', value: 'DBS' },
-    { label: '🛒 Preunic', value: 'PREUNIC' }
+    { label: '🛒 Preunic', value: 'PREUNIC' },
+    { label: '💄 Maicao', value: 'MAICAO' }
   ];
 
   // Filtrar y ordenar productos
@@ -316,14 +324,15 @@ const SearchResultsPage = () => {
                           hoverable
                           cover={
                             <Image
-                              alt={product.nombre}
-                              src={getImageUrl(product)}
+                              alt={product.nombre || product.productName}
+                              src={resolveImageUrl(product)}
                               style={{ 
                                 objectFit: 'contain', 
                                 height: 200,
+                                width: '100%',
                                 backgroundColor: '#f5f5f5'
                               }}
-                              fallback="/image-not-found.png"
+                              fallback={getDefaultThumbnail()}
                               preview={false}
                             />
                           }
@@ -342,12 +351,15 @@ const SearchResultsPage = () => {
                                 fontSize: 11, 
                                 padding: '2px 6px', 
                                 borderRadius: '4px',
-                                backgroundColor: product.tienda === 'DBS' ? '#e6f7ff' : '#f6ffed',
-                                color: product.tienda === 'DBS' ? '#1890ff' : '#52c41a',
+                                backgroundColor: product.tienda === 'DBS' ? '#e6f7ff' : 
+                                                 product.tienda === 'PREUNIC' ? '#f6ffed' : '#fff2e8',
+                                color: product.tienda === 'DBS' ? '#1890ff' : 
+                                       product.tienda === 'PREUNIC' ? '#52c41a' : '#fa8c16',
                                 fontWeight: 'bold'
                               }}
                             >
-                              {product.tienda === 'DBS' ? '🛍️ DBS' : '🛒 Preunic'}
+                              {product.tienda === 'DBS' ? '🛍️ DBS' : 
+                               product.tienda === 'PREUNIC' ? '🛒 Preunic' : '💄 Maicao'}
                             </Text>
                           </div>
                           <Paragraph 
@@ -368,7 +380,7 @@ const SearchResultsPage = () => {
                               fontSize: 16 
                             }}
                           >
-                            {formatPrice(product.precio || product.precio_min || 0)}
+                            {formatPriceCLP(product.precio || product.precio_min || 0)}
                           </Text>
                         </Card>
                       </Link>

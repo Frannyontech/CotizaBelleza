@@ -1,0 +1,1079 @@
+{
+  "fecha_extraccion": "2025-08-16 21:18:15",
+  "tienda": "DBS",
+  "categoria": "skincare",
+  "total_productos": 119,
+  "productos": [
+    {
+      "nombre": "Set Skincare Essentials",
+      "marca": "SKIN1004",
+      "precio": 46990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-sets-set-skincare-essentials",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skin1004_skincare_essencials_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Hydra Pro Glow",
+      "marca": "KIKO MILANO",
+      "precio": 25990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/hydra-pro-glow-km-00535",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-00535_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ampolla Probio-Cica 50Ml",
+      "marca": "SKIN1004",
+      "precio": 29990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-ampollas-ampolla-probio-cica-50ml",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skn-probiocica-ampolla.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Master Patch Original Fit - Parches Anti Imperfecciones 24 Un",
+      "marca": "COSRX",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/parches-antiacne-master-patch-original-fit-24-un-cx-45567",
+      "imagen": "https://dbs.cl/media/catalog/product/c/o/cosrx-cx-45567.png?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Péptidos 10 - Just Peptides 10 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-peptides-10-rx-10137",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10137.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Contorno De Ojos Eye Magic",
+      "marca": "Tessa",
+      "precio": 23990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ts-43322-contorno-de-ojos-eye-magic",
+      "imagen": "https://dbs.cl/media/catalog/product/t/e/tessa-ts-43322-01.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Protector Solar Facial Barra Spf50 Pa 19 Gr",
+      "marca": "TOCOBO",
+      "precio": 24990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/protector-solar-facial-barra-spf50-pa-19-gr-sk-06004",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tocobo-sk-06004.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Aceite Esencial Revitalizante Midnight Recovery Concentrate 50Ml",
+      "marca": "KIEHL'S",
+      "precio": 75990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-aceites-faciales-aceite-esencial-revitalizante-midnight-recovery-concentrate-50ml",
+      "imagen": "https://dbs.cl/media/catalog/product/k/h/kh-27975-01.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tratamiento Intensivo Para El Contorno De Los Ojos 15Ml",
+      "marca": "APIVITA",
+      "precio": 39990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tratamiento-intensivo-para-el-contorno-de-los-ojos-15ml-api-08615",
+      "imagen": "https://dbs.cl/media/catalog/product/a/p/apivita-api-08615.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ceramide Hidratante Facial Spf25 50Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ceramide-hidratante-facial-spf25-50ml-rve-10547",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10547.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Niacinamida 10 - Just Niacinamide 10 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-niacinamide-10-rx-10136",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10136.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Limpiador Facial Piel Seca Biosource 150Ml",
+      "marca": "BIOTHERM",
+      "precio": 32990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/limpiador-facial-piel-seca-biosource-150ml-btm-52641",
+      "imagen": "https://dbs.cl/media/catalog/product/b/t/btm-52641-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bruma Hidratante - Moisture Surge",
+      "marca": "CLINIQUE",
+      "precio": 34990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bruma-hidratante-moisture-surge-cli-19578",
+      "imagen": "https://dbs.cl/media/catalog/product/c/l/clinique-cli-19578.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bruma Facial Hydra Pro",
+      "marca": "KIKO MILANO",
+      "precio": 24990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-brumas-faciales-bruma-facial-hydra-pro",
+      "imagen": "https://dbs.cl/media/catalog/product/k/m/km-02894-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Serum Hydra Pro",
+      "marca": "KIKO MILANO",
+      "precio": 29990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-serums-serum-hydra-pro",
+      "imagen": "https://dbs.cl/media/catalog/product/k/m/km-02893-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Contorno De Ojos Lift Instant Q10 20 Ml",
+      "marca": "BYPHASSE",
+      "precio": 2990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09277-crema-contorno-de-ojos-lift-instant-q10-20-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09277.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Pétalos Desmaquillantes 100 algodón",
+      "marca": "DBS BASICS",
+      "precio": 1990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/dbs-pk91218-mp-petalos-desmaquillantes-100-algodon",
+      "imagen": "https://dbs.cl/media/catalog/product/d/b/dbs-pk91218-mp-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla Facial Peel Off Tako Pore",
+      "marca": "Tony",
+      "precio": 5090.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/to-35901-mascarilla-facial-peel-off-tako-pore",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-35901_5.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Niacinamide Serum 30Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/niacinamide-serum-30ml-rve-10619",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10619.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla Rostro Nocturna Panda",
+      "marca": "Tony",
+      "precio": 8490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/to-01406-mascarilla-rostro-nocturna-panda",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/to-01406-1.png?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Vitamina C 20 - Just Vitamin C 20 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-vitamin-c-20-rx-10141",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10141.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Gel Aloe Vera 99 Chok Chok 250 Ml",
+      "marca": "Tony",
+      "precio": 5990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/to-03295-gel-aloe-vera-99-chok-chok",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tonymoly-to-03295.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Almohadillas Para Remover Maquillaje",
+      "marca": "Beauty",
+      "precio": 3990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/almohadillas-para-remover-maquillaje-by-rf9927-mp",
+      "imagen": "https://dbs.cl/media/catalog/product/b/e/beauty-tools-by-rf9927-mp.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Vitamina Para Pestañas Ilash",
+      "marca": "Ilash",
+      "precio": 46990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/vitamina-para-pestanas",
+      "imagen": "https://dbs.cl/media/catalog/product/i/l/ilash-is-86256.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ácido Hialurónico 5 - Just Hyaluronic Acid 5 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-hyaluronic-acid-5-rx-10135",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10135.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Clear Fit Master Patch - Parches Anti Imperfecciones 18 Un",
+      "marca": "COSRX",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/parches-antiacne-clear-fit-master-patch-18-un-cx-47139",
+      "imagen": "https://dbs.cl/media/catalog/product/c/o/cosrx-cx-47139-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum Para Pestañas Y Cejas Super Boost",
+      "marca": "CATRICE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-para-pesta-as-y-cejas-super-boost-ca-32982",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-32982.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla De Arcilla Anti-Imperfecciones Pieles Mixtas A Grasas 150 Ml",
+      "marca": "BYPHASSE",
+      "precio": 6990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09417-mascarilla-de-arcilla-anti-imperfecciones-pieles-mixtas-a-grasas-150-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09417.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Termal 100 Natural 300Ml",
+      "marca": "BYPHASSE",
+      "precio": 8990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/agua-termal-100-natural-300ml-bh-09381",
+      "imagen": "https://dbs.cl/media/catalog/product/b/h/bh-09381-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ceramide Contorno De Ojos Reparador 25Ml",
+      "marca": "REVUELE",
+      "precio": 5990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ceramide-contorno-de-ojos-reparador-25ml-rve-10546",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10546.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Protector Solar Spf50 Hyalucica Sun Serum 50Ml",
+      "marca": "SKIN1004",
+      "precio": 24990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-protectores-solares-protector-solar-spf50-hyalucica-sun-serum-50ml",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skin1004-skn-26159-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Micelar en Óleo 400 ml",
+      "marca": "GARNIER",
+      "precio": 8990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ga-55450-agua-micelar-en-oleo",
+      "imagen": "https://dbs.cl/media/catalog/product/g/a/garnier-ga-55450.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla Facial Tomatox",
+      "marca": "Tony",
+      "precio": 16990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/to-45184-mascarilla-facial-tomatox",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/to-45184-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Aceite Youth Repairing Sleep",
+      "marca": "CATRICE",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/aceite-youth-repairing-sleep-ca-33083",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/catrice-ca-33083.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Contorno Ojos Cooling Hydra",
+      "marca": "Wet",
+      "precio": 6990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/contorno-ojos-cooling-hydra-ww-16107",
+      "imagen": "https://dbs.cl/media/catalog/product/w/e/wet-n-wild-ww-16107-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Centella Limpiador En Gel Suave 200Ml",
+      "marca": "REVUELE",
+      "precio": 8990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/centella-limpiador-en-gel-suave-200ml-rve-10630",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10630.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Facial Muntifuncional Lait-Crème Concentré 30Ml",
+      "marca": "Embryolisse",
+      "precio": 14990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lait-creme-concentre-30ml-emb-00039",
+      "imagen": "https://dbs.cl/media/catalog/product/e/m/embryolisse-emb-00039-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Limpiador Oleoso Ligero Centella 200Ml",
+      "marca": "SKIN1004",
+      "precio": 27990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/limpiador-oleoso-ligero-centella-200ml-skn-26111",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skin1004-skn-26111.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Cafeína 5 Sérum Contorno de Ojos - Just Caffeine 5 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-caffeine-5-rx-10134",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10134.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tratamiento De Labios The Super Peptide",
+      "marca": "ESSENCE",
+      "precio": 3790.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cuidado-de-labios-tratamiento-de-labios-the-super-peptide",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49066-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tónico Facial Árbol de Té y Hamamelis Anti Imperfecciones 130 Ml",
+      "marca": "Bye",
+      "precio": 3990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tonico-facial-te-de-arbol-hamamelis-antiacne-bbb-16407",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/bye-bye-blemish-bbb-16407.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Aceite Desmaquillante Wash The Day Off",
+      "marca": "DBS BASICS",
+      "precio": 6990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/dbs-hp002-mp-aceite-desmaquillante-wash-the-day-off",
+      "imagen": "https://dbs.cl/media/catalog/product/d/b/dbs-hp002-mp.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ácido Glicólico 20 - Just Glycolic Acid 20 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-glycolic-acid-20-rx-10142",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10142.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Niacinamide Crema En Gel 50Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/niacinamide-crema-en-gel-50ml-rve-10618",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10618.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla Rostro Master Lab Colágeno",
+      "marca": "Tony",
+      "precio": 2090.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/to-56971-mascarilla-rostro-master-lab-colageno",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tonymoly-to-56971.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Smart Radiance Cream 02 Radiant Gold",
+      "marca": "KIKO MILANO",
+      "precio": 8490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/smart-radiance-cream-02-radiant-gold-km-00536",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-00536-photoroom.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Exfoliante Botanical Scrub 100 Ml",
+      "marca": "MARIO BADESCU",
+      "precio": 8690.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/exfoliante-botanical-scrub-mba-13423",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/mario-badescu-mba-13423.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "3 Steps Sponge Set",
+      "marca": "Beauty",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/3-steps-sponge-set-by-qz007-mp",
+      "imagen": "https://dbs.cl/media/catalog/product/b/e/beauty-tools-by-qz007-mp_-_copia.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Limpiadora Té Verde 300 ml",
+      "marca": "Tony",
+      "precio": 7490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/to-00944-agua-limpiadora-te-verde",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tonymoly-to-00944.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Niacinamide Toner 200Ml",
+      "marca": "REVUELE",
+      "precio": 8990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/niacinamide-toner-200ml-rve-10616",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10616.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum para Manchas y Poros 10 Niacinamida 1 Zinc",
+      "marca": "Revolution",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-para-manchas-y-poros-10-niacinamide-and-1-zinc-rts-04850",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revolution-skincare-rts-04850-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Set De Cuidado Facial De Piedra Jade",
+      "marca": "Beauty",
+      "precio": 7490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/set-de-cuidado-facial-de-piedra-jade-by-cf9941-mp",
+      "imagen": "https://dbs.cl/media/catalog/product/b/e/beauty-tools-by-cf9941-mp_3.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Aceite Desmaquillante Douceur 150Ml",
+      "marca": "BYPHASSE",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/aceite-desmaquillante-douceur-150ml-bh-09528",
+      "imagen": "https://dbs.cl/media/catalog/product/b/h/bh-09528-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla Facial Holo Peel Off - Up De Disney Pixar",
+      "marca": "ESSENCE",
+      "precio": 2990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-mascarillas-mascarilla-facial-holo-peel-off-up-de-disney-pixar",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-49221-col-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Hero Mighty Patch Invisible 24U",
+      "marca": "Hero",
+      "precio": 11990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-anti-imperfecciones-hero-mighty-patch-invisible-24u",
+      "imagen": "https://dbs.cl/media/catalog/product/h/e/hero-he-46808-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Anti Pigment Serum Active 30Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/anti-pigment-serum-active-30ml-rve-10670",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10670.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum Express Aclara Vitamina C",
+      "marca": "GARNIER",
+      "precio": 10990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-express-aclara-vitimina-c-ga-84949",
+      "imagen": "https://dbs.cl/media/catalog/product/g/a/garnier-ga-84949.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Retinol Crema De Noche 40Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/retinol-crema-de-noche-40ml-rve-10626",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10626.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Parches Para Granos Pimple Patches",
+      "marca": "ESSENCE",
+      "precio": 2490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-antiacne-parches-para-granos-pimple-patches",
+      "imagen": "https://dbs.cl/media/catalog/product/e/e/ee-51795-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Micelar Desmaquillante 4 En 1 Para Pieles Sensibles 100ml",
+      "marca": "BYPHASSE",
+      "precio": 2990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09365-solucion-micelar-desmaquillante-pieles-sensibles-secas-irritables-100-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09365.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bálsamo Labial Disney Emoji Minnie",
+      "marca": "MAC",
+      "precio": 3490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/balsamo-labial-disney-emoji-minnie-ls-80796",
+      "imagen": "https://dbs.cl/media/catalog/product/l/i/lipsmacker-ls-80796.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Radiance Boost Serum Face Base",
+      "marca": "KIKO MILANO",
+      "precio": 11490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/radiance-boost-serum-face-base-km-97912",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-97912_4.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Máscara Nocturna Jelly Lip Care",
+      "marca": "ESSENCE",
+      "precio": 3790.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cuidado-de-labios-mascara-nocturna-jelly-lip-care",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49156-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Exfoliante De Labios Lip Care",
+      "marca": "ESSENCE",
+      "precio": 3790.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cuidado-de-labios-exfoliante-de-labios-lip-care",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49157-2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tónico Facial De Ceramida",
+      "marca": "Tony",
+      "precio": 15390.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tonico-facial-de-ceramida-to-01628",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-01628_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Protector Solar The Retouch One Sun Face Mist Spf30",
+      "marca": "Hello",
+      "precio": 11990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/protector-solar-the-retouch-one-sun-face-mist-spf30-hs-79308",
+      "imagen": "https://dbs.cl/media/catalog/product/h/e/hello-sunday-hs-79308.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Espuma Limpiadora Facial Centella 125Ml",
+      "marca": "SKIN1004",
+      "precio": 19990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/espuma-limpiadora-facial-centella-125ml-skn-26112",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skin1004-skn-26112.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Retinol en Escualano Sin H2O - Just Retinol In Squalane H20-Free Solution Age Control 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-retinol-in-squalane-h20-free-solution-age-control-rx-10389",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10389.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Retinol Suero Regenerador Unificador - Retinol Serum Unifying Regenerator 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/retinol-serum-unifying-regenerator-rx-10375",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10375.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Retinol Sérum De Noche 30Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/retinol-serum-de-noche-30ml-rve-10627",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10627.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Micelar en Óleo Travel Size 100 ml",
+      "marca": "GARNIER",
+      "precio": 4490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ga-10980-agua-micelar-en-oleo-travel-size",
+      "imagen": "https://dbs.cl/media/catalog/product/g/a/garnier-ga-10980.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Facial Hidratante Centella 75Ml",
+      "marca": "SKIN1004",
+      "precio": 26990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/crema-facial-hidratante-centella-75ml-skn-26044",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skin1004-skn-26044.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Vitamin C Serum 30Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/vitamin-c-serum-30ml-rve-10621",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10621.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tónico Sensi-Fresh Aloe Vera Piel Sensible 500 Ml",
+      "marca": "BYPHASSE",
+      "precio": 8990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09304-tonico-sensi-fresh-aloe-vera-piel-sensible-500-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/s/e/sensi-fresh_toning_lotion_with_aloe_vera_sensitive_skin_500ml-product-no-shadow_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Gloss Supreme Glowing Touch Eye Patches",
+      "marca": "KIKO MILANO",
+      "precio": 9490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-contorno-de-ojos-gloss-supreme-glowing-touch-eye-patches",
+      "imagen": "https://dbs.cl/media/catalog/product/k/m/km-02535-col-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Contorno De Ojos Refrescante PandaS Dream En Stick",
+      "marca": "Tony",
+      "precio": 7490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-contorno-de-ojos-contorno-de-ojos-refrescante-panda-s-dream-en-stick",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-51667-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Contorno De Ojos Probio-Cica 20Ml",
+      "marca": "SKIN1004",
+      "precio": 24990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-contorno-de-ojos-crema-contorno-de-ojos-crema-contorno-de-ojos-probio-cica-20ml",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skn-contorno.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Rutina Diaria para Piel Grasa - Just Oil Control Skincare Routine 3x30 Ml",
+      "marca": "REVOX B77",
+      "precio": 24990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-oil-control-skincare-routine-3-30ml-rx-10438",
+      "imagen": "https://dbs.cl/media/catalog/product/j/u/just_oil_control_skincare_routine-frontal_hdtv_1080_1024x1024.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Exfoliante Facial Purificante Home Spa Experience Pieles Mixtas A Grasas 150 Ml",
+      "marca": "BYPHASSE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09262-exfoliante-facial-purificante-home-spa-experience-pieles-mixtas-a-grasas-150-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09262.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ampolla Ceramida Wonder",
+      "marca": "Tony",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-ampollas-ampolla-ceramida-wonder",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-05312-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Limpiador Facial Aha Bha Pha - Zicare Aha Bha Pha Face Wash 250 Ml",
+      "marca": "REVOX B77",
+      "precio": 10990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/limpiador-facial-aha-bha-pha-zicare-aha-bha-pha-face-wash-250-ml-rx-10635",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10635-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Protector Labial The One For Your Lips Spf50",
+      "marca": "Hello",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/protector-labial-the-one-for-your-lips-sp50-hs-79309",
+      "imagen": "https://dbs.cl/media/catalog/product/l/i/lips_50_lips_50_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Retinol Contorno De Ojos En Gel 25Ml",
+      "marca": "REVUELE",
+      "precio": 6990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/retinol-contorno-de-ojos-en-gel-25ml-rve-10625",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10625.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Lip Lovin Mascarilla De Labios Nocturna",
+      "marca": "CATRICE",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lip-lovin-mascarilla-de-labios-nocturna-ca-37796",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/ca-37796.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Anti Pigment Crema De Dia Con Tinte Spf50 40Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/anti-pigment-crema-de-dia-con-tinte-spf50-40ml-rve-10668",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10668.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bruma Facial con Aloe Vera Pepino y Té Verde 118 Ml",
+      "marca": "MARIO BADESCU",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bruma-facial-aloevera-pepino-te-verde",
+      "imagen": "https://dbs.cl/media/catalog/product/m/a/mario-badescu-mba-34355_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Bálsamo Labial Hidratante 2X48G",
+      "marca": "BYPHASSE",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cuidado-de-labios-balsamo-labial-hidratante-2x48g",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09418-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Primer Sérum Hello Good Stuff Glow",
+      "marca": "ESSENCE",
+      "precio": 6990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/primer-serum-hello-good-stuff-glow-ee-36071",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-36071.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Micelar Todo en 1 Skin Active 400 Ml",
+      "marca": "GARNIER",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ga-45555-agua-micelar-todo-en-1-skin-active",
+      "imagen": "https://dbs.cl/media/catalog/product/g/a/garnier-ga-45555.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema De Día CatS Purrfect",
+      "marca": "Tony",
+      "precio": 8490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cremas-faciales-crema-de-dia-cat-s-purrfect",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-01767-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum Ojos Revitalift Ácido Hialurónico",
+      "marca": "Dermo",
+      "precio": 14990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-ojos-revitalift-acido-hialuronico-lo-79455",
+      "imagen": "https://dbs.cl/media/catalog/product/d/e/dermo-expertise-lo-79455.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Hydra Therapy Intense Moisturising Crema De Día SPF 15 50Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/hydra-therapy-intense-moisturising-crema-de-dia-50ml-rve-10030",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10030.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum Facial Skin Anti Imperfecciones",
+      "marca": "Bye",
+      "precio": 4990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-facial-skin-anti-imperfecciones-bbb-16405",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/bye-bye-blemish-bbb-16405.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum Booster Anti-Imperfecciones Express Aclara 30 Ml",
+      "marca": "GARNIER",
+      "precio": 10990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-booster-anti-imperfecciones-express-aclara-30-ml-ga-87546",
+      "imagen": "https://dbs.cl/media/catalog/product/g/a/garnier-ga-87546.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Vitamin C Crema Hidratante Spf20 50Ml",
+      "marca": "REVUELE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/vitamin-c-crema-hidratante-spf20-50ml-rve-10620",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10620.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Facial Antiedad Japanese Routine Face Cream Light Texture 50 Ml",
+      "marca": "REVOX B77",
+      "precio": 14990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/japanese-ritual-face-cream-light-texture-rx-10306",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10306.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla De Arcilla Purificante Todo Tipo De Piel 150 Ml",
+      "marca": "BYPHASSE",
+      "precio": 5990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09415-mascarilla-de-arcilla-purificante-todo-tipo-de-piel-150-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09415.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Parches Hydro Gel Para Contorno De Ojos",
+      "marca": "ESSENCE",
+      "precio": 1990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-contorno-de-ojos-parches-hydro-gel-para-contorno-de-ojos",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49107-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Smart Hydra Shot Eye Gel",
+      "marca": "KIKO MILANO",
+      "precio": 12990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/smart-hydra-shot-eye-gel-km-97994",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-97994_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Retinol Gel Antiarrugas Concentrado para Contorno de Ojos - Retinol Eye Gel Anti-Wrinkle Concentrate 30 Ml",
+      "marca": "REVOX B77",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/retinol-eye-gel-anti-wrinkle-concentrate-rx-10376",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10376.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tónico Facial De Té Verde",
+      "marca": "Tony",
+      "precio": 11490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tonico-facial-de-te-verde-to-51221",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-51221.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Exfoliante Facial Douceur Home Spa Experience Pieles Sensibles A Secas 150 Ml",
+      "marca": "BYPHASSE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09261-exfoliante-facial-douceur-home-spa-experience-pieles-sensibles-a-secas-150-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09261.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Hello Good Stuff Sérum En Barra 48H",
+      "marca": "ESSENCE",
+      "precio": 6590.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-serums-hello-good-stuff-serum-en-barra-48h",
+      "imagen": "https://dbs.cl/media/catalog/product/e/s/essence-ee-49119-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Micelar Desmaquillante 4 En 1 Bifásica Waterproof 500ml",
+      "marca": "BYPHASSE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/solucion-micelar-desmaquillante-500ml-bh-09443",
+      "imagen": "https://dbs.cl/media/catalog/product/b/h/bh-09443-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Facial Muntifuncional Lait-Crème Concentré 75Ml",
+      "marca": "Embryolisse",
+      "precio": 29990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lait-creme-concentre-75ml-emb-00011",
+      "imagen": "https://dbs.cl/media/catalog/product/e/m/embryolisse-emb-00011-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Parches de Ojo Gel Snail Repair Intensive Gold",
+      "marca": "Mizon",
+      "precio": 23990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/sk-052180-parches-de-ojo-gel-snail-repair-intensive-gold",
+      "imagen": "https://dbs.cl/media/catalog/product/s/o/sokobox-sk-052180.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Just Glycolic Acid 7 Exfoliating Toner",
+      "marca": "REVOX B77",
+      "precio": 10990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/just-glycolic-acid-7-exfoliating-toner-rx-10593",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revox-b77-rx-10593-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Agua Micelar Desmaquillante 4 En 1 Para Pieles Sensibles 500ml",
+      "marca": "BYPHASSE",
+      "precio": 7990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09207-solucion-micelar-desmaquillante-pieles-sensibles-secas-irritables-500-ml",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09207.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Mascarilla Nocturna CatS Purrfect",
+      "marca": "Tony",
+      "precio": 8490.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cremas-faciales-mascarilla-nocturna-cat-s-purrfect",
+      "imagen": "https://dbs.cl/media/catalog/product/t/o/tony-moly-to-01766-1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Tónico Exfoliante Poremizing 210Ml",
+      "marca": "SKIN1004",
+      "precio": 26990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/tonico-exfoliante-poremizing-210ml-skn-26145",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skin1004-skn-26145.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Parches Microaguja Anti Imperfecciones",
+      "marca": "Bye",
+      "precio": 14990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/parches-microaguja-antiacne-bbb-16400",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/bye-bye-blemish-bbb-16400.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Toallitas Desmaquillantes Con Aloe Vera Piel Sensible 20 Un",
+      "marca": "BYPHASSE",
+      "precio": 1990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/bh-09422-toallitas-desmaquillantes-con-aloe-vera-piel-sensible-20-un",
+      "imagen": "https://dbs.cl/media/catalog/product/b/y/byphasse-bh-09422.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Desmaquillante Bifásico Ojos y Labios Hidra Total 5 200Ml",
+      "marca": "Dermo",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/lo-92856-desmaquillante-bifasico-ojos-y-labios-hidra-total-5",
+      "imagen": "https://dbs.cl/media/catalog/product/l/o/loreal-lo-92856.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Sérum Noche Retinol Puro Revitalift",
+      "marca": "Dermo",
+      "precio": 18990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/serum-noche-retinol-puro-revitalift-lo-05733",
+      "imagen": "https://dbs.cl/media/catalog/product/d/e/dermo-expertise-lo-05733.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Ceramide Limpiador Hidratante 250Ml",
+      "marca": "REVUELE",
+      "precio": 8990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/ceramide-limpiador-hidratante-250ml-rve-10545",
+      "imagen": "https://dbs.cl/media/catalog/product/r/e/revuele-face-care-rve-10545.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Gel Matificante Express Aclara Anti-Imperfecciones",
+      "marca": "GARNIER",
+      "precio": 9990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/gel-matificante-express-aclara-anti-imperfecciones-ga-92834",
+      "imagen": "https://dbs.cl/media/catalog/product/g/a/garnier-ga-92834.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Energizing Eye Patch",
+      "marca": "KIKO MILANO",
+      "precio": 3990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/energizing-eye-patch-km-98546",
+      "imagen": "https://dbs.cl/media/catalog/product/k/i/kiko-milano-km-98546_2.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Facial Probio-Cica 50Ml",
+      "marca": "SKIN1004",
+      "precio": 29990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/skincare-cremas-faciales-crema-facial-probio-cica-50ml",
+      "imagen": "https://dbs.cl/media/catalog/product/s/k/skn-probiocica-crema.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    },
+    {
+      "nombre": "Crema Gel Regeneración Caracol 50 Ml",
+      "marca": "Caracol",
+      "precio": 24990.0,
+      "categoria": "skincare",
+      "stock": "In stock",
+      "url": "https://dbs.cl/cr-87901-crema-gel-de-regeneracion",
+      "imagen": "https://dbs.cl/media/catalog/product/c/a/caracol-cr-87901-1_1.jpg?optimize=low&bg-color=255,255,255&fit=bounds&height=328&width=328&canvas=328:328"
+    }
+  ]
+}

@@ -13,6 +13,7 @@ import {
   Empty
 } from 'antd';
 import { ExportOutlined } from '@ant-design/icons';
+import { getDefaultThumbnail } from '../utils/image';
 import './StoreComparison.css';
 
 const { Text, Title } = Typography;
@@ -93,6 +94,15 @@ const StoreComparison = ({
     return null;
   };
 
+  // Función para formatear precios en CLP sin decimales
+  const formatPriceCLP = (price) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
   // Renderizar skeleton mientras carga
   if (loading) {
     return (
@@ -145,8 +155,8 @@ const StoreComparison = ({
                   <div style={{ textAlign: 'center' }}>
                                          <Avatar
                        shape="square"
-                       size={48}
-                       src={storeLogo}
+                       size={40}
+                       src={storeLogo || getDefaultThumbnail()}
                        style={{ 
                          backgroundColor: storeLogo ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                          fontSize: '16px',
@@ -194,7 +204,7 @@ const StoreComparison = ({
                              fontSize: '20px'
                            }}
                          >
-                           {formatPrice ? formatPrice(finalPrice) : `$${finalPrice.toLocaleString()}`}
+                           {formatPrice ? formatPrice(finalPrice) : formatPriceCLP(finalPrice)}
                          </Title>
                       </Col>
                       
@@ -206,7 +216,7 @@ const StoreComparison = ({
                              delete 
                              style={{ fontSize: '15px', color: '#8c9bab' }}
                            >
-                             {formatPrice ? formatPrice(originalPrice) : `$${originalPrice.toLocaleString()}`}
+                             {formatPrice ? formatPrice(originalPrice) : formatPriceCLP(originalPrice)}
                            </Text>
                         </Col>
                       )}

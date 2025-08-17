@@ -21,6 +21,7 @@ import {
 } from '@ant-design/icons';
 import { dashboardService } from '../../services/api';
 import { processCategoriesForFrontend, processStoresForFrontend } from '../../utils/normalizeHelpers';
+import { resolveImageUrl, getDefaultThumbnail } from '../../utils/image';
 import './Dashboard.css';
 
 const { Content } = Layout;
@@ -54,25 +55,13 @@ const Dashboard = () => {
     loadDashboardData();
   }, []);
 
-  // Función para obtener la URL de imagen correcta (compatible con DBS y Preunic)
-  const getImageUrl = (product) => {
-    // Si no hay imagen_url o está vacía, usar la imagen por defecto
-    if (!product.imagen_url || product.imagen_url === '') {
-      return '/image-not-found.png';
-    }
-    
-    // Si la URL ya es completa (incluyendo Preunic), usarla directamente
-    if (product.imagen_url.startsWith('http')) {
-      return product.imagen_url;
-    }
-    
-    // Si es una ruta relativa, agregar el dominio de DBS
-    if (product.imagen_url.startsWith('/')) {
-      return `https://dbs.cl${product.imagen_url}`;
-    }
-    
-    // Si no es una URL válida, usar la imagen por defecto
-    return '/image-not-found.png';
+  // Formatear precio en formato CLP sin decimales
+  const formatPriceCLP = (price) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
   // Obtener datos procesados
@@ -252,10 +241,10 @@ const Dashboard = () => {
               >
                 <div className="product-image">
                   <img 
-                    src={getImageUrl(product)} 
-                    alt={product.nombre}
+                    src={resolveImageUrl(product)} 
+                    alt={product.nombre || product.productName}
                     onError={(e) => {
-                      e.target.src = '/image-not-found.png';
+                      e.target.src = getDefaultThumbnail();
                     }}
                   />
                 </div>
@@ -263,7 +252,7 @@ const Dashboard = () => {
                   <Text className="product-brand">{product.marca}</Text>
                   <Text className="product-name">{product.nombre}</Text>
                   <Text className="product-price">
-                    Desde ${product.precio_min?.toLocaleString() || product.precio_min}
+                    Desde {formatPriceCLP(product.precio_min || product.precio || 0)}
                   </Text>
                   <Button 
                     type="primary" 
