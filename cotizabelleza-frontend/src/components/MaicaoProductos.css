@@ -1,13 +1,13 @@
-/* Archivo CSS unificado para DBSProductos - Mismo diseño que MaicaoProductos */
+/* Archivo CSS unificado para MaicaoProductos - Mismo diseño que DBS */
 
-.dbs-productos-container {
+.maicao-productos-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
   background: var(--background-light);
 }
 
-.dbs-header {
+.maicao-header {
   background: var(--primary-gradient);
   color: white;
   padding: 24px;
@@ -17,14 +17,14 @@
   box-shadow: var(--shadow-medium);
 }
 
-.dbs-header h1 {
+.maicao-header h1 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 8px;
   color: white;
 }
 
-.dbs-header p {
+.maicao-header p {
   font-size: 1rem;
   opacity: 0.9;
   margin: 0;
@@ -200,16 +200,6 @@
   color: #dc3545;
 }
 
-.en-stock {
-  background: rgba(40, 167, 69, 0.1);
-  color: #28a745;
-}
-
-.sin-stock {
-  background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
-}
-
 /* Loading States */
 .loading-container {
   display: flex;
@@ -233,22 +223,6 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-.loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: var(--border-radius);
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
 }
 
 /* Error State */
@@ -282,36 +256,13 @@
 }
 
 /* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
-}
-
-.empty-state-icon {
-  font-size: 48px;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
-  color: var(--text-primary);
-}
-
-.empty-state p {
-  font-size: 0.9rem;
-  margin: 0;
-}
-
 .no-productos {
   text-align: center;
   padding: 60px 20px;
   color: var(--text-secondary);
 }
 
-.dbs-stats {
+.maicao-stats {
   background: rgba(255, 255, 255, 0.2);
   padding: 8px 16px;
   border-radius: 20px;
@@ -324,51 +275,9 @@
   font-weight: 500;
 }
 
-.ver-producto-btn {
-  background: var(--primary-gradient);
-  color: white;
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: var(--border-radius-small);
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: var(--transition);
-  border: none;
-  cursor: pointer;
-  display: block;
-}
-
-.ver-producto-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-medium);
-  color: white;
-}
-
-/* Pagination */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 32px;
-}
-
-.ant-pagination-item {
-  border-radius: var(--border-radius-small) !important;
-  transition: var(--transition) !important;
-}
-
-.ant-pagination-item:hover {
-  border-color: var(--primary-color) !important;
-}
-
-.ant-pagination-item-active {
-  background: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
-}
-
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .dbs-productos-container {
+  .maicao-productos-container {
     padding: 16px;
   }
   
@@ -378,11 +287,11 @@
 }
 
 @media (max-width: 992px) {
-  .dbs-header {
+  .maicao-header {
     padding: 20px;
   }
   
-  .dbs-header h1 {
+  .maicao-header h1 {
     font-size: 1.75rem;
   }
   
@@ -420,16 +329,16 @@
 }
 
 @media (max-width: 768px) {
-  .dbs-productos-container {
+  .maicao-productos-container {
     padding: 12px;
   }
   
-  .dbs-header {
+  .maicao-header {
     padding: 16px;
     margin-bottom: 20px;
   }
   
-  .dbs-header h1 {
+  .maicao-header h1 {
     font-size: 1.5rem;
   }
   
@@ -476,19 +385,14 @@
   .precio {
     font-size: 0.9rem;
   }
-  
-  .ver-producto-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
 }
 
 @media (max-width: 480px) {
-  .dbs-header h1 {
+  .maicao-header h1 {
     font-size: 1.3rem;
   }
   
-  .dbs-header p {
+  .maicao-header p {
     font-size: 0.9rem;
   }
   
@@ -520,19 +424,10 @@
   .precio {
     font-size: 0.85rem;
   }
-  
-  .ver-producto-btn {
-    padding: 5px 10px;
-    font-size: 0.75rem;
-  }
 }
 
 /* Animation for product cards */
 .producto-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.product-card {
   animation: fadeInUp 0.6s ease-out;
 }
 
@@ -546,14 +441,6 @@
     transform: translateY(0);
   }
 }
-
-/* Stagger animation for multiple cards */
-.product-card:nth-child(1) { animation-delay: 0.1s; }
-.product-card:nth-child(2) { animation-delay: 0.2s; }
-.product-card:nth-child(3) { animation-delay: 0.3s; }
-.product-card:nth-child(4) { animation-delay: 0.4s; }
-.product-card:nth-child(5) { animation-delay: 0.5s; }
-.product-card:nth-child(6) { animation-delay: 0.6s; }
 
 /* Filtros unificados */
 .filtros-container {

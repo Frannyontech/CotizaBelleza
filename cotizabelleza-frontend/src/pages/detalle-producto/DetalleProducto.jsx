@@ -47,13 +47,15 @@ const DetalleProducto = () => {
         // Detectar el tipo de producto basándose en el ID
         const isPreunicProduct = id && id.startsWith('preunic_');
         const isMaicaoProduct = id && id.startsWith('maicao_');
+        const isDBSProduct = id && id.startsWith('dbs_');
         
         let response;
         if (isPreunicProduct) {
           // Para Preunic, necesitamos buscar el producto por ID
+          const productId = id.replace('preunic_', '');
           const searchResponse = await axios.get(`/api/productos-preunic/`);
           const productos = searchResponse.data.productos || [];
-          const producto = productos.find(p => p.id === id);
+          const producto = productos.find(p => p.id.toString() === productId);
           
           if (!producto) {
             throw new Error('Producto no encontrado');
@@ -84,9 +86,10 @@ const DetalleProducto = () => {
           };
         } else if (isMaicaoProduct) {
           // Para Maicao, necesitamos buscar el producto por ID
+          const productId = id.replace('maicao_', '');
           const searchResponse = await axios.get(`/api/productos-maicao/`);
           const productos = searchResponse.data.productos || [];
-          const producto = productos.find(p => p.id === id);
+          const producto = productos.find(p => p.id.toString() === productId);
           
           if (!producto) {
             throw new Error('Producto no encontrado');
@@ -115,15 +118,53 @@ const DetalleProducto = () => {
               num_precios: 1
             }
           };
+        } else if (isDBSProduct) {
+          // Para DBS, necesitamos buscar el producto por ID
+          const productId = id.replace('dbs_', '');
+          const searchResponse = await axios.get(`/api/productos-dbs/`);
+          const productos = searchResponse.data.productos || [];
+          const producto = productos.find(p => p.id.toString() === productId);
+          
+          if (!producto) {
+            throw new Error('Producto no encontrado');
+          }
+          
+          // Adaptar el formato para que sea compatible con el resto del componente
+          response = {
+            data: {
+              id: producto.id,
+              nombre: producto.nombre,
+              marca: producto.marca || '',
+              categoria: producto.categoria,
+              precio: producto.precio,
+              stock: producto.stock,
+              url_producto: producto.url_producto,
+              imagen_url: producto.imagen_url,
+              descripcion: producto.descripcion || producto.nombre,
+              tienda: 'DBS',
+              tiendas_disponibles: ['DBS'],
+              tiendas_detalladas: [{
+                tienda: 'DBS',
+                precio: producto.precio,
+                stock: producto.stock,
+                url_producto: producto.url_producto
+              }],
+              num_precios: 1
+            }
+          };
         } else {
-          // Para DBS, usar la API existente
+          // Fallback para IDs antiguos sin prefijo
           response = await axios.get(`/api/productos-dbs/${id}/`);
         }
         
         setProducto(response.data);
         
-        // Obtener reseñas solo para productos DBS (que tienen ID numérico)
-        if (!isPreunicProduct && !isMaicaoProduct) {
+        // Obtener reseñas solo para productos DBS
+        if (isDBSProduct) {
+          const productId = id.replace('dbs_', '');
+          await fetchReviews(productId);
+        } else if (!isPreunicProduct && !isMaicaoProduct) {
+          // Fallback para IDs antiguos sin prefijo
           await fetchReviews(id);
         }
       } catch (error) {

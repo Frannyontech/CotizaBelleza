@@ -37,6 +37,9 @@ const Navbar = () => {
       <Menu.Item key="preunic">
         <Link to="/productos-preunic">🛒 Preunic</Link>
       </Menu.Item>
+      <Menu.Item key="maicao">
+        <Link to="/productos-maicao">💄 Maicao</Link>
+      </Menu.Item>
     </Menu>
   );
 
