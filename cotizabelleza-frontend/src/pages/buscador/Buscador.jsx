@@ -26,8 +26,10 @@ const Buscador = () => {
   
   const [data, setData] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [storeFilter, setStoreFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState(undefined);
+  const [storeFilter, setStoreFilter] = useState(undefined);
+  const [filterOptions, setFilterOptions] = useState({ categorias: [], tiendas: [] });
+  const [filtersLoading, setFiltersLoading] = useState(true);
 
   // Formatear precio en formato CLP sin decimales
   const formatPriceCLP = (price) => {
@@ -37,6 +39,39 @@ const Buscador = () => {
       maximumFractionDigits: 0
     }).format(price);
   };
+
+  // Cargar opciones de filtros desde la API del dashboard
+  useEffect(() => {
+    const loadFilterOptions = async () => {
+      try {
+        setFiltersLoading(true);
+        console.log('🔄 Cargando opciones de filtros...');
+        
+        const response = await fetch('http://localhost:8000/api/dashboard/');
+        const dashboardData = await response.json();
+        
+        console.log('📊 Dashboard data:', dashboardData);
+        
+        const categorias = dashboardData.categorias_disponibles?.map(cat => cat.nombre) || [];
+        const tiendas = dashboardData.tiendas_disponibles?.map(tienda => tienda.nombre) || [];
+        
+        console.log('✅ Filtros cargados:', { categorias, tiendas });
+        setFilterOptions({ categorias, tiendas });
+      } catch (error) {
+        console.error('❌ Error loading filter options:', error);
+        // Fallback estático
+        console.log('🔄 Usando fallback estático...');
+        setFilterOptions({ 
+          categorias: ['maquillaje', 'skincare'], 
+          tiendas: ['DBS', 'PREUNIC', 'MAICAO'] 
+        });
+      } finally {
+        setFiltersLoading(false);
+      }
+    };
+    
+    loadFilterOptions();
+  }, []);
 
   // Cargar productos unificados
   useEffect(() => {
@@ -73,12 +108,12 @@ const Buscador = () => {
     let filtered = data.items || [];
 
     // Filtro por categoría
-    if (categoryFilter) {
+    if (categoryFilter && categoryFilter !== undefined) {
       filtered = filtered.filter(product => product.categoria === categoryFilter);
     }
 
     // Filtro por tienda
-    if (storeFilter) {
+    if (storeFilter && storeFilter !== undefined) {
       filtered = filtered.filter(product => 
         product.tiendas_disponibles?.includes(storeFilter.toUpperCase())
       );
@@ -87,20 +122,26 @@ const Buscador = () => {
     return filtered;
   }, [data.items, categoryFilter, storeFilter]);
 
-  // Obtener categorías únicas
+  // Obtener categorías únicas (usar API + productos cargados)
   const categories = useMemo(() => {
-    const cats = new Set((data.items || []).map(p => p.categoria).filter(Boolean));
-    return Array.from(cats);
-  }, [data.items]);
+    const fromProducts = new Set((data.items || []).map(p => p.categoria).filter(Boolean));
+    const fromAPI = new Set(filterOptions.categorias);
+    const result = Array.from(new Set([...fromAPI, ...fromProducts]));
+    console.log('🏷️ Categories final:', result);
+    return result;
+  }, [data.items, filterOptions.categorias]);
 
-  // Obtener tiendas únicas
+  // Obtener tiendas únicas (usar API + productos cargados)
   const stores = useMemo(() => {
-    const storeSet = new Set();
+    const fromProducts = new Set();
     (data.items || []).forEach(product => {
-      product.tiendas_disponibles?.forEach(store => storeSet.add(store));
+      product.tiendas_disponibles?.forEach(store => fromProducts.add(store));
     });
-    return Array.from(storeSet);
-  }, [data.items]);
+    const fromAPI = new Set(filterOptions.tiendas);
+    const result = Array.from(new Set([...fromAPI, ...fromProducts]));
+    console.log('🏪 Stores final:', result);
+    return result;
+  }, [data.items, filterOptions.tiendas]);
 
   if (!searchQuery.trim()) {
     return (
@@ -125,11 +166,13 @@ const Buscador = () => {
           {/* Filtros */}
           <div style={{ marginBottom: '24px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <Select
-              placeholder="Filtrar por categoría"
+              placeholder="Categoría"
               style={{ width: 200 }}
               value={categoryFilter}
               onChange={setCategoryFilter}
               allowClear
+              loading={filtersLoading}
+              disabled={filtersLoading}
             >
               {categories.map(cat => (
                 <Option key={cat} value={cat}>{cat}</Option>
@@ -137,11 +180,13 @@ const Buscador = () => {
             </Select>
             
             <Select
-              placeholder="Filtrar por tienda"
+              placeholder="Tienda"
               style={{ width: 200 }}
               value={storeFilter}
               onChange={setStoreFilter}
               allowClear
+              loading={filtersLoading}
+              disabled={filtersLoading}
             >
               {stores.map(store => (
                 <Option key={store} value={store}>{store.toUpperCase()}</Option>

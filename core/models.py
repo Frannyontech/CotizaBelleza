@@ -1,11 +1,165 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Count, Min, Max, Avg
 from decimal import Decimal
-from .managers import (
-    ProductoManager, PrecioProductoManager, CategoriaManager, 
-    TiendaManager, ResenaManager
-)
+
+
+# ============================================================================
+# CUSTOM MANAGERS
+# ============================================================================
+
+class ProductoManager(models.Manager):
+    """Manager personalizado para Producto con consultas optimizadas"""
+    
+    def con_precios(self):
+        """Productos que tienen al menos un precio"""
+        return self.filter(precios__isnull=False).distinct()
+    
+    def por_categoria(self, categoria_nombre):
+        """Filtrar productos por categoría"""
+        return self.filter(categoria__nombre=categoria_nombre)
+    
+    def por_tienda(self, tienda_nombre):
+        """Filtrar productos disponibles en una tienda específica"""
+        return self.filter(precios__tienda__nombre=tienda_nombre).distinct()
+    
+    def por_tienda_id(self, tienda_id):
+        """Filtrar productos disponibles en una tienda específica por ID"""
+        return self.filter(precios__tienda_id=tienda_id).distinct()
+    
+    def buscar(self, texto):
+        """Búsqueda de texto en nombre, marca y descripción"""
+        return self.filter(
+            models.Q(nombre__icontains=texto) |
+            models.Q(marca__icontains=texto) |
+            models.Q(descripcion__icontains=texto)
+        )
+    
+    def populares(self, limit=10):
+        """Productos más populares basados en número de precios/tiendas"""
+        return self.annotate(
+            num_precios=Count('precios', distinct=True)
+        ).filter(num_precios__gt=0).order_by('-num_precios')[:limit]
+    
+    def con_descuento(self, porcentaje_minimo=10):
+        """Productos con descuentos significativos"""
+        return self.annotate(
+            precio_min=Min('precios__precio'),
+            precio_max=Max('precios__precio')
+        ).filter(
+            precio_min__lt=models.F('precio_max') * (100 - porcentaje_minimo) / 100
+        )
+
+
+class PrecioProductoManager(models.Manager):
+    """Manager personalizado para PrecioProducto"""
+    
+    def en_stock(self):
+        """Precios de productos en stock"""
+        return self.filter(stock=True)
+    
+    def por_tienda(self, tienda_nombre):
+        """Precios de una tienda específica"""
+        return self.filter(tienda__nombre=tienda_nombre)
+    
+    def mas_baratos(self, limit=10):
+        """Los precios más baratos disponibles"""
+        return self.filter(stock=True).order_by('precio')[:limit]
+    
+    def actualizados_hoy(self):
+        """Precios actualizados hoy"""
+        from django.utils import timezone
+        hoy = timezone.now().date()
+        return self.filter(fecha_extraccion__date=hoy)
+    
+    def estadisticas_generales(self):
+        """Estadísticas generales de precios"""
+        stats = self.filter(stock=True).aggregate(
+            precio_min=Min('precio'),
+            precio_max=Max('precio'),
+            precio_promedio=Avg('precio'),
+            total_productos_con_precio=Count('producto', distinct=True)
+        )
+        
+        # Asegurar que los valores no sean None
+        return {
+            'precio_min': stats['precio_min'] or 0,
+            'precio_max': stats['precio_max'] or 0,
+            'precio_promedio': stats['precio_promedio'] or 0,
+            'total_productos_con_precio': stats['total_productos_con_precio'] or 0
+        }
+
+
+class CategoriaManager(models.Manager):
+    """Manager personalizado para Categoria"""
+    
+    def con_productos(self):
+        """Categorías que tienen al menos un producto"""
+        return self.filter(productos__isnull=False).distinct()
+    
+    def con_estadisticas(self):
+        """Categorías con estadísticas de productos"""
+        return self.annotate(
+            cantidad_productos=Count('productos', distinct=True)
+        ).filter(cantidad_productos__gt=0)
+    
+    def populares(self, limit=5):
+        """Categorías más populares por número de productos"""
+        return self.con_estadisticas().order_by('-cantidad_productos')[:limit]
+
+
+class TiendaManager(models.Manager):
+    """Manager personalizado para Tienda"""
+    
+    def con_productos(self):
+        """Tiendas que tienen al menos un producto en stock"""
+        return self.filter(precios_tienda__stock=True).distinct()
+    
+    def con_estadisticas(self):
+        """Tiendas con estadísticas de productos"""
+        return self.annotate(
+            cantidad_productos=Count('precios_tienda__producto', distinct=True)
+        ).filter(cantidad_productos__gt=0)
+    
+    def activas(self):
+        """Tiendas activas (con precios recientes)"""
+        from django.utils import timezone
+        hace_una_semana = timezone.now() - timezone.timedelta(days=7)
+        return self.filter(precios_tienda__fecha_extraccion__gte=hace_una_semana).distinct()
+
+
+class ResenaManager(models.Manager):
+    """Manager personalizado para Resena"""
+    
+    def por_producto(self, producto_id):
+        """Reseñas de un producto específico"""
+        return self.filter(producto_id=producto_id)
+    
+    def recientes(self, limit=10):
+        """Reseñas más recientes"""
+        return self.order_by('-fecha_creacion')[:limit]
+    
+    def por_valoracion(self, valoracion_minima=4):
+        """Reseñas con valoración alta"""
+        return self.filter(valoracion__gte=valoracion_minima)
+    
+    def estadisticas_producto(self, producto_id):
+        """Estadísticas de reseñas para un producto"""
+        stats = self.filter(producto_id=producto_id).aggregate(
+            total_resenas=Count('id'),
+            promedio_valoracion=Avg('valoracion')
+        )
+        
+        return {
+            'total_resenas': stats['total_resenas'] or 0,
+            'promedio_valoracion': round(stats['promedio_valoracion'], 1) if stats['promedio_valoracion'] else 0
+        }
+
+
+# ============================================================================
+# MODELS
+# ============================================================================
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
@@ -240,3 +394,4 @@ class AlertaPrecioUnificada(models.Model):
     
     def __str__(self):
         return f"Alerta de {self.email} para {self.producto_nombre}"
+

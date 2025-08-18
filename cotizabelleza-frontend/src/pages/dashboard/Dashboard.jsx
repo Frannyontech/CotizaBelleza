@@ -144,11 +144,11 @@ const Dashboard = () => {
   };
 
   // Extraer categorías y tiendas disponibles
-  const categorias_unicas = [...new Set(products.map(product => product.categoria))];
-  const tiendas_unicas = [...new Set(products.flatMap(product => product.tiendas || []))];
+  const categorias_unicas = [...new Set(products.map(product => product.categoria).filter(cat => cat))];
+  const tiendas_unicas = [...new Set(products.flatMap(product => product.tiendas_disponibles || []))];
   
   const categoriesList = ['Todos', ...categorias_unicas];
-  const storesList = ['Todas', ...tiendas_unicas.map(store => store.toUpperCase())];
+  const storesList = ['Todas', ...tiendas_unicas];
 
   // Aplicar filtros a los productos
   const filteredProducts = products.filter(product => {
@@ -275,9 +275,6 @@ const Dashboard = () => {
       <div className="products-section">
         <div className="section-header">
           <Title level={3}>Productos más populares ({filteredProducts.length})</Title>
-          <Button type="link" className="view-all">
-            Ver todos <LinkOutlined />
-          </Button>
         </div>
 
         <div className="products-grid">

@@ -50,8 +50,9 @@ const PreunicProductos = () => {
   };
 
   const manejarClickProducto = (producto) => {
-    const productId = `preunic_${producto.id}`;
-    navigate(`/detalle-producto/${productId}`);
+    // Usar directamente el ID unificado (product_id o id)
+    const productId = producto.product_id || producto.id;
+    navigate(`/detalle-producto/${encodeURIComponent(productId)}`);
   };
 
   const obtenerImagenProducto = (producto) => {
