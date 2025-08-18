@@ -10,6 +10,46 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 
+def parse_precio(txt: str) -> int | None:
+    """
+    Normaliza precios CLP: "$7.299" -> 7299 (int)
+    """
+    if not txt: 
+        return None
+    # quita espacios, símbolos y separadores de miles
+    t = txt.strip()
+    t = re.sub(r"[^\d]", "", t)  # deja solo dígitos
+    return int(t) if t else None
+
+def get_text_by_selectors(node, selectors):
+    """
+    Busca texto usando múltiples selectores en orden de prioridad
+    """
+    for sel in selectors:
+        try:
+            el = node.find_element("css selector", sel)
+            txt = el.text.strip()
+            if txt: 
+                return txt
+        except Exception:
+            continue
+    return ""
+
+def get_text_by_selectors_soup(element, selectors):
+    """
+    Busca texto usando múltiples selectores con BeautifulSoup
+    """
+    for sel in selectors:
+        try:
+            el = element.select_one(sel)
+            if el:
+                txt = el.get_text(strip=True)
+                if txt:
+                    return txt
+        except Exception:
+            continue
+    return ""
+
 def scrape_preunic_list(categoria: str = "maquillaje", headless: bool = True, max_scrolls: int = 15, scroll_delay: float = 1.0, save_json: bool = True) -> List[Dict]:
     """
     Scraper para productos de Preunic con scroll infinito
@@ -198,52 +238,57 @@ def scrape_preunic_list(categoria: str = "maquillaje", headless: bool = True, ma
                                 imagen = f"https://preunic.cl{src}"
                             break
                 
-                # Extraer precio (.plp-price, [class*="price"] o span que contenga $)
-                precio_texto = ""
-                precio_normalizado = 0
-                
-                # Buscar en selectores específicos
-                precio_selectors = [
-                    '.plp-price',
-                    '[class*="price"]',
-                    '.price',
-                    '.product-price'
+                # Extraer precios: normal y oferta
+                offer_selectors = [
+                    ".price__current", ".product-price__current", ".price-offer",
+                    ".price .current-price", ".price", '[data-testid="price-current"]',
+                    ".plp-price"
+                ]
+                normal_selectors = [
+                    ".price__old", ".product-price__old", ".old-price",
+                    ".price-regular", ".was-price", ".price-before", '[data-testid="price-old"]'
                 ]
                 
-                for selector in precio_selectors:
-                    precio_element = elemento.select_one(selector)
-                    if precio_element:
-                        precio_texto = precio_element.get_text(strip=True)
-                        if '$' in precio_texto:
-                            break
+                raw_offer = get_text_by_selectors_soup(elemento, offer_selectors)
+                raw_normal = get_text_by_selectors_soup(elemento, normal_selectors)
                 
-                # Si no se encuentra precio, buscar cualquier texto que contenga $
-                if not precio_texto:
-                    texto_completo = elemento.get_text()
-                    precio_match = re.search(r'\$[\d,.\s]+', texto_completo)
-                    if precio_match:
-                        precio_texto = precio_match.group()
+                precio_oferta = parse_precio(raw_offer)
+                precio_normal = parse_precio(raw_normal)
                 
-                # Normalizar el precio eliminando $, puntos y espacios, retornando un int
-                if precio_texto:
-                    precio_clean = re.sub(r'[^\d]', '', precio_texto)
-                    if precio_clean:
-                        try:
-                            precio_normalizado = int(precio_clean)
-                        except ValueError:
-                            precio_normalizado = 0
+                # Fallback: si no hay oferta y no hay "old", intenta único precio visible
+                if precio_oferta is None and precio_normal is None:
+                    unico = get_text_by_selectors_soup(elemento, [".price", ".product-price", ".pricing", ".product__price", ".plp-price"])
+                    precio_normal = parse_precio(unico)
+                
+                # Precio vigente para compatibilidad
+                precio_vigente = precio_oferta if precio_oferta is not None else precio_normal
+                
+                # Validaciones de precios
+                if precio_oferta is not None and precio_normal is not None:
+                    if precio_oferta > precio_normal:
+                        print(f"Advertencia: Precio oferta ({precio_oferta}) mayor que precio normal ({precio_normal}) en producto {i+1}")
+                
+                # Mantener compatibilidad con código legado
+                precio_normalizado = precio_vigente if precio_vigente is not None else 0
+                precio_texto = raw_offer if raw_offer else (raw_normal if raw_normal else "")
                 
                 # Extraer marca del nombre del producto
                 marca = extraer_marca_del_nombre(nombre)
                 
                 # Validar datos mínimos antes de agregar
                 if nombre and url_producto and len(nombre) > 2:
+                    # Advertencia si no hay precio válido
+                    if precio_vigente is None or precio_vigente == 0:
+                        print(f"Advertencia: Producto {i+1} sin precio válido: {nombre[:50]}...")
+                    
                     producto = {
                         'name': nombre.strip(),
                         'url': url_producto.strip(),
                         'image': imagen.strip(),
                         'price': precio_normalizado,
                         'price_text': precio_texto.strip(),
+                        'precio_normal': precio_normal,
+                        'precio_oferta': precio_oferta,
                         'categoria': categoria_estandar
                     }
                     productos_finales.append(producto)
@@ -255,12 +300,20 @@ def scrape_preunic_list(categoria: str = "maquillaje", headless: bool = True, ma
                 print(f"Error procesando producto {i+1}: {e}")
                 continue
         
+        # Calcular estadísticas de ofertas
+        productos_con_oferta = sum(1 for p in productos_finales if p.get('precio_oferta') is not None)
+        productos_con_precio_normal = sum(1 for p in productos_finales if p.get('precio_normal') is not None)
+        productos_sin_precio = sum(1 for p in productos_finales if p.get('price', 0) == 0)
+        
         # Mostrar estadísticas de procesamiento
         print(f"\nEstadísticas de procesamiento:")
         print(f"Productos encontrados: {len(productos_elementos)}")
         print(f"Productos procesados: {productos_procesados}")
         print(f"Productos válidos extraídos: {len(productos_finales)}")
         print(f"Productos con errores: {productos_con_error}")
+        print(f"Productos con precio oferta: {productos_con_oferta}")
+        print(f"Productos con precio normal: {productos_con_precio_normal}")
+        print(f"Productos sin precio válido: {productos_sin_precio}")
         
         # Guardar resultados automáticamente si se especifica
         if save_json and productos_finales:
@@ -378,10 +431,13 @@ def scrapear_todas_categorias_preunic(headless=True, max_scrolls=20):
                 'nombre': producto.get('name', ''),
                 'marca': extraer_marca_del_nombre(producto.get('name', '')),
                 'precio': float(producto.get('price', 0)),
+                'precio_normal': producto.get('precio_normal'),
+                'precio_oferta': producto.get('precio_oferta'),
                 'categoria': categoria,  # Usar categoría estándar
                 'stock': "In stock" if producto.get('available', True) else "Out of stock",
                 'url': producto.get('url', ''),
-                'imagen': producto.get('image', '')
+                'imagen': producto.get('image', ''),
+                'fuente': 'preunic'
             }
             productos_adaptados.append(producto_adaptado)
         
@@ -430,9 +486,13 @@ def main_scraper_preunic(categoria: str = "maquillaje", headless: bool = True):
         # Análisis de datos
         precios = [p['price'] for p in productos if p['price'] > 0]
         productos_con_imagen = sum(1 for p in productos if p['image'])
+        productos_con_oferta = sum(1 for p in productos if p.get('precio_oferta') is not None)
+        productos_con_precio_normal = sum(1 for p in productos if p.get('precio_normal') is not None)
         
         print(f"Productos con precio válido: {len(precios)}")
         print(f"Productos con imagen: {productos_con_imagen}")
+        print(f"Productos con precio oferta: {productos_con_oferta}")
+        print(f"Productos con precio normal: {productos_con_precio_normal}")
         if precios:
             print(f"Precio promedio: ${sum(precios)//len(precios):,}")
             print(f"Precio mínimo: ${min(precios):,}")
