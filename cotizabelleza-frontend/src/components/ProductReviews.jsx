@@ -42,7 +42,7 @@ const ProductReviews = ({ productId }) => {
       
       // Si el error es por ID inválido o producto no encontrado, no mostrar error
       if (errorMessage.includes('inválido') || errorMessage.includes('no encontrado')) {
-        setReviewsData({ resenas: [], total_resenas: 0, promedio_valoracion: 0 });
+        setReviewsData({ resenas_recientes: [], todas_resenas: [], total_resenas: 0, promedio_valoracion: 0 });
       } else {
         setError(errorMessage);
       }
@@ -56,7 +56,7 @@ const ProductReviews = ({ productId }) => {
       fetchReviews();
     } else {
       // Si no hay productId válido, establecer estado vacío
-      setReviewsData({ resenas: [], total_resenas: 0, promedio_valoracion: 0 });
+      setReviewsData({ resenas_recientes: [], todas_resenas: [], total_resenas: 0, promedio_valoracion: 0 });
       setLoading(false);
     }
   }, [productId]);
@@ -167,7 +167,7 @@ const ProductReviews = ({ productId }) => {
     );
   }
 
-  const { total_resenas, promedio_valoracion, resenas_recientes } = reviewsData;
+  const { total_resenas, promedio_valoracion, resenas_recientes = [] } = reviewsData;
 
   return (
     <div style={{ marginTop: 32 }}>

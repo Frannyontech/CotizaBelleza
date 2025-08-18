@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.db.models import Min, Max, Count, Avg
-from .models import Producto, PrecioProducto, Categoria, Tienda, AlertaPrecio, Resena
+from .models import Producto, PrecioProducto, Categoria, Tienda, AlertaPrecio, Resena, ResenaUnificada
 from .serializers import (
     ProductoSerializer, PrecioProductoSerializer, 
     UserSerializer, CategoriaSerializer, TiendaSerializer, AlertaPrecioSerializer, ResenaSerializer
@@ -682,25 +682,16 @@ class ProductoResenasAPIView(APIView):
     
     def get(self, request, producto_id):
         try:
-            # Find numeric product ID from various formats
-            numeric_id = _find_product_by_id(producto_id)
-            if not numeric_id:
-                return Response(
-                    {"error": "ID de producto inválido"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Verificar que el producto existe
-            try:
-                producto = Producto.objects.get(id=numeric_id)
-            except Producto.DoesNotExist:
+            # Verificar si el producto existe en el sistema unificado
+            producto_info = _get_product_info_from_unified(producto_id)
+            if not producto_info:
                 return Response(
                     {"error": "Producto no encontrado"}, 
                     status=status.HTTP_404_NOT_FOUND
                 )
             
-            # Obtener las reseñas del producto (ordenadas por fecha descendente)
-            resenas = Resena.objects.filter(producto=producto).order_by('-fecha_creacion')
+            # Obtener reseñas usando el nuevo modelo unificado
+            resenas = ResenaUnificada.objects.filter(producto_id=producto_id).order_by('-fecha_creacion')
             
             # Calcular estadísticas
             total_resenas = resenas.count()
@@ -710,16 +701,52 @@ class ProductoResenasAPIView(APIView):
             else:
                 promedio_valoracion = 0
             
-            # Serializar las 3 reseñas más recientes para la vista de detalle
+            # Reseñas recientes (3 más recientes)
             resenas_recientes = resenas[:3]
-            resenas_serializer = ResenaSerializer(resenas_recientes, many=True)
+            
+            # Convertir a formato API
+            resenas_recientes_data = []
+            todas_resenas_data = []
+            
+            for resena in resenas_recientes:
+                resena_data = {
+                    'id': resena.id,
+                    'usuario': {
+                        'id': resena.usuario.id,
+                        'username': resena.usuario.username,
+                        'first_name': resena.usuario.first_name,
+                        'last_name': resena.usuario.last_name
+                    },
+                    'valoracion': resena.valoracion,
+                    'comentario': resena.comentario,
+                    'nombre_autor': resena.nombre_autor,
+                    'fecha_creacion': resena.fecha_creacion.isoformat()
+                }
+                resenas_recientes_data.append(resena_data)
+            
+            for resena in resenas:
+                resena_data = {
+                    'id': resena.id,
+                    'usuario': {
+                        'id': resena.usuario.id,
+                        'username': resena.usuario.username,
+                        'first_name': resena.usuario.first_name,
+                        'last_name': resena.usuario.last_name
+                    },
+                    'valoracion': resena.valoracion,
+                    'comentario': resena.comentario,
+                    'nombre_autor': resena.nombre_autor,
+                    'fecha_creacion': resena.fecha_creacion.isoformat()
+                }
+                todas_resenas_data.append(resena_data)
             
             return Response({
                 "producto_id": producto_id,
+                "producto_info": producto_info,
                 "total_resenas": total_resenas,
                 "promedio_valoracion": promedio_valoracion,
-                "resenas_recientes": resenas_serializer.data,
-                "todas_resenas": ResenaSerializer(resenas, many=True).data
+                "resenas_recientes": resenas_recientes_data,
+                "todas_resenas": todas_resenas_data
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -730,18 +757,9 @@ class ProductoResenasAPIView(APIView):
     
     def post(self, request, producto_id):
         try:
-            # Find numeric product ID from various formats
-            numeric_id = _find_product_by_id(producto_id)
-            if not numeric_id:
-                return Response(
-                    {"error": "ID de producto inválido"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Verificar que el producto existe
-            try:
-                producto = Producto.objects.get(id=numeric_id)
-            except Producto.DoesNotExist:
+            # Verificar que el producto existe en el sistema unificado
+            producto_info = _get_product_info_from_unified(producto_id)
+            if not producto_info:
                 return Response(
                     {"error": "Producto no encontrado"}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -771,53 +789,56 @@ class ProductoResenasAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Crear usuario anónimo si no se proporciona autor
-            if not autor:
-                # Crear o obtener un usuario anónimo genérico
-                usuario_anonimo, created = User.objects.get_or_create(
-                    username=f'anonimo_{producto_id}_{len(comentario)}',
-                    defaults={
-                        'first_name': 'Usuario',
-                        'last_name': 'Anónimo',
-                        'email': f'anonimo{producto_id}@example.com'
-                    }
-                )
-                usuario = usuario_anonimo
-            else:
-                # Crear usuario temporal con el nombre proporcionado
-                usuario_temp, created = User.objects.get_or_create(
-                    username=f'temp_{autor.replace(" ", "_").lower()}_{producto_id}',
-                    defaults={
-                        'first_name': autor.split(' ')[0] if ' ' in autor else autor,
-                        'last_name': ' '.join(autor.split(' ')[1:]) if ' ' in autor else '',
-                        'email': f'temp_{autor.replace(" ", "_").lower()}@example.com'
-                    }
-                )
-                usuario = usuario_temp
+            # Crear usuario temporal
+            username = f'temp_{autor.replace(" ", "_").lower()}_{producto_id}' if autor else f'anonimo_{producto_id}_{len(comentario)}'
+            
+            usuario, created = User.objects.get_or_create(
+                username=username,
+                defaults={
+                    'first_name': autor.split(' ')[0] if autor and ' ' in autor else (autor or 'Usuario'),
+                    'last_name': ' '.join(autor.split(' ')[1:]) if autor and ' ' in autor else '',
+                    'email': f'{username}@example.com'
+                }
+            )
             
             # Verificar si ya existe una reseña de este usuario para este producto
-            resena_existente = Resena.objects.filter(producto=producto, usuario=usuario).first()
-            if resena_existente:
+            if ResenaUnificada.objects.filter(producto_id=producto_id, usuario=usuario).exists():
                 return Response(
                     {"error": "Ya has escrito una reseña para este producto"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Crear la reseña
-            resena = Resena.objects.create(
-                producto=producto,
+            # Crear la reseña en el modelo unificado
+            resena = ResenaUnificada.objects.create(
+                producto_id=producto_id,
+                producto_nombre=producto_info['nombre'],
+                producto_marca=producto_info['marca'],
+                producto_categoria=producto_info['categoria'],
                 usuario=usuario,
                 valoracion=valoracion,
                 comentario=comentario.strip(),
-                nombre_autor=autor  # Guardar el nombre original del autor
+                nombre_autor=autor
             )
             
-            # Serializar y retornar la reseña creada
-            resena_serializer = ResenaSerializer(resena)
+            # Crear respuesta
+            resena_data = {
+                'id': resena.id,
+                'producto_id': resena.producto_id,
+                'usuario': {
+                    'id': resena.usuario.id,
+                    'username': resena.usuario.username,
+                    'first_name': resena.usuario.first_name,
+                    'last_name': resena.usuario.last_name
+                },
+                'valoracion': resena.valoracion,
+                'comentario': resena.comentario,
+                'nombre_autor': resena.nombre_autor,
+                'fecha_creacion': resena.fecha_creacion.isoformat()
+            }
             
             return Response({
                 "message": "Reseña creada exitosamente",
-                "resena": resena_serializer.data
+                "resena": resena_data
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
@@ -914,6 +935,11 @@ def _find_product_by_id(producto_id):
         if str(producto_id).isdigit():
             return int(producto_id)
         
+        # If it's a canonical product ID (cb_xxxxx), try to find matching product
+        if str(producto_id).startswith('cb_'):
+            # Try to find product by searching the unified data
+            return _find_product_by_canonical_id(producto_id)
+        
         # If it contains underscores (e.g., "dbs_123"), extract the numeric part
         if '_' in str(producto_id):
             parts = str(producto_id).split('_')
@@ -930,4 +956,97 @@ def _find_product_by_id(producto_id):
         
         return None
     except (ValueError, TypeError):
+        return None
+
+def _find_product_by_canonical_id(canonical_id):
+    """Find a database product that matches a canonical ID from unified data"""
+    try:
+        # Load unified data directly to avoid circular imports
+        unified_data = load_unified_products()
+        productos = unified_data.get("productos", [])
+        
+        # Find the product in unified data
+        target_product = None
+        for producto in productos:
+            if producto.get('product_id') == canonical_id:
+                target_product = producto
+                break
+        
+        if not target_product:
+            return None
+        
+        # Try to find a matching product in the database by name and marca
+        from .models import Producto
+        
+        # Search by exact name and marca match
+        matching_products = Producto.objects.filter(
+            nombre__iexact=target_product.get('nombre', ''),
+            marca__iexact=target_product.get('marca', '')
+        )
+        
+        if matching_products.exists():
+            return matching_products.first().id
+        
+        # If no exact match, try partial name match
+        matching_products = Producto.objects.filter(
+            nombre__icontains=target_product.get('nombre', '')[:50]  # First 50 chars
+        )
+        
+        if matching_products.exists():
+            return matching_products.first().id
+        
+        return None
+    except Exception:
+        return None
+
+def _get_product_info_from_unified(producto_id):
+    """Get product info from unified data file"""
+    try:
+        unified_data = load_unified_products()
+        productos = unified_data.get("productos", [])
+        
+        for producto in productos:
+            if producto.get('product_id') == producto_id:
+                return {
+                    'id': producto_id,
+                    'nombre': producto.get('nombre', ''),
+                    'marca': producto.get('marca', ''),
+                    'categoria': producto.get('categoria', ''),
+                    'source': 'unified'
+                }
+        return None
+    except Exception:
+        return None
+
+def _create_or_get_placeholder_product(producto_id):
+    """Create or get a placeholder product for canonical IDs"""
+    try:
+        from .models import Producto, Categoria
+        
+        # Get product info from unified data
+        producto_info = _get_product_info_from_unified(producto_id)
+        if not producto_info:
+            return None
+        
+        # Get or create category
+        categoria, _ = Categoria.objects.get_or_create(
+            nombre=producto_info.get('categoria', 'general')
+        )
+        
+        # Create placeholder product name that includes the canonical ID
+        nombre_placeholder = f"{producto_info.get('nombre', 'Producto')[:400]} [{producto_id}]"
+        
+        # Create or get placeholder product
+        producto, created = Producto.objects.get_or_create(
+            nombre=nombre_placeholder,
+            defaults={
+                'marca': producto_info.get('marca', '')[:200],
+                'categoria': categoria,
+                'descripcion': f"Producto del sistema unificado - ID: {producto_id}"
+            }
+        )
+        
+        return producto.id
+    except Exception as e:
+        print(f"Error creating placeholder product: {e}")
         return None

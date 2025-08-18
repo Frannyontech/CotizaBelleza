@@ -19,6 +19,9 @@ urlpatterns = [
     path('usuarios/', views.UsuarioCreateAPIView.as_view(), name='usuario-create'),
     path('alertas-precio/', views.AlertaPrecioCreateAPIView.as_view(), name='alerta-precio-create'),
     path('productos-dbs/<str:producto_id>/resenas/', views.ProductoResenasAPIView.as_view(), name='producto-resenas'),
+    path('productos/<str:producto_id>/resenas/', views.ProductoResenasAPIView.as_view(), name='producto-resenas-generic'),
+    path('productos-preunic/<str:producto_id>/resenas/', views.ProductoResenasAPIView.as_view(), name='producto-preunic-resenas'),
+    path('productos-maicao/<str:producto_id>/resenas/', views.ProductoResenasAPIView.as_view(), name='producto-maicao-resenas'),
     path('unified/', views.UnifiedProductsAPIView.as_view(), name='unified-products'),
     path('unified/dashboard/', views.UnifiedDashboardAPIView.as_view(), name='unified-dashboard'),
 ] 

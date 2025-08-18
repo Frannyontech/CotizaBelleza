@@ -170,3 +170,73 @@ class AlertaPrecio(models.Model):
     
     def __str__(self):
         return f"Alerta de {self.email} para {self.producto.nombre}"
+
+
+# MODELOS UNIFICADOS - IDs canónicos como definitivos
+
+class ResenaUnificada(models.Model):
+    """Modelo para reseñas usando IDs unificados como definitivos"""
+    
+    # ID del producto unificado (ej: cb_666f92f1)
+    producto_id = models.CharField(max_length=50, db_index=True)
+    
+    # Información del producto (para evitar lookups)
+    producto_nombre = models.CharField(max_length=500)
+    producto_marca = models.CharField(max_length=200, blank=True, null=True)
+    producto_categoria = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Usuario y reseña
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resenas_unificadas')
+    valoracion = models.SmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comentario = models.TextField()
+    nombre_autor = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Timestamps
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Reseña Unificada"
+        verbose_name_plural = "Reseñas Unificadas"
+        unique_together = ['producto_id', 'usuario']
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['producto_id', '-fecha_creacion']),
+            models.Index(fields=['valoracion']),
+        ]
+    
+    def __str__(self):
+        return f"Reseña de {self.nombre_autor or self.usuario.username} para {self.producto_nombre} - {self.valoracion}/5"
+
+
+class AlertaPrecioUnificada(models.Model):
+    """Modelo para alertas de precio usando IDs unificados"""
+    
+    # ID del producto unificado
+    producto_id = models.CharField(max_length=50, db_index=True)
+    
+    # Información del producto (para evitar lookups)
+    producto_nombre = models.CharField(max_length=500)
+    producto_marca = models.CharField(max_length=200, blank=True, null=True)
+    
+    # Email para la alerta
+    email = models.EmailField(max_length=255)
+    
+    # Precio objetivo (opcional)
+    precio_objetivo = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    
+    # Estado
+    activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_ultima_notificacion = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Alerta de Precio Unificada"
+        verbose_name_plural = "Alertas de Precios Unificadas"
+        unique_together = ['producto_id', 'email']
+        ordering = ['-fecha_creacion']
+    
+    def __str__(self):
+        return f"Alerta de {self.email} para {self.producto_nombre}"

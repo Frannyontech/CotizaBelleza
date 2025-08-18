@@ -309,20 +309,9 @@ const DetalleProducto = () => {
           </section>
 
           {/* Product Reviews Section */}
-          {(() => {
-            // Solo mostrar reseñas si podemos extraer un ID válido de DBS
-            const dbsTienda = product.tiendas?.find(t => t.fuente === 'dbs');
-            if (dbsTienda?.url) {
-              const match = dbsTienda.url.match(/[-/](\d+)$/);
-              const extractedId = match?.[1];
-              if (extractedId) {
-                return (
-                  <ProductReviews productId={extractedId} />
-                );
-              }
-            }
-            return null;
-          })()}
+          {product && (
+            <ProductReviews productId={id} />
+          )}
 
           {/* Price Alert Modal */}
         <PriceAlertModal
