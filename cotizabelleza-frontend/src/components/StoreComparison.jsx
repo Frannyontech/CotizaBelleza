@@ -171,7 +171,7 @@ const StoreComparison = ({
                        size={40}
                        src={storeLogo || getDefaultThumbnail()}
                        style={{ 
-                         backgroundColor: storeLogo ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                         backgroundColor: storeLogo ? 'transparent' : 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
                          fontSize: '16px',
                          fontWeight: 'bold',
                          color: 'white'
@@ -243,7 +243,7 @@ const StoreComparison = ({
                                 level={4} 
                                 style={{ 
                                   margin: 0, 
-                                  color: '#667eea',
+                                  color: '#ff6b9d',
                                   fontWeight: 'bold',
                                   fontSize: '20px'
                                 }}
@@ -302,9 +302,9 @@ const StoreComparison = ({
                          height: '44px',
                          borderRadius: '12px',
                          fontWeight: 'bold',
-                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                         background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
                          border: 'none',
-                         boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                         boxShadow: '0 4px 12px rgba(255, 107, 157, 0.3)',
                          fontSize: '14px'
                        }}
                        aria-label={`Ir a tienda ${storeName} para ${productName}`}

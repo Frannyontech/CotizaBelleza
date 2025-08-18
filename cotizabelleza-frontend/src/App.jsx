@@ -16,6 +16,7 @@ import DBSProductos from './components/DBSProductos';
 
 import PreunicProductos from './components/PreunicProductos';
 import MaicaoProductos from './components/MaicaoProductos';
+import CategoriasProductos from './components/CategoriasProductos';
 
 const { Content } = Layout;
 
@@ -60,6 +61,14 @@ function App() {
             <Navbar />
             <Content style={{ padding: '0', background: '#f5f5f5' }}>
               <MaicaoProductos />
+            </Content>
+          </Layout>
+        } />
+        <Route path="/categorias/:categoria" element={
+          <Layout style={{ minHeight: '100vh' }}>
+            <Navbar />
+            <Content style={{ padding: '0', background: '#f5f5f5' }}>
+              <CategoriasProductos />
             </Content>
           </Layout>
         } />

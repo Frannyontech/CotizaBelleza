@@ -106,6 +106,21 @@ export const unifiedProductsService = {
     }
   },
 
+  // Get products by category
+  getProductsByCategory: async (categoryName) => {
+    try {
+      const unifiedData = await unifiedProductsService.getUnifiedProducts();
+      const productos = unifiedData.productos || [];
+      
+      return productos.filter(product => 
+        product.categoria && product.categoria.toLowerCase() === categoryName.toLowerCase()
+      );
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
+      throw error;
+    }
+  },
+
   // Convert unified products to listing format used by components
   convertToListingFormat: (unifiedData) => {
     try {

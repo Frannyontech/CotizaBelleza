@@ -143,7 +143,10 @@ const DetalleProducto = () => {
         <div className="breadcrumb-container">
             <Breadcrumb items={[
               { title: 'Inicio', href: '/' },
-              { title: product.categoria || 'Productos', href: '/productos' },
+              { 
+                title: product.categoria || 'Productos', 
+                href: product.categoria ? `/categorias/${product.categoria.toLowerCase()}` : '/productos' 
+              },
               { title: product.nombre }
             ]} />
         </div>

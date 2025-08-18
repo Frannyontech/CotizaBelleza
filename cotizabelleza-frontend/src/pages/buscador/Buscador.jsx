@@ -28,6 +28,8 @@ const Buscador = () => {
   const [loading, setLoading] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState(undefined);
   const [storeFilter, setStoreFilter] = useState(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(25);
   const [filterOptions, setFilterOptions] = useState({ categorias: [], tiendas: [] });
   const [filtersLoading, setFiltersLoading] = useState(true);
 
@@ -122,6 +124,21 @@ const Buscador = () => {
     return filtered;
   }, [data.items, categoryFilter, storeFilter]);
 
+  // Lógica de paginación
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const shouldShowPagination = filteredProducts.length > itemsPerPage;
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, storeFilter, searchQuery]);
+
   // Obtener categorías únicas (usar API + productos cargados)
   const categories = useMemo(() => {
     const fromProducts = new Set((data.items || []).map(p => p.categoria).filter(Boolean));
@@ -208,11 +225,16 @@ const Buscador = () => {
               <div style={{ marginBottom: '16px' }}>
                 <Text type="secondary">
                   {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''} para "{searchQuery}"
+                  {shouldShowPagination && (
+                    <span style={{ color: '#a0aec0', fontSize: '0.9rem', fontWeight: 400 }}>
+                      {' '}- Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(currentPage * itemsPerPage, filteredProducts.length)} de {filteredProducts.length}
+                    </span>
+                  )}
                 </Text>
               </div>
               
               <div className="products-grid">
-                {filteredProducts.map((product) => (
+                {paginatedProducts.map((product) => (
                   <div 
                     key={product.product_id}
                     className="product-card" 
@@ -257,6 +279,89 @@ const Buscador = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Controles de paginación */}
+              {shouldShowPagination && (
+                <div style={{ 
+                  background: 'white', 
+                  padding: '30px', 
+                  marginTop: '20px',
+                  boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)',
+                  borderTop: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    gap: '8px', 
+                    marginBottom: '15px', 
+                    flexWrap: 'wrap' 
+                  }}>
+                    <Button 
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                      style={{ fontWeight: 500 }}
+                    >
+                      Primera
+                    </Button>
+                    <Button 
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      style={{ fontWeight: 500 }}
+                    >
+                      Anterior
+                    </Button>
+                    
+                    <div style={{ display: 'flex', gap: '4px', margin: '0 12px' }}>
+                      {(() => {
+                        const startPage = Math.max(1, currentPage - 2);
+                        const endPage = Math.min(totalPages, currentPage + 2);
+                        const pages = [];
+                        
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(
+                            <Button
+                              key={i}
+                              type={i === currentPage ? 'primary' : 'default'}
+                              onClick={() => setCurrentPage(i)}
+                              style={{ 
+                                width: '40px', 
+                                height: '40px',
+                                fontWeight: 600,
+                                ...(i === currentPage ? {
+                                  background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
+                                  borderColor: '#ff6b9d'
+                                } : {})
+                              }}
+                            >
+                              {i}
+                            </Button>
+                          );
+                        }
+                        return pages;
+                      })()}
+                    </div>
+                    
+                    <Button 
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      style={{ fontWeight: 500 }}
+                    >
+                      Siguiente
+                    </Button>
+                    <Button 
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                      style={{ fontWeight: 500 }}
+                    >
+                      Última
+                    </Button>
+                  </div>
+                  <div style={{ textAlign: 'center', color: '#718096', fontWeight: 500, fontSize: '0.9rem' }}>
+                    Página {currentPage} de {totalPages}
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <Empty 

@@ -10,6 +10,8 @@ const PreunicProductos = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
   const [marcaFilter, setMarcaFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(25);
 
   // Formatear precio en formato CLP sin decimales
   const formatPriceCLP = (price) => {
@@ -71,6 +73,21 @@ const PreunicProductos = () => {
 
     return filtered;
   }, [data.items, categoryFilter, searchFilter, marcaFilter]);
+
+  // Lógica de paginación
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const shouldShowPagination = filteredProducts.length > itemsPerPage;
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, searchFilter, marcaFilter]);
 
   // Obtener categorías únicas
   const categories = useMemo(() => {
@@ -141,8 +158,21 @@ const PreunicProductos = () => {
           <span className="loading-text">Cargando productos de Preunic...</span>
         </div>
       ) : filteredProducts.length > 0 ? (
-        <div className="productos-grid">
-          {filteredProducts.map((product) => (
+        <>
+          {/* Contador de resultados */}
+          <div className="resultados-contador">
+            <p>
+              {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+              {shouldShowPagination && (
+                <span className="pagination-info">
+                  {' '}- Mostrando {(currentPage - 1) * itemsPerPage + 1} a {Math.min(currentPage * itemsPerPage, filteredProducts.length)} de {filteredProducts.length}
+                </span>
+              )}
+            </p>
+          </div>
+
+          <div className="productos-grid">
+            {paginatedProducts.map((product) => (
             <div 
               key={product.product_id}
               className="producto-card" 
@@ -171,7 +201,69 @@ const PreunicProductos = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+
+          {/* Controles de paginación */}
+          {shouldShowPagination && (
+            <div className="pagination-container">
+              <div className="pagination-controls">
+                <button 
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                >
+                  Primera
+                </button>
+                <button 
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Anterior
+                </button>
+                
+                <div className="pagination-numbers">
+                  {(() => {
+                    const startPage = Math.max(1, currentPage - 2);
+                    const endPage = Math.min(totalPages, currentPage + 2);
+                    const pages = [];
+                    
+                    for (let i = startPage; i <= endPage; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          className={`pagination-number ${i === currentPage ? 'active' : ''}`}
+                          onClick={() => setCurrentPage(i)}
+                        >
+                          {i}
+                        </button>
+                      );
+                    }
+                    return pages;
+                  })()}
+                </div>
+                
+                <button 
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                </button>
+                <button 
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                >
+                  Última
+                </button>
+              </div>
+              <div className="pagination-summary">
+                Página {currentPage} de {totalPages}
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         <div className="no-productos">
           <p>No se encontraron productos de Preunic con los filtros aplicados</p>
