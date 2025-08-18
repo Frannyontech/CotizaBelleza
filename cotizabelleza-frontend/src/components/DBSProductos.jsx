@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Typography, Select, Empty, Button } from 'antd';
+import { Empty, Button } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 import { unifiedProductsService } from '../services/unifiedApi';
 import './DBSProductos.css';
 
-const { Content } = Layout;
-const { Title, Text } = Typography;
-const { Option } = Select;
+
 
 const DBSProductos = () => {
   const navigate = useNavigate();
@@ -78,115 +76,94 @@ const DBSProductos = () => {
   }, [data.items]);
 
   return (
-    <Layout style={{ minHeight: '400px', background: '#f5f5f5' }}>
-      <Content style={{ padding: '24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          
-          {/* Header */}
-          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
-            <Title level={2}>🛍️ Productos DBS</Title>
-            <Text type="secondary" style={{ fontSize: '16px' }}>
-              Encuentra los mejores productos de belleza en DBS
-            </Text>
-          </div>
+    <div className="dbs-productos-container">
+      
+      {/* Header */}
+      <div className="dbs-header">
+        <h1>🛍️ Productos DBS</h1>
+        <p>Encuentra los mejores productos de belleza en DBS</p>
+      </div>
 
-          {/* Filtros */}
-          <div style={{ marginBottom: '24px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-            <Select
-              placeholder="Filtrar por categoría"
-              style={{ width: 200 }}
-              value={categoryFilter}
-              onChange={setCategoryFilter}
-              allowClear
-            >
-              {categories.map(cat => (
-                <Option key={cat} value={cat}>{cat}</Option>
-              ))}
-            </Select>
-            
-            <Select
-              placeholder="Buscar productos..."
-              style={{ minWidth: 250, flex: 1 }}
-              value={searchFilter}
-              onChange={setSearchFilter}
-              allowClear
-              showSearch
-              filterOption={false}
-              notFoundContent={null}
-            >
-              {(data.items || []).map(product => (
-                <Option key={product.product_id} value={product.nombre}>
-                  {product.nombre}
-                </Option>
-              ))}
-            </Select>
-          </div>
+      {/* Filtros */}
+      <div className="filtros-container">
+        <div className="filtro-grupo">
+          <label>Categoría:</label>
+          <select 
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="filtro-select"
+          >
+            <option value="">Todas las categorías</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
 
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '50px' }}>
-              <Text>Cargando productos de DBS...</Text>
-            </div>
-          ) : filteredProducts.length > 0 ? (
-            <>
-              <div style={{ marginBottom: '16px' }}>
-                <Text type="secondary">
-                  {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} de DBS
-                </Text>
+        <div className="filtro-grupo">
+          <label>Buscar:</label>
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            className="filtro-input"
+          />
+        </div>
+
+        <div className="filtro-grupo">
+          <label>Marca:</label>
+          <input
+            type="text"
+            placeholder="Buscar por marca..."
+            value=""
+            className="filtro-input"
+          />
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="loading-container">
+          <span className="loading-text">Cargando productos de DBS...</span>
+        </div>
+      ) : filteredProducts.length > 0 ? (
+        <div className="productos-grid">
+          {filteredProducts.map((product) => (
+            <div 
+              key={product.product_id}
+              className="producto-card" 
+              onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
+            >
+              <div className="producto-imagen">
+                <img 
+                  src={product.imagen_url || '/image-not-found.png'} 
+                  alt={product.nombre}
+                  onError={(e) => {
+                    e.target.src = '/image-not-found.png';
+                  }}
+                />
+                <div className="producto-tienda">🛍️ DBS</div>
               </div>
               
-              <div className="products-grid">
-                {filteredProducts.map((product) => (
-                  <div 
-                    key={product.product_id}
-                    className="product-card" 
-                    onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="product-image">
-                      <img 
-                        src={product.imagen_url || '/image-not-found.png'} 
-                        alt={product.nombre}
-                        onError={(e) => {
-                          e.target.src = '/image-not-found.png';
-                        }}
-                      />
-                    </div>
-                    <div className="product-info">
-                      <Text className="product-brand">{product.marca}</Text>
-                      <Text className="product-name">{product.nombre}</Text>
-                      <Text className="product-price">
-                        {formatPriceCLP(product.precio_min || 0)}
-                      </Text>
-                      <Button 
-                        type="primary" 
-                        size="small" 
-                        className="view-more-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`);
-                        }}
-                      >
-                        Ver más <LinkOutlined />
-                      </Button>
-                      <div className="product-stores">
-                        <Text type="secondary">
-                          🛍️ Disponible en DBS
-                        </Text>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="producto-info">
+                <h3 className="producto-nombre">{product.nombre}</h3>
+                <p className="producto-marca">{product.marca}</p>
+                <div className="producto-precio">
+                  <span className="precio">{formatPriceCLP(product.precio_min || 0)}</span>
+                </div>
+                <div className="producto-stock">
+                  <span className="stock disponible">✓ Disponible</span>
+                </div>
               </div>
-            </>
-          ) : (
-            <Empty 
-              description="No se encontraron productos de DBS"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-          )}
+            </div>
+          ))}
         </div>
-      </Content>
-    </Layout>
+      ) : (
+        <div className="no-productos">
+          <p>No se encontraron productos de DBS con los filtros aplicados</p>
+        </div>
+      )}
+    </div>
   );
 };
 

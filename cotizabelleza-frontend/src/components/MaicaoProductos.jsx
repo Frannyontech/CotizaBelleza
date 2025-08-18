@@ -1,87 +1,91 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productService } from '../services/api';
+import { unifiedProductsService } from '../services/unifiedApi';
 import './MaicaoProductos.css';
 
 const MaicaoProductos = () => {
   const navigate = useNavigate();
-  const [productos, setProductos] = useState([]);
-  const [filtros, setFiltros] = useState({
-    categoria: '',
-    search: '',
-    marca: ''
-  });
+  const [data, setData] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [total, setTotal] = useState(0);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [searchFilter, setSearchFilter] = useState('');
+  const [marcaFilter, setMarcaFilter] = useState('');
 
-  // Cargar productos al montar el componente
-  useEffect(() => {
-    cargarProductos();
-  }, []);
-
-  const cargarProductos = async (nuevosFiltros = filtros) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await productService.getMaicaoProducts(nuevosFiltros);
-      setProductos(response.productos || []);
-      setTotal(response.total || 0);
-    } catch (error) {
-      console.error('Error cargando productos de Maicao:', error);
-      setError('Error al cargar los productos de Maicao');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const manejarCambioFiltro = (campo, valor) => {
-    const nuevosFiltros = { ...filtros, [campo]: valor };
-    setFiltros(nuevosFiltros);
-    cargarProductos(nuevosFiltros);
-  };
-
-  const formatearPrecio = (precio) => {
+  // Formatear precio en formato CLP sin decimales
+  const formatPriceCLP = (price) => {
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
       currency: 'CLP',
-      minimumFractionDigits: 0
-    }).format(precio);
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
-  const manejarClickProducto = (producto) => {
-    // Usar directamente el ID unificado (product_id o id)
-    const productId = producto.product_id || producto.id;
-    navigate(`/detalle-producto/${encodeURIComponent(productId)}`);
+  // Cargar productos al montar el componente
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Obtener productos de Maicao únicamente del archivo unificado
+        const maicaoProducts = await unifiedProductsService.getProductsByStore('maicao');
+        
+        // Convertir a formato de listing
+        const listingProducts = unifiedProductsService.convertToListingFormat({ productos: maicaoProducts });
+        
+        setData({ items: listingProducts });
+        
+      } catch (error) {
+        console.error('Error loading Maicao products:', error);
+        setData({ items: [] });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filtrar productos por categoría, búsqueda y marca
+  const filteredProducts = useMemo(() => {
+    let filtered = data.items || [];
+
+    // Filtro por categoría
+    if (categoryFilter) {
+      filtered = filtered.filter(product => product.categoria === categoryFilter);
+    }
+
+    // Filtro por búsqueda
+    if (searchFilter) {
+      filtered = filtered.filter(product =>
+        product.nombre.toLowerCase().includes(searchFilter.toLowerCase()) ||
+        product.marca.toLowerCase().includes(searchFilter.toLowerCase())
+      );
+    }
+
+    // Filtro por marca
+    if (marcaFilter) {
+      filtered = filtered.filter(product =>
+        product.marca.toLowerCase().includes(marcaFilter.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [data.items, categoryFilter, searchFilter, marcaFilter]);
+
+  // Obtener categorías únicas
+  const categories = useMemo(() => {
+    const cats = new Set();
+    data.items.forEach(product => {
+      if (product.categoria) cats.add(product.categoria);
+    });
+    return Array.from(cats);
+  }, [data.items]);
+
+  const manejarCambioFiltro = (campo, valor) => {
+    if (campo === 'categoria') setCategoryFilter(valor);
+    if (campo === 'search') setSearchFilter(valor);
+    if (campo === 'marca') setMarcaFilter(valor);
   };
-
-  const obtenerImagenProducto = (producto) => {
-    return producto.imagen_url || '/image-not-found.png';
-  };
-
-  if (loading) {
-    return (
-      <div className="maicao-productos-container">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Cargando productos de Maicao...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="maicao-productos-container">
-        <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button onClick={() => cargarProductos()} className="retry-button">
-            Reintentar
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="maicao-productos-container">
@@ -96,13 +100,14 @@ const MaicaoProductos = () => {
         <div className="filtro-grupo">
           <label>Categoría:</label>
           <select 
-            value={filtros.categoria} 
+            value={categoryFilter} 
             onChange={(e) => manejarCambioFiltro('categoria', e.target.value)}
             className="filtro-select"
           >
             <option value="">Todas las categorías</option>
-            <option value="maquillaje">Maquillaje</option>
-            <option value="skincare">Skincare</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
         </div>
 
@@ -111,7 +116,7 @@ const MaicaoProductos = () => {
           <input
             type="text"
             placeholder="Buscar por nombre..."
-            value={filtros.search}
+            value={searchFilter}
             onChange={(e) => manejarCambioFiltro('search', e.target.value)}
             className="filtro-input"
           />
@@ -122,51 +127,52 @@ const MaicaoProductos = () => {
           <input
             type="text"
             placeholder="Buscar por marca..."
-            value={filtros.marca}
+            value={marcaFilter}
             onChange={(e) => manejarCambioFiltro('marca', e.target.value)}
             className="filtro-input"
           />
         </div>
       </div>
 
-      {/* Grid de productos */}
-      <div className="productos-grid">
-        {productos.map((producto) => (
-          <div 
-            key={producto.id}
-            className="producto-card"
-            onClick={() => manejarClickProducto(producto)}
-          >
-            <div className="producto-imagen">
-              <img
-                src={obtenerImagenProducto(producto)}
-                alt={producto.nombre}
-                onError={(e) => {
-                  e.target.src = '/image-not-found.png';
-                }}
-              />
-              <div className="producto-tienda">💄 Maicao</div>
-            </div>
-            
-            <div className="producto-info">
-              <h3 className="producto-nombre">{producto.nombre}</h3>
-              <p className="producto-marca">{producto.marca}</p>
-              <div className="producto-precio">
-                {formatearPrecio(producto.precio)}
+      {loading ? (
+        <div className="loading-container">
+          <span className="loading-text">Cargando productos de Maicao...</span>
+        </div>
+      ) : filteredProducts.length > 0 ? (
+        <div className="productos-grid">
+          {filteredProducts.map((product) => (
+            <div 
+              key={product.product_id}
+              className="producto-card" 
+              onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
+            >
+              <div className="producto-imagen">
+                <img 
+                  src={product.imagen_url || '/image-not-found.png'} 
+                  alt={product.nombre}
+                  onError={(e) => {
+                    e.target.src = '/image-not-found.png';
+                  }}
+                />
+                <div className="producto-tienda">💄 Maicao</div>
               </div>
-              <div className="producto-stock">
-                <span className={`stock ${producto.stock ? 'disponible' : 'agotado'}`}>
-                  {producto.stock ? '✓ Disponible' : '✗ Agotado'}
-                </span>
+              
+              <div className="producto-info">
+                <h3 className="producto-nombre">{product.nombre}</h3>
+                <p className="producto-marca">{product.marca}</p>
+                <div className="producto-precio">
+                  <span className="precio">{formatPriceCLP(product.precio_min || 0)}</span>
+                </div>
+                <div className="producto-stock">
+                  <span className="stock disponible">✓ Disponible</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {productos.length === 0 && !loading && (
+          ))}
+        </div>
+      ) : (
         <div className="no-productos">
-          <p>No se encontraron productos con los filtros aplicados</p>
+          <p>No se encontraron productos de Maicao con los filtros aplicados</p>
         </div>
       )}
     </div>
