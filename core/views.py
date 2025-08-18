@@ -12,6 +12,9 @@ from .serializers import (
     ProductoSerializer, PrecioProductoSerializer, 
     UserSerializer, CategoriaSerializer, TiendaSerializer, AlertaPrecioSerializer, ResenaSerializer
 )
+import json
+import os
+from django.conf import settings
 
 
 def home(request):
@@ -679,9 +682,17 @@ class ProductoResenasAPIView(APIView):
     
     def get(self, request, producto_id):
         try:
+            # Find numeric product ID from various formats
+            numeric_id = _find_product_by_id(producto_id)
+            if not numeric_id:
+                return Response(
+                    {"error": "ID de producto inválido"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             # Verificar que el producto existe
             try:
-                producto = Producto.objects.get(id=producto_id)
+                producto = Producto.objects.get(id=numeric_id)
             except Producto.DoesNotExist:
                 return Response(
                     {"error": "Producto no encontrado"}, 
@@ -719,9 +730,17 @@ class ProductoResenasAPIView(APIView):
     
     def post(self, request, producto_id):
         try:
+            # Find numeric product ID from various formats
+            numeric_id = _find_product_by_id(producto_id)
+            if not numeric_id:
+                return Response(
+                    {"error": "ID de producto inválido"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             # Verificar que el producto existe
             try:
-                producto = Producto.objects.get(id=producto_id)
+                producto = Producto.objects.get(id=numeric_id)
             except Producto.DoesNotExist:
                 return Response(
                     {"error": "Producto no encontrado"}, 
@@ -806,3 +825,112 @@ class ProductoResenasAPIView(APIView):
                 {"error": f"Error al crear la reseña: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+def load_unified_products():
+    """Cargar productos unificados desde el archivo JSON"""
+    try:
+        possible_paths = [
+            os.path.join(settings.BASE_DIR, 'unified_products.json'),  # Django project root
+            os.path.join(settings.BASE_DIR, '..', 'unified_products.json'),  # Parent directory
+            os.path.join(settings.BASE_DIR, '..', 'processed', 'unified_products.json'),  # Processed directory
+            os.path.join(settings.BASE_DIR, 'cotizabelleza-frontend', 'public', 'unified_products.json'),  # Frontend public
+        ]
+        
+        for json_path in possible_paths:
+            if os.path.exists(json_path):
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Handle both array format and object format
+                    if isinstance(data, list):
+                        return {"productos": data}
+                    elif isinstance(data, dict) and "productos" in data:
+                        return data
+                    else:
+                        return {"productos": []}
+        
+        return {"productos": []}
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading unified products: {e}")
+        return {"productos": []}
+
+class UnifiedProductsAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        try:
+            unified_data = load_unified_products()
+            return Response(unified_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener productos unificados: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class UnifiedDashboardAPIView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        try:
+            unified_data = load_unified_products()
+            productos = unified_data.get("productos", [])
+            
+            # Estadísticas básicas
+            total_productos = len(productos)
+            tiendas_disponibles = set()
+            categorias_disponibles = set()
+            
+            for producto in productos:
+                # Extract stores from tiendas array
+                tiendas_producto = producto.get('tiendas', [])
+                for tienda in tiendas_producto:
+                    if tienda.get('fuente'):
+                        tiendas_disponibles.add(tienda['fuente'])
+                
+                if producto.get('categoria'):
+                    categorias_disponibles.add(producto['categoria'])
+            
+            # Seleccionar 10 productos populares (los primeros para simplificar)
+            productos_populares = productos[:10]
+            
+            dashboard_data = {
+                'estadisticas': {
+                    'total_productos': total_productos,
+                    'total_tiendas': len(tiendas_disponibles),
+                    'total_categorias': len(categorias_disponibles),
+                },
+                'productos_populares': productos_populares,
+                'tiendas_disponibles': list(tiendas_disponibles),
+                'categorias_disponibles': list(categorias_disponibles)
+            }
+            
+            return Response(dashboard_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener datos del dashboard unificado: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+def _find_product_by_id(producto_id):
+    """Helper function to find numeric product ID from various formats"""
+    try:
+        # If it's already numeric, return as-is
+        if str(producto_id).isdigit():
+            return int(producto_id)
+        
+        # If it contains underscores (e.g., "dbs_123"), extract the numeric part
+        if '_' in str(producto_id):
+            parts = str(producto_id).split('_')
+            for part in parts:
+                if part.isdigit():
+                    return int(part)
+        
+        # If it contains hyphens (canonical format), try to extract numeric part
+        if '-' in str(producto_id):
+            parts = str(producto_id).split('-')
+            for part in parts:
+                if part.isdigit():
+                    return int(part)
+        
+        return None
+    except (ValueError, TypeError):
+        return None

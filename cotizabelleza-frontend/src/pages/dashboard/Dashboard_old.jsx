@@ -19,7 +19,8 @@ import {
   ClockCircleOutlined,
   BellOutlined
 } from '@ant-design/icons';
-import { unifiedProductsService } from '../../services/unifiedApi';
+import { dashboardService } from '../../services/api';
+import { processCategoriesForFrontend, processStoresForFrontend } from '../../utils/normalizeHelpers';
 import { resolveImageUrl, getDefaultThumbnail } from '../../utils/image';
 import './Dashboard.css';
 
@@ -31,23 +32,18 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedStore, setSelectedStore] = useState('Todas');
   const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
 
-  // Cargar productos unificados
+  // Cargar datos del dashboard
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadDashboardData = async () => {
       try {
         setLoading(true);
-        
-        // Cargar productos unificados
-        const unifiedProducts = await unifiedProductsService.getUnifiedProducts();
-        
-        // Convertir a formato de dashboard
-        const dashboardProducts = unifiedProductsService.convertToListingFormat(unifiedProducts);
-        
-        // Tomar los primeros 20 como "productos populares"
-        setProducts(dashboardProducts.slice(0, 20));
-        
+
+        // Cargar datos del dashboard
+        const dashboardResponse = await dashboardService.getDashboardData();
+        setDashboardData(dashboardResponse);
+
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         message.error('Error al cargar los datos del dashboard');
@@ -56,7 +52,7 @@ const Dashboard = () => {
       }
     };
 
-    loadProducts();
+    loadDashboardData();
   }, []);
 
   // Formatear precio en formato CLP sin decimales
@@ -68,15 +64,20 @@ const Dashboard = () => {
     }).format(price);
   };
 
-  // Extraer categorías y tiendas disponibles
-  const categorias_unicas = [...new Set(products.map(product => product.categoria))];
-  const tiendas_unicas = [...new Set(products.flatMap(product => product.tiendas || []))];
+  // Obtener datos procesados
+  const allPopularProducts = dashboardData?.productos_populares || [];
   
-  const categoriesList = ['Todos', ...categorias_unicas];
-  const storesList = ['Todas', ...tiendas_unicas.map(store => store.toUpperCase())];
+  // Extraer categorías y tiendas disponibles directamente de los productos
+  const categorias_unicas = [...new Set(allPopularProducts.map(product => product.categoria))];
+  const tiendas_unicas = [...new Set(allPopularProducts.flatMap(product => 
+    product.tiendas_disponibles || []
+  ))];
+  
+  const categoriesList = processCategoriesForFrontend(categorias_unicas);
+  const storesList = processStoresForFrontend(tiendas_unicas);
 
-  // Aplicar filtros a los productos
-  const filteredProducts = products.filter(product => {
+  // Aplicar filtros a los productos populares
+  const popularProducts = allPopularProducts.filter(product => {
     // Filtro por categoría
     if (selectedCategory !== 'Todos' && product.categoria !== selectedCategory) {
       return false;
@@ -84,10 +85,10 @@ const Dashboard = () => {
     
     // Filtro por tienda
     if (selectedStore !== 'Todas') {
-      const storeMatch = product.tiendas?.some(store => 
-        store.toUpperCase() === selectedStore
-      );
-      if (!storeMatch) return false;
+      // Verificar si el producto está disponible en la tienda seleccionada
+      if (!product.tiendas_disponibles || !product.tiendas_disponibles.includes(selectedStore)) {
+        return false;
+      }
     }
     
     return true;
@@ -128,96 +129,120 @@ const Dashboard = () => {
         <Carousel autoplay>
           <div>
             <div className="carousel-slide">
+              <img 
+                src="/src/assets/hero-slider-1.jpg" 
+                alt="Productos de belleza"
+                className="carousel-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
               <div className="carousel-content">
-                <h2>Productos de belleza unificados</h2>
-                <p>Comparación de precios en tiempo real</p>
+                <h2>Revisa los productos disponibles</h2>
+                <p>Ya disponibles en Chile</p>
               </div>
             </div>
           </div>
           <div>
             <div className="carousel-slide">
+              <img 
+                src="/src/assets/hero-slider-2.jpg" 
+                alt="Ofertas especiales"
+                className="carousel-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
               <div className="carousel-content">
-                <h2>Mejor precio garantizado</h2>
-                <p>Compara entre DBS, Preunic y Maicao</p>
+                <h2>Ofertas especiales</h2>
+                <p>Hasta 50% de descuento</p>
               </div>
             </div>
           </div>
           <div>
             <div className="carousel-slide">
+              <img 
+                src="/src/assets/hero-slider-3.jpg" 
+                alt="Productos destacados"
+                className="carousel-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
               <div className="carousel-content">
                 <h2>Productos destacados</h2>
                 <p>Las mejores marcas de belleza</p>
               </div>
             </div>
-          </div>
+        </div>
         </Carousel>
       </div>
 
       {/* Filter Section */}
-      <div className="filter-container">
-        <div className="filter-row">
+        <div className="filter-container">
+          <div className="filter-row">
           <Text strong>Categoría:</Text>
-          <Space wrap>
-            {categoriesList.map(category => (
-              <Tag
-                key={category}
-                className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </Tag>
-            ))}
-          </Space>
-        </div>
+            <Space wrap>
+              {categoriesList.map(category => (
+                <Tag
+                  key={category}
+                  className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Tag>
+              ))}
+            </Space>
+          </div>
 
-        <div className="filter-row">
-          <Text strong>Tienda:</Text>
-          <Space wrap>
-            {storesList.map(store => (
-              <Tag
-                key={store}
-                className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
-                onClick={() => setSelectedStore(store)}
-              >
-                {store}
-              </Tag>
-            ))}
-          </Space>
-          <Button 
-            type="link" 
-            className="clear-filters"
-            onClick={() => {
-              setSelectedCategory('Todos');
-              setSelectedStore('Todas');
-            }}
-          >
-            Limpiar filtros
-          </Button>
+          <div className="filter-row">
+            <Text strong>Tienda:</Text>
+            <Space wrap>
+              {storesList.map(store => (
+                <Tag
+                  key={store}
+                  className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
+                  onClick={() => setSelectedStore(store)}
+                >
+                  {store}
+                </Tag>
+              ))}
+            </Space>
+            <Button 
+              type="link" 
+              className="clear-filters"
+              onClick={() => {
+                setSelectedCategory('Todos');
+                setSelectedStore('Todas');
+              }}
+            >
+              Limpiar filtros
+            </Button>
         </div>
       </div>
 
       {/* Popular Products Section */}
       <div className="products-section">
         <div className="section-header">
-          <Title level={3}>Productos más populares ({filteredProducts.length})</Title>
+          <Title level={3}>Productos más populares ({popularProducts.length})</Title>
           <Button type="link" className="view-all">
             Ver todos <LinkOutlined />
           </Button>
         </div>
 
         <div className="products-grid">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => (
+          {popularProducts.length > 0 ? (
+            popularProducts.map(product => (
               <div 
-                key={product.product_id}
+                key={product.id}
                 className="product-card" 
-                onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
+                onClick={() => navigate(`/detalle-producto/${product.id}`)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="product-image">
                   <img 
-                    src={resolveImageUrl({ imagen_url: product.imagen })} 
-                    alt={product.nombre}
+                    src={resolveImageUrl(product)} 
+                    alt={product.nombre || product.productName}
                     onError={(e) => {
                       e.target.src = getDefaultThumbnail();
                     }}
@@ -227,7 +252,7 @@ const Dashboard = () => {
                   <Text className="product-brand">{product.marca}</Text>
                   <Text className="product-name">{product.nombre}</Text>
                   <Text className="product-price">
-                    {product.tiendasCount > 1 ? 'Desde ' : ''}{formatPriceCLP(product.precioMin || 0)}
+                    Desde {formatPriceCLP(product.precio_min || product.precio || 0)}
                   </Text>
                   <Button 
                     type="primary" 
@@ -235,17 +260,15 @@ const Dashboard = () => {
                     className="view-more-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`);
+                      navigate(`/detalle-producto/${product.id}`);
                     }}
                   >
                     Ver más <LinkOutlined />
                   </Button>
                   <div className="product-stores">
-                    <Text type="secondary">
-                      {product.tiendasCount > 1 
-                        ? `${product.tiendasCount} tiendas` 
-                        : `Disponible en: ${product.tiendas?.join(', ').toUpperCase()}`
-                      }
+                    <Text type="secondary">Disponible en:</Text>
+                    <Text className="store-list">
+                        {product.tiendas_disponibles?.join(', ') || 'DBS'}
                     </Text>
                   </div>
                 </div>
@@ -264,22 +287,22 @@ const Dashboard = () => {
         <div className="benefits-container">
           <Title level={2} className="benefits-title">¿Por qué elegir CotizaBelleza?</Title>
           <Row gutter={[24, 24]}>
-            {benefits.map((benefit, index) => (
+          {benefits.map((benefit, index) => (
               <Col xs={24} sm={12} md={8} key={index}>
                 <Card className="benefit-card" hoverable>
-                  <div className="benefit-icon">
-                    {benefit.icon}
-                  </div>
+                <div className="benefit-icon">
+                  {benefit.icon}
+                </div>
                   <Title level={4} className="benefit-title">{benefit.title}</Title>
                   <Text className="benefit-description">{benefit.description}</Text>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+              </Card>
+            </Col>
+          ))}
+        </Row>
         </div>
       </div>
     </Layout>
   );
 };
 
-export default Dashboard;
+export default Dashboard; 

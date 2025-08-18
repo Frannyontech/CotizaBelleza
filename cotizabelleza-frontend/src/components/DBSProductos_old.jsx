@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { unifiedProductsService } from '../services/unifiedApi';
+import { productService } from '../services/api';
 import './DBSProductos.css';
 
 const DBSProductos = () => {
@@ -24,10 +24,9 @@ const DBSProductos = () => {
     setLoading(true);
     setError(null);
     try {
-      // Usar el servicio unificado para obtener productos de DBS
-      const productos = await unifiedProductsService.getProductsByStore('dbs', nuevosFiltros);
-      setProductos(productos);
-      setTotal(productos.length);
+      const response = await productService.getDBSProducts(nuevosFiltros);
+      setProductos(response.productos || []);
+      setTotal(response.total || 0);
     } catch (error) {
       console.error('Error cargando productos de DBS:', error);
       setError('Error al cargar los productos de DBS');
@@ -51,13 +50,12 @@ const DBSProductos = () => {
   };
 
   const manejarClickProducto = (producto) => {
-    // Usar el ID unificado si está disponible, sino el ID de la tienda
-    const productId = producto.unified_product_id || `dbs_${producto.id}`;
-    navigate(`/detalle-producto/${encodeURIComponent(productId)}`);
+    const productId = `dbs_${producto.id}`;
+    navigate(`/detalle-producto/${productId}`);
   };
 
   const obtenerImagenProducto = (producto) => {
-    return producto.imagen_url || producto.imagen || '/image-not-found.png';
+    return producto.imagen_url || '/image-not-found.png';
   };
 
   if (loading) {
@@ -130,15 +128,6 @@ const DBSProductos = () => {
         </div>
       </div>
 
-      {/* Stats */}
-      {productos.length > 0 && (
-        <div style={{ marginBottom: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
-          <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-            Mostrando {productos.length} productos de DBS {filtros.search && `para "${filtros.search}"`}
-          </p>
-        </div>
-      )}
-
       {/* Grid de productos */}
       <div className="productos-grid">
         {productos.map((producto) => (
@@ -165,8 +154,8 @@ const DBSProductos = () => {
                 {formatearPrecio(producto.precio)}
               </div>
               <div className="producto-stock">
-                <span className={`stock ${producto.stock?.toLowerCase().includes('stock') ? 'disponible' : 'agotado'}`}>
-                  {producto.stock?.toLowerCase().includes('stock') ? '✓ Disponible' : '✗ Agotado'}
+                <span className={`stock ${producto.stock ? 'disponible' : 'agotado'}`}>
+                  {producto.stock ? '✓ Disponible' : '✗ Agotado'}
                 </span>
               </div>
             </div>
