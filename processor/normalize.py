@@ -358,7 +358,7 @@ def build_canonical(cluster: List[Dict]) -> Dict[str, Any]:
         
         # Si ya existe esta fuente, mantener la de menor precio
         if fuente not in tiendas_por_fuente or precio < tiendas_por_fuente[fuente]['precio']:
-            tiendas_por_fuente[fuente] = {
+            tienda_data = {
                 'fuente': fuente,
                 'precio': precio,
                 'stock': item.get('stock', 'Desconocido'),
@@ -366,6 +366,15 @@ def build_canonical(cluster: List[Dict]) -> Dict[str, Any]:
                 'imagen': item.get('imagen', ''),
                 'marca_origen': item['marca']  # Marca original sin modificar
             }
+            
+            # Agregar precios específicos de Preunic si existen
+            if fuente == 'preunic':
+                if 'precio_normal' in item and item['precio_normal'] is not None:
+                    tienda_data['precio_normal'] = item['precio_normal']
+                if 'precio_oferta' in item and item['precio_oferta'] is not None:
+                    tienda_data['precio_oferta'] = item['precio_oferta']
+            
+            tiendas_por_fuente[fuente] = tienda_data
     
     # Convertir a lista y ordenar por precio ascendente
     tiendas = list(tiendas_por_fuente.values())
