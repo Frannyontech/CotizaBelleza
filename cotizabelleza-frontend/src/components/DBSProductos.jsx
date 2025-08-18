@@ -1,185 +1,192 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Layout, Typography, Select, Empty, Button } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
 import { unifiedProductsService } from '../services/unifiedApi';
 import './DBSProductos.css';
 
+const { Content } = Layout;
+const { Title, Text } = Typography;
+const { Option } = Select;
+
 const DBSProductos = () => {
   const navigate = useNavigate();
-  const [productos, setProductos] = useState([]);
-  const [filtros, setFiltros] = useState({
-    categoria: '',
-    search: '',
-    marca: ''
-  });
+  const [data, setData] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [total, setTotal] = useState(0);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [searchFilter, setSearchFilter] = useState('');
 
-  // Cargar productos al montar el componente
-  useEffect(() => {
-    cargarProductos();
-  }, []);
-
-  const cargarProductos = async (nuevosFiltros = filtros) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Usar el servicio unificado para obtener productos de DBS
-      const productos = await unifiedProductsService.getProductsByStore('dbs', nuevosFiltros);
-      setProductos(productos);
-      setTotal(productos.length);
-    } catch (error) {
-      console.error('Error cargando productos de DBS:', error);
-      setError('Error al cargar los productos de DBS');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const manejarCambioFiltro = (campo, valor) => {
-    const nuevosFiltros = { ...filtros, [campo]: valor };
-    setFiltros(nuevosFiltros);
-    cargarProductos(nuevosFiltros);
-  };
-
-  const formatearPrecio = (precio) => {
+  // Formatear precio en formato CLP sin decimales
+  const formatPriceCLP = (price) => {
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
       currency: 'CLP',
-      minimumFractionDigits: 0
-    }).format(precio);
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
-  const manejarClickProducto = (producto) => {
-    // Usar el ID unificado si está disponible, sino el ID de la tienda
-    const productId = producto.unified_product_id || `dbs_${producto.id}`;
-    navigate(`/detalle-producto/${encodeURIComponent(productId)}`);
-  };
+  // Cargar productos al montar el componente
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Obtener productos de DBS únicamente
+        const dbsProducts = await unifiedProductsService.getProductsByStore('dbs');
+        
+        // Convertir a formato de listing
+        const listingProducts = unifiedProductsService.convertToListingFormat({ productos: dbsProducts });
+        
+        setData({ items: listingProducts });
+        
+      } catch (error) {
+        console.error('Error loading DBS products:', error);
+        setData({ items: [] });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const obtenerImagenProducto = (producto) => {
-    return producto.imagen_url || producto.imagen || '/image-not-found.png';
-  };
+    fetchData();
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="dbs-productos-container">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Cargando productos de DBS...</p>
-        </div>
-      </div>
-    );
-  }
+  // Filtrar productos por categoría y búsqueda
+  const filteredProducts = useMemo(() => {
+    let filtered = data.items || [];
 
-  if (error) {
-    return (
-      <div className="dbs-productos-container">
-        <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button onClick={() => cargarProductos()} className="retry-button">
-            Reintentar
-          </button>
-        </div>
-      </div>
-    );
-  }
+    // Filtro por categoría
+    if (categoryFilter) {
+      filtered = filtered.filter(product => product.categoria === categoryFilter);
+    }
+
+    // Filtro por búsqueda en nombre o marca
+    if (searchFilter.trim()) {
+      const searchLower = searchFilter.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.nombre?.toLowerCase().includes(searchLower) ||
+        product.marca?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return filtered;
+  }, [data.items, categoryFilter, searchFilter]);
+
+  // Obtener categorías únicas
+  const categories = useMemo(() => {
+    const cats = new Set((data.items || []).map(p => p.categoria).filter(Boolean));
+    return Array.from(cats);
+  }, [data.items]);
 
   return (
-    <div className="dbs-productos-container">
-      {/* Header */}
-      <div className="dbs-header">
-        <h1>🛍️ Productos DBS</h1>
-        <p>Encuentra los mejores productos de belleza en DBS</p>
-      </div>
-
-      {/* Filtros */}
-      <div className="filtros-container">
-        <div className="filtro-grupo">
-          <label>Categoría:</label>
-          <select 
-            value={filtros.categoria} 
-            onChange={(e) => manejarCambioFiltro('categoria', e.target.value)}
-            className="filtro-select"
-          >
-            <option value="">Todas las categorías</option>
-            <option value="maquillaje">Maquillaje</option>
-            <option value="skincare">Skincare</option>
-          </select>
-        </div>
-
-        <div className="filtro-grupo">
-          <label>Buscar:</label>
-          <input
-            type="text"
-            placeholder="Buscar por nombre..."
-            value={filtros.search}
-            onChange={(e) => manejarCambioFiltro('search', e.target.value)}
-            className="filtro-input"
-          />
-        </div>
-
-        <div className="filtro-grupo">
-          <label>Marca:</label>
-          <input
-            type="text"
-            placeholder="Buscar por marca..."
-            value={filtros.marca}
-            onChange={(e) => manejarCambioFiltro('marca', e.target.value)}
-            className="filtro-input"
-          />
-        </div>
-      </div>
-
-      {/* Stats */}
-      {productos.length > 0 && (
-        <div style={{ marginBottom: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
-          <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
-            Mostrando {productos.length} productos de DBS {filtros.search && `para "${filtros.search}"`}
-          </p>
-        </div>
-      )}
-
-      {/* Grid de productos */}
-      <div className="productos-grid">
-        {productos.map((producto) => (
-          <div 
-            key={producto.id}
-            className="producto-card"
-            onClick={() => manejarClickProducto(producto)}
-          >
-            <div className="producto-imagen">
-              <img
-                src={obtenerImagenProducto(producto)}
-                alt={producto.nombre}
-                onError={(e) => {
-                  e.target.src = '/image-not-found.png';
-                }}
-              />
-              <div className="producto-tienda">🛍️ DBS</div>
-            </div>
-            
-            <div className="producto-info">
-              <h3 className="producto-nombre">{producto.nombre}</h3>
-              <p className="producto-marca">{producto.marca}</p>
-              <div className="producto-precio">
-                {formatearPrecio(producto.precio)}
-              </div>
-              <div className="producto-stock">
-                <span className={`stock ${producto.stock?.toLowerCase().includes('stock') ? 'disponible' : 'agotado'}`}>
-                  {producto.stock?.toLowerCase().includes('stock') ? '✓ Disponible' : '✗ Agotado'}
-                </span>
-              </div>
-            </div>
+    <Layout style={{ minHeight: '400px', background: '#f5f5f5' }}>
+      <Content style={{ padding: '24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          
+          {/* Header */}
+          <div style={{ marginBottom: '24px', textAlign: 'center' }}>
+            <Title level={2}>🛍️ Productos DBS</Title>
+            <Text type="secondary" style={{ fontSize: '16px' }}>
+              Encuentra los mejores productos de belleza en DBS
+            </Text>
           </div>
-        ))}
-      </div>
 
-      {productos.length === 0 && !loading && (
-        <div className="no-productos">
-          <p>No se encontraron productos con los filtros aplicados</p>
+          {/* Filtros */}
+          <div style={{ marginBottom: '24px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <Select
+              placeholder="Filtrar por categoría"
+              style={{ width: 200 }}
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              allowClear
+            >
+              {categories.map(cat => (
+                <Option key={cat} value={cat}>{cat}</Option>
+              ))}
+            </Select>
+            
+            <Select
+              placeholder="Buscar productos..."
+              style={{ minWidth: 250, flex: 1 }}
+              value={searchFilter}
+              onChange={setSearchFilter}
+              allowClear
+              showSearch
+              filterOption={false}
+              notFoundContent={null}
+            >
+              {(data.items || []).map(product => (
+                <Option key={product.product_id} value={product.nombre}>
+                  {product.nombre}
+                </Option>
+              ))}
+            </Select>
+          </div>
+
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '50px' }}>
+              <Text>Cargando productos de DBS...</Text>
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <>
+              <div style={{ marginBottom: '16px' }}>
+                <Text type="secondary">
+                  {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} de DBS
+                </Text>
+              </div>
+              
+              <div className="products-grid">
+                {filteredProducts.map((product) => (
+                  <div 
+                    key={product.product_id}
+                    className="product-card" 
+                    onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="product-image">
+                      <img 
+                        src={product.imagen_url || '/image-not-found.png'} 
+                        alt={product.nombre}
+                        onError={(e) => {
+                          e.target.src = '/image-not-found.png';
+                        }}
+                      />
+                    </div>
+                    <div className="product-info">
+                      <Text className="product-brand">{product.marca}</Text>
+                      <Text className="product-name">{product.nombre}</Text>
+                      <Text className="product-price">
+                        {formatPriceCLP(product.precio_min || 0)}
+                      </Text>
+                      <Button 
+                        type="primary" 
+                        size="small" 
+                        className="view-more-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`);
+                        }}
+                      >
+                        Ver más <LinkOutlined />
+                      </Button>
+                      <div className="product-stores">
+                        <Text type="secondary">
+                          🛍️ Disponible en DBS
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <Empty 
+              description="No se encontraron productos de DBS"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          )}
         </div>
-      )}
-    </div>
+      </Content>
+    </Layout>
   );
 };
 

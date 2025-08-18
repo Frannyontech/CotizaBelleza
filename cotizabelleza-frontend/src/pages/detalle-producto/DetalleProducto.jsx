@@ -18,7 +18,6 @@ import {
   BellOutlined,
   HeartOutlined
 } from '@ant-design/icons';
-import { productService } from '../../services/api';
 import { unifiedProductsService } from '../../services/unifiedApi';
 import { resolveImageUrl } from '../../utils/image';
 import PriceAlertModal from '../../components/PriceAlertModal';
@@ -39,20 +38,28 @@ const DetalleProducto = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        
         // Decodificar el ID (puede venir URL-encoded)
         const decodedId = decodeURIComponent(id);
         
-        // Intentar buscar en productos unificados primero
-        let foundProduct = await unifiedProductsService.getProductById(decodedId);
+        // Buscar en productos unificados exclusivamente
+        const foundProduct = await unifiedProductsService.getProductById(decodedId);
         
         if (foundProduct) {
-          // Convertir a formato esperado
-          const convertedProduct = unifiedProductsService.convertToListingFormat([foundProduct])[0];
-          setProduct(convertedProduct);
+          
+          // Usar los datos directamente del JSON unificado
+          setProduct({
+            product_id: foundProduct.product_id,
+            nombre: foundProduct.nombre,
+            marca: foundProduct.marca,
+            categoria: foundProduct.categoria,
+            imagen_url: foundProduct.imagen || foundProduct.tiendas?.[0]?.imagen,
+            precio_min: Math.min(...foundProduct.tiendas.map(t => parseFloat(t.precio))),
+            tiendasCount: foundProduct.tiendas.length,
+            tiendas_disponibles: foundProduct.tiendas.map(t => t.fuente.toUpperCase()),
+            tiendas: foundProduct.tiendas // Datos completos de tiendas
+          });
         } else {
-          // Fallback: buscar en APIs individuales para IDs legacy (dbs_559, etc.)
-          await handleLegacyId(decodedId);
+          message.error('Producto no encontrado');
         }
         
       } catch (error) {
@@ -68,97 +75,10 @@ const DetalleProducto = () => {
     }
   }, [id]);
 
-  const handleLegacyId = async (legacyId) => {
-    try {
-      // Para IDs prefijados como dbs_559, maicao_123, etc.
-      if (/^(dbs|maicao|preunic)_/.test(legacyId)) {
-        const [storeName] = legacyId.split('_');
-        const storeProducts = await unifiedProductsService.getProductsByStore(storeName);
-        
-        // Buscar el producto específico
-        const foundStoreProduct = storeProducts.find(p => 
-          p.id === legacyId || p.unified_product_id === legacyId
-        );
-        
-        if (foundStoreProduct) {
-          // Convertir producto individual a formato detalle
-          setProduct({
-            product_id: foundStoreProduct.unified_product_id || legacyId,
-            nombre: foundStoreProduct.nombre,
-            marca: foundStoreProduct.marca,
-            categoria: foundStoreProduct.categoria,
-            imagen: foundStoreProduct.imagen,
-            precioMin: foundStoreProduct.precio,
-            tiendasCount: 1,
-            tiendas: [storeName],
-            ofertas: [{
-              fuente: foundStoreProduct.fuente,
-              precio: foundStoreProduct.precio,
-              stock: foundStoreProduct.stock,
-              url: foundStoreProduct.url,
-              imagen: foundStoreProduct.imagen,
-              marca_origen: foundStoreProduct.marca
-            }]
-          });
-        }
-      }
-      // Para IDs numéricos legacy
-      else if (/^\d+$/.test(legacyId)) {
-        // Buscar en todas las tiendas
-        const [dbsProducts, preunicProducts, maicaoProducts] = await Promise.all([
-          unifiedProductsService.getProductsByStore('dbs'),
-          unifiedProductsService.getProductsByStore('preunic'),
-          unifiedProductsService.getProductsByStore('maicao')
-        ]);
-        
-        const allStoreProducts = [...dbsProducts, ...preunicProducts, ...maicaoProducts];
-        const foundProduct = allStoreProducts.find(p => p.id.includes(legacyId));
-        
-        if (foundProduct) {
-          setProduct({
-            product_id: foundProduct.unified_product_id || legacyId,
-            nombre: foundProduct.nombre,
-            marca: foundProduct.marca,
-            categoria: foundProduct.categoria,
-            imagen: foundProduct.imagen,
-            precioMin: foundProduct.precio,
-            tiendasCount: 1,
-            tiendas: [foundProduct.fuente],
-            ofertas: [{
-              fuente: foundProduct.fuente,
-              precio: foundProduct.precio,
-              stock: foundProduct.stock,
-              url: foundProduct.url,
-              imagen: foundProduct.imagen,
-              marca_origen: foundProduct.marca
-            }]
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error handling legacy ID:', error);
-    }
-  };
 
-  // Cargar reseñas cuando se encuentra el producto
-  useEffect(() => {
-    const loadReviews = async () => {
-      if (product) {
-        try {
-          // Intentar cargar reseñas usando diferentes IDs
-          const reviewId = product.ofertas?.[0]?.productId || product.product_id || id;
-          if (reviewId) {
-            const reviews = await productService.getProductReviews(reviewId);
-        setReviewsData(reviews);
-          }
-      } catch (error) {
-          console.error('Error loading reviews:', error);
-        }
-      }
-    };
 
-    loadReviews();
-  }, [product, id]);
+  // Las reseñas se manejan directamente en el componente ProductReviews
+  // No necesitamos cargar reseñas aquí ya que el componente las maneja
 
   const getImageUrl = (imagenUrl) => {
     return resolveImageUrl({ imagen_url: imagenUrl });
@@ -235,7 +155,7 @@ const DetalleProducto = () => {
             <Col xs={24} md={12}>
               <div className="product-image-container">
                 <img 
-                    src={getImageUrl(product.imagen)} 
+                    src={getImageUrl(product.imagen_url)} 
                     alt={product.nombre}
                   className="product-image"
                   onError={(e) => {
@@ -276,7 +196,7 @@ const DetalleProducto = () => {
                       <>
                   <div className="price-info">
                     <Text className="price-label">Mejor precio</Text>
-                          <Text className="best-price">{formatPrice(product.precioMin)}</Text>
+                          <Text className="best-price">{formatPrice(product.precio_min)}</Text>
                   </div>
                     <div className="price-info">
                           <Text className="price-label">Disponible en</Text>
@@ -286,7 +206,7 @@ const DetalleProducto = () => {
                     </div>
                       </>
                     ) : (
-                      <Text className="best-price">{formatPrice(product.precioMin)}</Text>
+                      <Text className="best-price">{formatPrice(product.precio_min)}</Text>
                   )}
                 </div>
 
@@ -332,23 +252,23 @@ const DetalleProducto = () => {
             {isMultiStore ? (
               <>
                 <Title level={3}>
-                  Comparación de tiendas ({product.ofertas?.length || 0})
+                  Comparación de tiendas ({product.tiendas?.length || 0})
                 </Title>
                 <div className="comparacion" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {(product.ofertas || []).map((oferta, index) => (
+                  {(product.tiendas || []).map((tienda, index) => (
                     <Card key={index} className="store-info-card">
                       <div className="store-row">
                         <span className="store-name">
-                          {getStoreDisplayName(oferta.fuente)}
+                          {getStoreDisplayName(tienda.fuente)}
                         </span>
-                        <span className="store-stock" style={{ color: getStockColor(oferta.stock) }}>
-                          {oferta.stock || 'Desconocido'}
+                        <span className="store-stock" style={{ color: getStockColor(tienda.stock) }}>
+                          {tienda.stock || 'Desconocido'}
                         </span>
                         <strong className="store-price">
-                          ${oferta.precio.toLocaleString("es-CL")}
+                          ${parseFloat(tienda.precio).toLocaleString("es-CL")}
                         </strong>
                         <a 
-                          href={oferta.url} 
+                          href={tienda.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="store-button"
@@ -366,16 +286,16 @@ const DetalleProducto = () => {
                 <Card className="store-info-card">
                   <div className="store-row">
                     <span className="store-name">
-                      {getStoreDisplayName(product.ofertas?.[0]?.fuente || product.tiendas?.[0])}
+                      {getStoreDisplayName(product.tiendas?.[0]?.fuente)}
                     </span>
-                    <span className="store-stock" style={{ color: getStockColor(product.ofertas?.[0]?.stock) }}>
-                      {product.ofertas?.[0]?.stock || 'Desconocido'}
+                    <span className="store-stock" style={{ color: getStockColor(product.tiendas?.[0]?.stock) }}>
+                      {product.tiendas?.[0]?.stock || 'Desconocido'}
                     </span>
                     <strong className="store-price">
-                      ${(product.precioMin || 0).toLocaleString("es-CL")}
+                      ${(product.precio_min || 0).toLocaleString("es-CL")}
                     </strong>
                     <a 
-                      href={product.ofertas?.[0]?.url} 
+                      href={product.tiendas?.[0]?.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="store-button"
@@ -389,7 +309,20 @@ const DetalleProducto = () => {
           </section>
 
           {/* Product Reviews Section */}
-          <ProductReviews productId={product.product_id || id} />
+          {(() => {
+            // Solo mostrar reseñas si podemos extraer un ID válido de DBS
+            const dbsTienda = product.tiendas?.find(t => t.fuente === 'dbs');
+            if (dbsTienda?.url) {
+              const match = dbsTienda.url.match(/[-/](\d+)$/);
+              const extractedId = match?.[1];
+              if (extractedId) {
+                return (
+                  <ProductReviews productId={extractedId} />
+                );
+              }
+            }
+            return null;
+          })()}
 
           {/* Price Alert Modal */}
         <PriceAlertModal

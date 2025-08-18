@@ -830,10 +830,7 @@ def load_unified_products():
     """Cargar productos unificados desde el archivo JSON"""
     try:
         possible_paths = [
-            os.path.join(settings.BASE_DIR, 'unified_products.json'),  # Django project root
-            os.path.join(settings.BASE_DIR, '..', 'unified_products.json'),  # Parent directory
-            os.path.join(settings.BASE_DIR, '..', 'processed', 'unified_products.json'),  # Processed directory
-            os.path.join(settings.BASE_DIR, 'cotizabelleza-frontend', 'public', 'unified_products.json'),  # Frontend public
+            os.path.join(settings.BASE_DIR, 'data', 'processed', 'unified_products.json'),  # Primary data source
         ]
         
         for json_path in possible_paths:

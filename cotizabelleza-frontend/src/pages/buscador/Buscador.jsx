@@ -29,6 +29,15 @@ const Buscador = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [storeFilter, setStoreFilter] = useState('');
 
+  // Formatear precio en formato CLP sin decimales
+  const formatPriceCLP = (price) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
   // Cargar productos unificados
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +53,7 @@ const Buscador = () => {
         const results = await unifiedProductsService.searchUnifiedProducts(searchQuery);
         
         // Convertir a formato de listing
-        const listingProducts = unifiedProductsService.convertToListingFormat(results);
+        const listingProducts = unifiedProductsService.convertToListingFormat({ productos: results });
         
         setData({ items: listingProducts });
         
@@ -71,7 +80,7 @@ const Buscador = () => {
     // Filtro por tienda
     if (storeFilter) {
       filtered = filtered.filter(product => 
-        product.tiendas?.includes(storeFilter.toLowerCase())
+        product.tiendas_disponibles?.includes(storeFilter.toUpperCase())
       );
     }
 
@@ -88,7 +97,7 @@ const Buscador = () => {
   const stores = useMemo(() => {
     const storeSet = new Set();
     (data.items || []).forEach(product => {
-      product.tiendas?.forEach(store => storeSet.add(store));
+      product.tiendas_disponibles?.forEach(store => storeSet.add(store));
     });
     return Array.from(storeSet);
   }, [data.items]);
@@ -158,61 +167,50 @@ const Buscador = () => {
               </div>
               
               <div className="products-grid">
-                <Row gutter={[16, 16]}>
-                  {filteredProducts.map((card) => (
-                    <Col key={card.product_id} xs={24} sm={12} md={8} lg={6}>
-                      <div 
-                        className="product-card" 
-                        onClick={() => navigate(`/detalle-producto/${encodeURIComponent(card.product_id)}`)}
-                        style={{ cursor: 'pointer' }}
+                {filteredProducts.map((product) => (
+                  <div 
+                    key={product.product_id}
+                    className="product-card" 
+                    onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="product-image">
+                      <img 
+                        src={product.imagen_url || '/image-not-found.png'} 
+                        alt={product.nombre}
+                        onError={(e) => {
+                          e.target.src = '/image-not-found.png';
+                        }}
+                      />
+                    </div>
+                    <div className="product-info">
+                      <Text className="product-brand">{product.marca}</Text>
+                      <Text className="product-name">{product.nombre}</Text>
+                      <Text className="product-price">
+                        {product.tiendasCount > 1 ? 'Desde ' : ''}{formatPriceCLP(product.precio_min || 0)}
+                      </Text>
+                      <Button 
+                        type="primary" 
+                        size="small" 
+                        className="view-more-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`);
+                        }}
                       >
-                        <div className="product-image">
-                          <img
-                            src={resolveImageUrl({ imagen_url: card.imagen })}
-                            alt={card.nombre}
-                            onError={(e) => {
-                              e.target.src = '/image-not-found.png';
-                            }}
-                          />
-                        </div>
-                        
-                        <div className="product-info">
-                          <div className="product-brand">{card.marca}</div>
-                          <div className="product-name">{card.nombre}</div>
-                          <div className="product-price">
-                            {card.tiendasCount > 1 ? 'Desde ' : ''}${card.precioMin?.toLocaleString('es-CL')}
-                          </div>
-                          
-                          <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Button 
-                              type="primary" 
-                              size="small" 
-                              className="view-more-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/detalle-producto/${encodeURIComponent(card.product_id)}`);
-                              }}
-                            >
-                              Ver más
-                            </Button>
-                            
-                            <div className="product-stores">
-                              {card.tiendasCount > 1 ? (
-                                <Text type="secondary" style={{ fontSize: '12px' }}>
-                                  {card.tiendasCount} tiendas
-                                </Text>
-                              ) : (
-                                <Text type="secondary" style={{ fontSize: '12px' }}>
-                                  {card.tiendas?.join(', ').toUpperCase()}
-                                </Text>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                        Ver más <LinkOutlined />
+                      </Button>
+                      <div className="product-stores">
+                        <Text type="secondary">
+                          {product.tiendasCount > 1 
+                            ? `${product.tiendasCount} tiendas` 
+                            : `Disponible en: ${product.tiendas_disponibles?.join(', ') || 'N/A'}`
+                          }
+                        </Text>
                       </div>
-                    </Col>
-                  ))}
-                </Row>
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           ) : (

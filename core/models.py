@@ -2,9 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from .managers import (
+    ProductoManager, PrecioProductoManager, CategoriaManager, 
+    TiendaManager, ResenaManager
+)
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
+    
+    # Manager personalizado
+    objects = CategoriaManager()
     
     class Meta:
         verbose_name = "Categoría"
@@ -17,6 +24,9 @@ class Categoria(models.Model):
 class Tienda(models.Model):
     nombre = models.CharField(max_length=100)
     url_website = models.URLField(max_length=255, blank=True, null=True)
+    
+    # Manager personalizado
+    objects = TiendaManager()
     
     class Meta:
         verbose_name = "Tienda"
@@ -33,6 +43,9 @@ class Producto(models.Model):
     imagen_url = models.URLField(max_length=500, blank=True, null=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
     
+    # Manager personalizado
+    objects = ProductoManager()
+    
     class Meta:
         verbose_name = "Producto"
         verbose_name_plural = "Productos"
@@ -40,6 +53,24 @@ class Producto(models.Model):
     
     def __str__(self):
         return f"{self.nombre} - {self.marca}" if self.marca else self.nombre
+    
+    def get_precio_min(self):
+        """Obtiene el precio mínimo del producto"""
+        precio_min = self.precios.filter(stock=True).aggregate(
+            models.Min('precio')
+        )['precio__min']
+        return precio_min
+    
+    def get_precio_max(self):
+        """Obtiene el precio máximo del producto"""
+        precio_max = self.precios.filter(stock=True).aggregate(
+            models.Max('precio')
+        )['precio__max']
+        return precio_max
+    
+    def get_tiendas_disponibles(self):
+        """Obtiene las tiendas donde está disponible el producto"""
+        return [p.tienda.nombre for p in self.precios.filter(stock=True).select_related('tienda')]
 
 class ProductoTienda(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='tiendas_producto')
@@ -63,6 +94,9 @@ class PrecioProducto(models.Model):
     fecha_baja = models.DateTimeField(blank=True, null=True)
     url_producto = models.URLField(max_length=500, blank=True, null=True)
     
+    # Manager personalizado
+    objects = PrecioProductoManager()
+    
     class Meta:
         verbose_name = "Precio de Producto"
         verbose_name_plural = "Precios de Productos"
@@ -80,6 +114,9 @@ class Resena(models.Model):
     comentario = models.TextField()
     nombre_autor = models.CharField(max_length=100, blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    # Manager personalizado
+    objects = ResenaManager()
     
     class Meta:
         verbose_name = "Reseña"

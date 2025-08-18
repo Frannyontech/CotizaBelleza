@@ -38,15 +38,26 @@ const ProductReviews = ({ productId }) => {
       setReviewsData(data);
     } catch (err) {
       console.error('Error fetching reviews:', err);
-      setError(err.response?.data?.error || 'Error al cargar las reseñas');
+      const errorMessage = err.response?.data?.error || 'Error al cargar las reseñas';
+      
+      // Si el error es por ID inválido o producto no encontrado, no mostrar error
+      if (errorMessage.includes('inválido') || errorMessage.includes('no encontrado')) {
+        setReviewsData({ resenas: [], total_resenas: 0, promedio_valoracion: 0 });
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (productId) {
+    if (productId && productId !== 'null' && productId !== 'undefined') {
       fetchReviews();
+    } else {
+      // Si no hay productId válido, establecer estado vacío
+      setReviewsData({ resenas: [], total_resenas: 0, promedio_valoracion: 0 });
+      setLoading(false);
     }
   }, [productId]);
 
@@ -136,7 +147,11 @@ const ProductReviews = ({ productId }) => {
           description="Aún no hay reseñas"
           style={{ padding: '40px 0' }}
         >
-          <Button type="primary" onClick={() => setModalOpen(true)}>
+          <Button 
+          type="primary" 
+          onClick={() => setModalOpen(true)}
+          disabled={!productId || productId === 'null' || productId === 'undefined'}
+        >
             Escribir reseña
           </Button>
         </Empty>
@@ -179,7 +194,11 @@ const ProductReviews = ({ productId }) => {
 
       {/* Botón Escribir reseña */}
       <div style={{ marginBottom: 24 }}>
-        <Button type="primary" onClick={() => setModalOpen(true)}>
+        <Button 
+          type="primary" 
+          onClick={() => setModalOpen(true)}
+          disabled={!productId || productId === 'null' || productId === 'undefined'}
+        >
           Escribir reseña
         </Button>
       </div>

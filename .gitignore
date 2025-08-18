@@ -197,4 +197,8 @@ static/
 test_*.py
 *_test.py
 scraper/scrapers/scraper/
-*.tmp 
+*.tmp
+
+# Data files - ignore all data content
+data/
+!data/.gitkeep 

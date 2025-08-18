@@ -23,6 +23,11 @@ import { unifiedProductsService } from '../../services/unifiedApi';
 import { resolveImageUrl, getDefaultThumbnail } from '../../utils/image';
 import './Dashboard.css';
 
+// Importar imágenes del carrusel
+import heroSlider1 from '../../assets/hero-slider-1.jpg';
+import heroSlider2 from '../../assets/hero-slider-2.jpg';
+import heroSlider3 from '../../assets/hero-slider-3.jpg';
+
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
@@ -38,18 +43,88 @@ const Dashboard = () => {
     const loadProducts = async () => {
       try {
         setLoading(true);
+        // Cargar productos unificados directamente desde el backend
+        const response = await fetch('http://localhost:8000/api/unified/');
         
-        // Cargar productos unificados
-        const unifiedProducts = await unifiedProductsService.getUnifiedProducts();
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Convertir a formato de dashboard
-        const dashboardProducts = unifiedProductsService.convertToListingFormat(unifiedProducts);
+        const unifiedData = await response.json();
+        const productos = unifiedData.productos || [];
         
-        // Tomar los primeros 20 como "productos populares"
-        setProducts(dashboardProducts.slice(0, 20));
+        // Función para seleccionar productos mixtos (priorizar multi-tienda)
+        const selectMixedProducts = (productos, count) => {
+          const multiStore = productos.filter(p => (p.tiendas || []).length > 1);
+          const singleStore = productos.filter(p => (p.tiendas || []).length === 1);
+          
+          const selected = [];
+          
+          // Agregar productos multi-tienda primero
+          selected.push(...multiStore.slice(0, Math.min(count, multiStore.length)));
+          
+          // Completar con productos de tienda única, balanceado
+          const remaining = count - selected.length;
+          if (remaining > 0) {
+            const dbsProducts = singleStore.filter(p => p.tiendas?.[0]?.fuente === 'dbs');
+            const maicaoProducts = singleStore.filter(p => p.tiendas?.[0]?.fuente === 'maicao');
+            const preunicProducts = singleStore.filter(p => p.tiendas?.[0]?.fuente === 'preunic');
+            
+            const perStore = Math.ceil(remaining / 3);
+            selected.push(...dbsProducts.slice(0, perStore));
+            selected.push(...maicaoProducts.slice(0, perStore));
+            selected.push(...preunicProducts.slice(0, perStore));
+          }
+          
+          return selected.slice(0, count);
+        };
+        
+        // Seleccionar 10 productos mixtos
+        const selectedProducts = selectMixedProducts(productos, 10);
+        
+        // Convertir productos a formato simple para dashboard
+        const dashboardProducts = selectedProducts.map(product => {
+          const tiendas = product.tiendas || [];
+          let precio_min = null;
+          let imagen_url = '';
+          let tiendas_disponibles = [];
+          
+          // Extraer precio mínimo e imagen
+          tiendas.forEach(tienda => {
+            // Imagen - usar cualquier imagen disponible
+            if (tienda.imagen && !imagen_url) {
+              imagen_url = tienda.imagen;
+            }
+            
+            // Precio - convertir y validar
+            const precio = parseFloat(tienda.precio);
+            if (!isNaN(precio) && precio > 0 && (precio_min === null || precio < precio_min)) {
+              precio_min = precio;
+            }
+            
+            // Tienda - agregar fuente
+            if (tienda.fuente) {
+              tiendas_disponibles.push(tienda.fuente.toUpperCase());
+            }
+          });
+          
+          return {
+            id: product.product_id,
+            product_id: product.product_id,
+            nombre: product.nombre || 'Sin nombre',
+            marca: product.marca || '',
+            categoria: product.categoria || '',
+            precio_min: precio_min || 0, // Default a 0 en lugar de null
+            imagen_url: imagen_url || '', // Default a string vacío
+            tiendas_disponibles: [...new Set(tiendas_disponibles)],
+            tiendasCount: tiendas.length
+          };
+        });
+        
+        setProducts(dashboardProducts);
         
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('❌ Error loading dashboard data:', error);
         message.error('Error al cargar los datos del dashboard');
       } finally {
         setLoading(false);
@@ -84,7 +159,7 @@ const Dashboard = () => {
     
     // Filtro por tienda
     if (selectedStore !== 'Todas') {
-      const storeMatch = product.tiendas?.some(store => 
+      const storeMatch = product.tiendas_disponibles?.some(store => 
         store.toUpperCase() === selectedStore
       );
       if (!storeMatch) return false;
@@ -127,7 +202,7 @@ const Dashboard = () => {
       <div className="hero-carousel-section">
         <Carousel autoplay>
           <div>
-            <div className="carousel-slide">
+            <div className="carousel-slide" style={{ backgroundImage: `url(${heroSlider1})` }}>
               <div className="carousel-content">
                 <h2>Productos de belleza unificados</h2>
                 <p>Comparación de precios en tiempo real</p>
@@ -135,7 +210,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
-            <div className="carousel-slide">
+            <div className="carousel-slide" style={{ backgroundImage: `url(${heroSlider2})` }}>
               <div className="carousel-content">
                 <h2>Mejor precio garantizado</h2>
                 <p>Compara entre DBS, Preunic y Maicao</p>
@@ -143,7 +218,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
-            <div className="carousel-slide">
+            <div className="carousel-slide" style={{ backgroundImage: `url(${heroSlider3})` }}>
               <div className="carousel-content">
                 <h2>Productos destacados</h2>
                 <p>Las mejores marcas de belleza</p>
@@ -216,7 +291,7 @@ const Dashboard = () => {
               >
                 <div className="product-image">
                   <img 
-                    src={resolveImageUrl({ imagen_url: product.imagen })} 
+                    src={product.imagen_url || getDefaultThumbnail()} 
                     alt={product.nombre}
                     onError={(e) => {
                       e.target.src = getDefaultThumbnail();
@@ -227,7 +302,7 @@ const Dashboard = () => {
                   <Text className="product-brand">{product.marca}</Text>
                   <Text className="product-name">{product.nombre}</Text>
                   <Text className="product-price">
-                    {product.tiendasCount > 1 ? 'Desde ' : ''}{formatPriceCLP(product.precioMin || 0)}
+                    {product.tiendasCount > 1 ? 'Desde ' : ''}{formatPriceCLP(product.precio_min || 0)}
                   </Text>
                   <Button 
                     type="primary" 
@@ -244,7 +319,7 @@ const Dashboard = () => {
                     <Text type="secondary">
                       {product.tiendasCount > 1 
                         ? `${product.tiendasCount} tiendas` 
-                        : `Disponible en: ${product.tiendas?.join(', ').toUpperCase()}`
+                        : `Disponible en: ${product.tiendas_disponibles?.join(', ') || 'N/A'}`
                       }
                     </Text>
                   </div>

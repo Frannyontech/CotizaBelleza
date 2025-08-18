@@ -1,6 +1,40 @@
 /* Estilos de las tarjetas de productos - Copiados exactamente del dashboard */
-.products-grid .ant-col {
-  display: contents !important;
+.products-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+  padding: 20px !important;
+  background: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #f0f0f0 !important;
+}
+
+@media (min-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 992px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .products-grid {
+    grid-template-columns: repeat(1, 1fr) !important;
+    gap: 15px !important;
+    padding: 15px !important;
+  }
 }
 
 /* COMPLETELY NEW PRODUCT CARD STYLES - Override Ant Design */

@@ -350,20 +350,25 @@ def build_canonical(cluster: List[Dict]) -> Dict[str, Any]:
     key_string = '|'.join(key_parts)
     product_id = 'cb_' + hashlib.sha1(key_string.encode('utf-8')).hexdigest()[:8]
     
-    # Crear lista de tiendas ordenada por precio
-    tiendas = []
+    # Crear lista de tiendas con deduplicación por fuente
+    tiendas_por_fuente = {}
     for item in cluster:
-        tienda_info = {
-            'fuente': item['fuente'],
-            'precio': item['precio'],
-            'stock': item.get('stock', 'Desconocido'),
-            'url': item.get('url', ''),
-            'imagen': item.get('imagen', ''),
-            'marca_origen': item['marca']  # Marca original sin modificar
-        }
-        tiendas.append(tienda_info)
+        fuente = item['fuente']
+        precio = item['precio']
+        
+        # Si ya existe esta fuente, mantener la de menor precio
+        if fuente not in tiendas_por_fuente or precio < tiendas_por_fuente[fuente]['precio']:
+            tiendas_por_fuente[fuente] = {
+                'fuente': fuente,
+                'precio': precio,
+                'stock': item.get('stock', 'Desconocido'),
+                'url': item.get('url', ''),
+                'imagen': item.get('imagen', ''),
+                'marca_origen': item['marca']  # Marca original sin modificar
+            }
     
-    # Ordenar por precio ascendente
+    # Convertir a lista y ordenar por precio ascendente
+    tiendas = list(tiendas_por_fuente.values())
     tiendas.sort(key=lambda x: x['precio'])
     
     canonical = {
@@ -429,19 +434,19 @@ def main():
                        help='Umbral mínimo para match fuerte (default: 90)')
     parser.add_argument('--min-prob', type=float, default=85,
                        help='Umbral mínimo para match probable (default: 85)')
-    parser.add_argument('--out', default='processed/unified_products.json',
-                       help='Archivo de salida (default: processed/unified_products.json)')
+    parser.add_argument('--out', default='../data/processed/unified_products.json',
+                       help='Archivo de salida (default: ../data/processed/unified_products.json)')
     
     args = parser.parse_args()
     
     # Archivos de entrada
     input_files = [
-        'scraper/data/dbs_maquillaje.json',
-        'scraper/data/dbs_skincare.json',
-        'scraper/data/maicao_maquillaje.json',
-        'scraper/data/maicao_skincare.json',
-        'scraper/data/preunic_maquillaje.json',
-        'scraper/data/preunic_skincare.json'
+        '../data/raw/dbs_maquillaje.json',
+        '../data/raw/dbs_skincare.json',
+        '../data/raw/maicao_maquillaje.json',
+        '../data/raw/maicao_skincare.json',
+        '../data/raw/preunic_maquillaje.json',
+        '../data/raw/preunic_skincare.json'
     ]
     
     logger.info("Iniciando pipeline de normalización...")

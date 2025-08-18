@@ -53,7 +53,6 @@ export const unifiedProductsService = {
       
       // If not found, try to find by legacy ID formats
       if (!product) {
-        // Try to match any store-specific ID
         product = productos.find(p => {
           const tiendas = p.tiendas || [];
           return tiendas.some(tienda => {
@@ -115,12 +114,14 @@ export const unifiedProductsService = {
       return productos.map(product => {
         const tiendas = product.tiendas || [];
         
+        const tiendasArray = tiendas;
+        
         // Find the best image and price
         let imagen = product.imagen || '';
         let precioMin = null;
         let tiendas_disponibles = [];
         
-        tiendas.forEach(tienda => {
+        tiendasArray.forEach(tienda => {
           if (tienda.imagen && !imagen) {
             imagen = tienda.imagen;
           }
@@ -144,8 +145,8 @@ export const unifiedProductsService = {
           precio_min: precioMin,
           imagen_url: imagen,
           tiendas_disponibles: [...new Set(tiendas_disponibles)], // Remove duplicates
-          tiendasCount: tiendas.length,
-          tiendas: tiendas
+          tiendasCount: tiendasArray.length,
+          tiendas: tiendasArray
         };
       });
     } catch (error) {
