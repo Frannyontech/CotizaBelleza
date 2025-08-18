@@ -238,27 +238,62 @@ def scrape_preunic_list(categoria: str = "maquillaje", headless: bool = True, ma
                                 imagen = f"https://preunic.cl{src}"
                             break
                 
-                # Extraer precios: normal y oferta
-                offer_selectors = [
-                    ".price__current", ".product-price__current", ".price-offer",
-                    ".price .current-price", ".price", '[data-testid="price-current"]',
-                    ".plp-price"
-                ]
-                normal_selectors = [
-                    ".price__old", ".product-price__old", ".old-price",
-                    ".price-regular", ".was-price", ".price-before", '[data-testid="price-old"]'
-                ]
+                # Extraer precios: normal y oferta (según estructura actual de Preunic)
                 
-                raw_offer = get_text_by_selectors_soup(elemento, offer_selectors)
-                raw_normal = get_text_by_selectors_soup(elemento, normal_selectors)
+                # Buscar todos los textos que contengan "Normal:" y "Oferta:"
+                def extract_preunic_prices(elemento):
+                    texto_completo = elemento.get_text()
+                    precio_normal = None
+                    precio_oferta = None
+                    
+                    # Buscar "Normal: $XXXX"
+                    normal_match = re.search(r'Normal:\s*\$?([\d,\.]+)', texto_completo, re.IGNORECASE)
+                    if normal_match:
+                        precio_normal = parse_precio(normal_match.group(1))
+                    
+                    # Buscar "Oferta: $XXXX" 
+                    oferta_match = re.search(r'Oferta:\s*\$?([\d,\.]+)', texto_completo, re.IGNORECASE)
+                    if oferta_match:
+                        precio_oferta = parse_precio(oferta_match.group(1))
+                    
+                    # Evitar sbpay - buscar y excluir cualquier precio que aparezca después de "sbpay"
+                    # NO extraer precios que estén cerca de "sbpay"
+                    if 'sbpay' in texto_completo.lower():
+                        # Si hay sbpay, ser más específico con las extracciones
+                        lineas = texto_completo.split('\n')
+                        for linea in lineas:
+                            if 'sbpay' in linea.lower():
+                                continue  # Saltar líneas que contengan sbpay
+                            
+                            if 'normal:' in linea.lower():
+                                normal_match = re.search(r'Normal:\s*\$?([\d,\.]+)', linea, re.IGNORECASE)
+                                if normal_match:
+                                    precio_normal = parse_precio(normal_match.group(1))
+                            
+                            if 'oferta:' in linea.lower():
+                                oferta_match = re.search(r'Oferta:\s*\$?([\d,\.]+)', linea, re.IGNORECASE)
+                                if oferta_match:
+                                    precio_oferta = parse_precio(oferta_match.group(1))
+                    
+                    return precio_normal, precio_oferta
                 
-                precio_oferta = parse_precio(raw_offer)
-                precio_normal = parse_precio(raw_normal)
+                precio_normal, precio_oferta = extract_preunic_prices(elemento)
                 
-                # Fallback: si no hay oferta y no hay "old", intenta único precio visible
-                if precio_oferta is None and precio_normal is None:
-                    unico = get_text_by_selectors_soup(elemento, [".price", ".product-price", ".pricing", ".product__price", ".plp-price"])
-                    precio_normal = parse_precio(unico)
+                # Debug: mostrar qué se extrajo
+                if i <= 3:  # Solo para los primeros 3 productos para no llenar logs
+                    texto_debug = elemento.get_text()[:200] + "..." if len(elemento.get_text()) > 200 else elemento.get_text()
+                    print(f"DEBUG Producto {i+1}: Normal={precio_normal}, Oferta={precio_oferta}")
+                    print(f"Texto: {texto_debug}")
+                
+                # Fallback: si no encuentra precios con los patrones anteriores, buscar cualquier precio
+                if precio_normal is None and precio_oferta is None:
+                    # Buscar cualquier precio en el elemento, pero evitar sbpay
+                    texto = elemento.get_text()
+                    if 'sbpay' not in texto.lower():
+                        # Buscar precio con formato $X.XXX
+                        precio_match = re.search(r'\$[\d,\.]+', texto)
+                        if precio_match:
+                            precio_normal = parse_precio(precio_match.group())
                 
                 # Precio vigente para compatibilidad
                 precio_vigente = precio_oferta if precio_oferta is not None else precio_normal
@@ -270,7 +305,14 @@ def scrape_preunic_list(categoria: str = "maquillaje", headless: bool = True, ma
                 
                 # Mantener compatibilidad con código legado
                 precio_normalizado = precio_vigente if precio_vigente is not None else 0
-                precio_texto = raw_offer if raw_offer else (raw_normal if raw_normal else "")
+                
+                # Generar texto de precio para compatibilidad
+                if precio_oferta is not None:
+                    precio_texto = f"${precio_oferta:,}"
+                elif precio_normal is not None:
+                    precio_texto = f"${precio_normal:,}"
+                else:
+                    precio_texto = ""
                 
                 # Extraer marca del nombre del producto
                 marca = extraer_marca_del_nombre(nombre)
