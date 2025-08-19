@@ -226,18 +226,7 @@ class Producto(models.Model):
         """Obtiene las tiendas donde está disponible el producto"""
         return [p.tienda.nombre for p in self.precios.filter(stock=True).select_related('tienda')]
 
-class ProductoTienda(models.Model):
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='tiendas_producto')
-    tienda = models.ForeignKey(Tienda, on_delete=models.CASCADE, related_name='productos_tienda')
-    
-    class Meta:
-        verbose_name = "Producto en Tienda"
-        verbose_name_plural = "Productos en Tiendas"
-        unique_together = ['producto', 'tienda']
-        ordering = ['producto__nombre', 'tienda__nombre']
-    
-    def __str__(self):
-        return f"{self.producto.nombre} en {self.tienda.nombre}"
+
 
 class PrecioProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='precios')
@@ -281,32 +270,7 @@ class Resena(models.Model):
     def __str__(self):
         return f"Reseña de {self.usuario.username} para {self.producto.nombre} - {self.valoracion}/5"
 
-class Alerta(models.Model):
-    fecha_notificacion = models.BooleanField(default=False)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Alerta"
-        verbose_name_plural = "Alertas"
-        ordering = ['-fecha_creacion']
-    
-    def __str__(self):
-        return f"Alerta {self.id} - {self.fecha_creacion.strftime('%d/%m/%Y')}"
 
-class AlertaUsuario(models.Model):
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='alertas_producto')
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='alertas_usuario')
-    alerta = models.ForeignKey(Alerta, on_delete=models.CASCADE, related_name='usuarios_alerta')
-    alerta_activa = models.BooleanField(default=True)
-    
-    class Meta:
-        verbose_name = "Alerta de Usuario"
-        verbose_name_plural = "Alertas de Usuarios"
-        unique_together = ['producto', 'usuario', 'alerta']
-        ordering = ['-alerta__fecha_creacion']
-    
-    def __str__(self):
-        return f"Alerta de {self.usuario.username} para {self.producto.nombre}"
 
 class AlertaPrecio(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='alertas_precio')

@@ -36,13 +36,13 @@ const PreunicProductos = () => {
         
         setData({ items: listingProducts });
         
-      } catch (error) {
+    } catch (error) {
         console.error('Error loading Preunic products:', error);
         setData({ items: [] });
-      } finally {
-        setLoading(false);
-      }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
     fetchData();
   }, []);
@@ -171,37 +171,37 @@ const PreunicProductos = () => {
             </p>
           </div>
 
-          <div className="productos-grid">
+      <div className="productos-grid">
             {paginatedProducts.map((product) => (
-            <div 
+          <div 
               key={product.product_id}
-              className="producto-card" 
+            className="producto-card"
               onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
-            >
-              <div className="producto-imagen">
-                <img 
+          >
+            <div className="producto-imagen">
+              <img
                   src={product.imagen_url || '/image-not-found.png'} 
                   alt={product.nombre}
-                  onError={(e) => {
-                    e.target.src = '/image-not-found.png';
-                  }}
-                />
-                <div className="producto-tienda">🛒 Preunic</div>
-              </div>
-              
-              <div className="producto-info">
+                onError={(e) => {
+                  e.target.src = '/image-not-found.png';
+                }}
+              />
+              <div className="producto-tienda">🛒 Preunic</div>
+            </div>
+            
+            <div className="producto-info">
                 <h3 className="producto-nombre">{product.nombre}</h3>
                 <p className="producto-marca">{product.marca}</p>
-                <div className="producto-precio">
+              <div className="producto-precio">
                   <span className="precio">{formatPriceCLP(product.precio_min || 0)}</span>
-                </div>
-                <div className="producto-stock">
+              </div>
+              <div className="producto-stock">
                   <span className="stock disponible">✓ Disponible</span>
-                </div>
               </div>
             </div>
-          ))}
           </div>
+        ))}
+      </div>
 
           {/* Controles de paginación */}
           {shouldShowPagination && (

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from .models import (
-    Categoria, Tienda, Producto, ProductoTienda, 
-    PrecioProducto, Resena, Alerta, AlertaUsuario
+    Categoria, Tienda, Producto, 
+    PrecioProducto, Resena, AlertaPrecio,
+    ResenaUnificada, AlertaPrecioUnificada
 )
 
 # Register your models here.
@@ -26,14 +27,6 @@ class ProductoAdmin(admin.ModelAdmin):
     ordering = ['nombre']
     autocomplete_fields = ['categoria']
 
-@admin.register(ProductoTienda)
-class ProductoTiendaAdmin(admin.ModelAdmin):
-    list_display = ['producto', 'tienda']
-    list_filter = ['tienda', 'producto__categoria']
-    search_fields = ['producto__nombre', 'tienda__nombre']
-    ordering = ['producto__nombre', 'tienda__nombre']
-    autocomplete_fields = ['producto', 'tienda']
-
 @admin.register(PrecioProducto)
 class PrecioProductoAdmin(admin.ModelAdmin):
     list_display = ['producto', 'tienda', 'precio', 'stock', 'fecha_extraccion']
@@ -50,16 +43,25 @@ class ResenaAdmin(admin.ModelAdmin):
     ordering = ['-fecha_creacion']
     autocomplete_fields = ['producto', 'usuario']
 
-@admin.register(Alerta)
-class AlertaAdmin(admin.ModelAdmin):
-    list_display = ['id', 'fecha_notificacion', 'fecha_creacion']
-    list_filter = ['fecha_notificacion', 'fecha_creacion']
+@admin.register(AlertaPrecio)
+class AlertaPrecioAdmin(admin.ModelAdmin):
+    list_display = ['producto', 'email', 'precio_objetivo', 'activa', 'fecha_creacion']
+    list_filter = ['activa', 'fecha_creacion', 'producto__categoria']
+    search_fields = ['producto__nombre', 'email']
     ordering = ['-fecha_creacion']
+    autocomplete_fields = ['producto']
 
-@admin.register(AlertaUsuario)
-class AlertaUsuarioAdmin(admin.ModelAdmin):
-    list_display = ['producto', 'usuario', 'alerta', 'alerta_activa']
-    list_filter = ['alerta_activa', 'alerta__fecha_creacion', 'producto__categoria']
-    search_fields = ['producto__nombre', 'usuario__username']
-    ordering = ['-alerta__fecha_creacion']
-    autocomplete_fields = ['producto', 'usuario']
+@admin.register(ResenaUnificada)
+class ResenaUnificadaAdmin(admin.ModelAdmin):
+    list_display = ['producto_id', 'producto_nombre', 'usuario', 'valoracion', 'fecha_creacion']
+    list_filter = ['valoracion', 'fecha_creacion', 'producto_categoria']
+    search_fields = ['producto_nombre', 'usuario__username', 'comentario', 'producto_id']
+    ordering = ['-fecha_creacion']
+    autocomplete_fields = ['usuario']
+
+@admin.register(AlertaPrecioUnificada)
+class AlertaPrecioUnificadaAdmin(admin.ModelAdmin):
+    list_display = ['producto_id', 'producto_nombre', 'email', 'precio_objetivo', 'activa', 'fecha_creacion']
+    list_filter = ['activa', 'fecha_creacion']
+    search_fields = ['producto_nombre', 'email', 'producto_id']
+    ordering = ['-fecha_creacion']

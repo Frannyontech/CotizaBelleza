@@ -1,0 +1,21 @@
+# Archivo systemd para Celery Beat
+# Ubicación: /etc/systemd/system/celery-beat.service
+
+[Unit]
+Description=Celery Beat Service - CotizaBelleza ETL Scheduler
+After=network.target redis.service
+
+[Service]
+Type=forking
+User=www-data
+Group=www-data
+EnvironmentFile=/path/to/your/project/.env
+WorkingDirectory=/path/to/your/project
+ExecStart=/path/to/your/project/venv/bin/celery -A etl.celery_app:app beat --loglevel=info --detach --pidfile=/var/run/celery/beat.pid
+ExecStop=/bin/kill -s TERM $MAINPID
+PIDFile=/var/run/celery/beat.pid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

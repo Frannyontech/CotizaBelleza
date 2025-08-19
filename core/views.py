@@ -1,27 +1,11 @@
 """
-Vistas MVT - Capa de presentación limpia que delega lógica a servicios
+Vistas MVT - Arquitectura limpia con datos unificados
 """
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-from django.db.models import Min, Max, Count, Avg
-
-from .models import Producto, PrecioProducto, Categoria, Tienda, AlertaPrecio, Resena, ResenaUnificada
-from .serializers import (
-    ProductoSerializer, PrecioProductoSerializer, 
-    UserSerializer, CategoriaSerializer, TiendaSerializer, AlertaPrecioSerializer, ResenaSerializer
-)
-from .services import (
-    DashboardService, ProductoService, CategoriaService,
-    TiendaService, PrecioService, UsuarioService,
-    AlertaService, ResenaService, UnifiedDataService,
-    ETLService, DataIntegrationService
-)
 import json
 import os
 from django.conf import settings
@@ -36,23 +20,52 @@ def home(request):
 
 
 class DashboardAPIView(APIView):
-    """Vista para dashboard - Delega toda la lógica al servicio"""
+    """Vista para dashboard usando datos unificados"""
     permission_classes = [AllowAny]
     
     def get(self, request):
         try:
-            dashboard_data = DashboardService.get_estadisticas()
-            productos_populares = DashboardService.get_productos_populares()
-            productos_por_categoria = DashboardService.get_productos_por_categoria()
-            tiendas_disponibles = DashboardService.get_tiendas_disponibles()
-            categorias_disponibles = DashboardService.get_categorias_disponibles()
+            unified_data = load_unified_products()
+            productos = unified_data.get("productos", [])
+            
+            # Calcular estadísticas
+            categorias = {}
+            tiendas = {}
+            multi_store = 0
+            
+            for producto in productos:
+                # Categorías
+                cat = producto.get('categoria', 'unknown')
+                categorias[cat] = categorias.get(cat, 0) + 1
+                
+                # Tiendas y multi-store
+                tiendas_producto = producto.get('tiendas', [])
+                if len(tiendas_producto) > 1:
+                    multi_store += 1
+                
+                for tienda in tiendas_producto:
+                    fuente = tienda.get('fuente', 'unknown')
+                    tiendas[fuente] = tiendas.get(fuente, 0) + 1
+            
+            # Formato para frontend
+            tiendas_disponibles = [{"id": i+1, "nombre": nombre.upper(), "cantidad_productos": count} 
+                                  for i, (nombre, count) in enumerate(tiendas.items())]
+            
+            categorias_disponibles = [{"id": i+1, "nombre": nombre, "cantidad_productos": count} 
+                                     for i, (nombre, count) in enumerate(categorias.items())]
             
             return Response({
-                'estadisticas': dashboard_data,
-                'productos_populares': productos_populares,
-                'productos_por_categoria': productos_por_categoria,
-                'tiendas_disponibles': tiendas_disponibles,
-                'categorias_disponibles': categorias_disponibles
+                "estadisticas": {
+                    "total_productos": len(productos),
+                    "productos_con_precios": len(productos),
+                    "total_categorias": len(categorias),
+                    "total_tiendas": len(tiendas),
+                    "multi_store_products": multi_store
+                },
+                "productos_populares": productos[:8],
+                "productos_por_categoria": [{"nombre": k, "cantidad_productos": v} for k, v in categorias.items()],
+                "tiendas_disponibles": tiendas_disponibles,
+                "categorias_disponibles": categorias_disponibles
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -62,102 +75,7 @@ class DashboardAPIView(APIView):
             )
 
 
-class ProductoListAPIView(APIView):
-    """Vista para listado de productos"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        try:
-            categoria_id = request.GET.get('categoria')
-            tienda_id = request.GET.get('tienda')
-            search = request.GET.get('search')
-            limit = int(request.GET.get('limit', 50))
-            
-            productos = ProductoService.buscar_productos(
-                categoria_id=categoria_id,
-                tienda_id=tienda_id,
-                search=search,
-                limit=limit
-            )
-            
-            return Response({
-                'productos': productos,
-                'total': len(productos)
-            }, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            return Response(
-                {"error": f"Error al buscar productos: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
-
-class CategoriaListAPIView(APIView):
-    """Vista para listado de categorías"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        try:
-            categorias = CategoriaService.get_categorias_con_estadisticas()
-            return Response(categorias, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener categorías: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class TiendaListAPIView(APIView):
-    """Vista para listado de tiendas"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        try:
-            tiendas = TiendaService.get_tiendas_con_estadisticas()
-            return Response(tiendas, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener tiendas: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class PreciosPorProductoAPIView(APIView):
-    """Vista para precios de un producto específico"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request, producto_id):
-        try:
-            precios = PrecioService.get_precios_por_producto(producto_id)
-            return Response(precios, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener precios: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class ProductoDetalleAPIView(APIView):
-    """Vista para detalle de producto"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request, producto_id):
-        try:
-            producto_detalle = ProductoService.get_producto_detalle(producto_id)
-            
-            if not producto_detalle:
-                return Response(
-                    {"error": "Producto no encontrado"}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            return Response(producto_detalle, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener detalle del producto: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
 
 class TiendaProductosAPIView(APIView):
@@ -166,18 +84,25 @@ class TiendaProductosAPIView(APIView):
     
     def get(self, request, tienda_nombre):
         try:
-            categoria_nombre = request.GET.get('categoria')
-            search = request.GET.get('search')
-            marca = request.GET.get('marca')
+            unified_data = load_unified_products()
+            productos = unified_data.get("productos", [])
             
-            productos_tienda = ProductoService.get_productos_por_tienda(
-                tienda_nombre=tienda_nombre,
-                categoria_nombre=categoria_nombre,
-                search=search,
-                marca=marca
-            )
+            # Filtrar productos por tienda
+            productos_tienda = []
+            for producto in productos:
+                for tienda in producto.get('tiendas', []):
+                    if tienda.get('fuente', '').lower() == tienda_nombre.lower():
+                        productos_tienda.append(producto)
+                        break
             
-            return Response(productos_tienda, status=status.HTTP_200_OK)
+            categorias_disponibles = list(set(p.get('categoria', 'unknown') for p in productos_tienda))
+            
+            return Response({
+                "productos": productos_tienda,
+                "total": len(productos_tienda),
+                "categorias_disponibles": categorias_disponibles,
+                "tienda": tienda_nombre.upper()
+            }, status=status.HTTP_200_OK)
             
         except Exception as e:
             return Response(
@@ -186,179 +111,36 @@ class TiendaProductosAPIView(APIView):
             )
 
 
-class TiendaProductoDetalleAPIView(APIView):
-    """Vista para detalle de producto en tienda específica"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request, tienda_nombre, producto_id):
-        try:
-            producto_detalle = ProductoService.get_producto_detalle(producto_id)
-            
-            if not producto_detalle:
-                return Response(
-                    {"error": "Producto no encontrado"}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            # Filtrar información específica de la tienda
-            tiendas_detalladas = [
-                tienda for tienda in producto_detalle.get('tiendas_detalladas', [])
-                if tienda['nombre'].lower() == tienda_nombre.lower()
-            ]
-            
-            producto_detalle['tiendas_detalladas'] = tiendas_detalladas
-            
-            return Response(producto_detalle, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener detalle del producto: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
 
-class UsuarioCreateAPIView(APIView):
-    """Vista para crear usuarios"""
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        try:
-            username = request.data.get('username')
-            email = request.data.get('email')
-            password = request.data.get('password')
-            
-            if not username or not password:
-                return Response(
-                    {"error": "Se requiere username y password"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            user = UsuarioService.crear_usuario(username, email, password)
-            user_serializer = UserSerializer(user)
-            
-            return Response({
-                "message": "Usuario creado exitosamente",
-                "user": user_serializer.data
-            }, status=status.HTTP_201_CREATED)
-            
-        except ValueError as e:
-            return Response(
-                {"error": str(e)}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            return Response(
-                {"error": f"Error al crear usuario: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
-
-class AlertaPrecioCreateAPIView(APIView):
-    """Vista para crear alertas de precio"""
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        try:
-            producto_id = request.data.get('producto_id')
-            email = request.data.get('email')
-            
-            if not producto_id or not email:
-                return Response(
-                    {"error": "Se requiere producto_id y email"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            alerta = AlertaService.crear_alerta_precio(producto_id, email)
-            alerta_serializer = AlertaPrecioSerializer(alerta)
-            
-            return Response({
-                "message": "Alerta creada exitosamente",
-                "alerta": alerta_serializer.data
-            }, status=status.HTTP_201_CREATED)
-            
-        except ValueError as e:
-            return Response(
-                {"error": str(e)}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        except Exception as e:
-            return Response(
-                {"error": f"Error al crear la alerta: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+# Almacén temporal de reseñas en memoria (se pierde al reiniciar Django)
+RESENAS_TEMP = {}
 
 class ProductoResenasAPIView(APIView):
-    """Vista para reseñas de productos usando IDs unificados"""
+    """Vista para reseñas de productos usando almacén temporal"""
     permission_classes = [AllowAny]
     
-    def get(self, request, producto_id):
+    def get(self, request, producto_id, **kwargs):
         try:
-            # Verificar si el producto existe en el sistema unificado
-            producto_info = _get_product_info_from_unified(producto_id)
-            if not producto_info:
-                return Response(
-                    {"error": "Producto no encontrado"}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            global RESENAS_TEMP
+            tienda_nombre = kwargs.get('tienda_nombre', 'general')
+            key = f"{tienda_nombre}_{producto_id}"
             
-            # Obtener reseñas usando el nuevo modelo unificado
-            resenas = ResenaUnificada.objects.filter(producto_id=producto_id).order_by('-fecha_creacion')
+            # Obtener reseñas existentes para este producto
+            resenas_producto = RESENAS_TEMP.get(key, [])
             
-            # Calcular estadísticas
-            total_resenas = resenas.count()
-            if total_resenas > 0:
-                promedio_valoracion = resenas.aggregate(promedio=Avg('valoracion'))['promedio']
-                promedio_valoracion = round(promedio_valoracion, 1) if promedio_valoracion else 0
-            else:
-                promedio_valoracion = 0
-            
-            # Reseñas recientes (3 más recientes)
-            resenas_recientes = resenas[:3]
-            
-            # Convertir a formato API
-            resenas_recientes_data = []
-            todas_resenas_data = []
-            
-            for resena in resenas_recientes:
-                resena_data = {
-                    'id': resena.id,
-                    'usuario': {
-                        'id': resena.usuario.id,
-                        'username': resena.usuario.username,
-                        'first_name': resena.usuario.first_name,
-                        'last_name': resena.usuario.last_name
-                    },
-                    'valoracion': resena.valoracion,
-                    'comentario': resena.comentario,
-                    'nombre_autor': resena.nombre_autor,
-                    'fecha_creacion': resena.fecha_creacion.isoformat()
-                }
-                resenas_recientes_data.append(resena_data)
-            
-            for resena in resenas:
-                resena_data = {
-                    'id': resena.id,
-                    'usuario': {
-                        'id': resena.usuario.id,
-                        'username': resena.usuario.username,
-                        'first_name': resena.usuario.first_name,
-                        'last_name': resena.usuario.last_name
-                    },
-                    'valoracion': resena.valoracion,
-                    'comentario': resena.comentario,
-                    'nombre_autor': resena.nombre_autor,
-                    'fecha_creacion': resena.fecha_creacion.isoformat()
-                }
-                todas_resenas_data.append(resena_data)
+            # Calcular promedio de valoración
+            promedio = 0
+            if resenas_producto:
+                total_valoracion = sum(r.get('valoracion', 0) for r in resenas_producto)
+                promedio = round(total_valoracion / len(resenas_producto), 1)
             
             return Response({
-                "producto_id": producto_id,
-                "producto_info": producto_info,
-                "total_resenas": total_resenas,
-                "promedio_valoracion": promedio_valoracion,
-                "resenas_recientes": resenas_recientes_data,
-                "todas_resenas": todas_resenas_data
+                "resenas_recientes": resenas_producto[-3:] if resenas_producto else [],  # Últimas 3
+                "todas_resenas": resenas_producto,
+                "total_resenas": len(resenas_producto),
+                "promedio_valoracion": promedio
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -367,90 +149,41 @@ class ProductoResenasAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
-    def post(self, request, producto_id):
+    def post(self, request, producto_id, **kwargs):
         try:
-            # Verificar que el producto existe en el sistema unificado
-            producto_info = _get_product_info_from_unified(producto_id)
-            if not producto_info:
-                return Response(
-                    {"error": "Producto no encontrado"}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            global RESENAS_TEMP
+            from datetime import datetime
             
-            # Obtener datos de la reseña
-            valoracion = request.data.get('valoracion')
-            comentario = request.data.get('comentario')
-            autor = request.data.get('autor')
+            tienda_nombre = kwargs.get('tienda_nombre', 'general')
+            key = f"{tienda_nombre}_{producto_id}"
             
-            # Validaciones básicas
-            if not valoracion or not comentario:
-                return Response(
-                    {"error": "Se requiere valoración y comentario"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            if not (1 <= valoracion <= 5):
-                return Response(
-                    {"error": "La valoración debe estar entre 1 y 5"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            if len(comentario.strip()) < 10:
-                return Response(
-                    {"error": "El comentario debe tener al menos 10 caracteres"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Crear usuario temporal
-            username = f'temp_{autor.replace(" ", "_").lower()}_{producto_id}' if autor else f'anonimo_{producto_id}_{len(comentario)}'
-            
-            usuario, created = User.objects.get_or_create(
-                username=username,
-                defaults={
-                    'first_name': autor.split(' ')[0] if autor and ' ' in autor else (autor or 'Usuario'),
-                    'last_name': ' '.join(autor.split(' ')[1:]) if autor and ' ' in autor else '',
-                    'email': f'{username}@example.com'
-                }
-            )
-            
-            # Verificar si ya existe una reseña de este usuario para este producto
-            if ResenaUnificada.objects.filter(producto_id=producto_id, usuario=usuario).exists():
-                return Response(
-                    {"error": "Ya has escrito una reseña para este producto"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Crear la reseña en el modelo unificado
-            resena = ResenaUnificada.objects.create(
-                producto_id=producto_id,
-                producto_nombre=producto_info['nombre'],
-                producto_marca=producto_info['marca'],
-                producto_categoria=producto_info['categoria'],
-                usuario=usuario,
-                valoracion=valoracion,
-                comentario=comentario.strip(),
-                nombre_autor=autor
-            )
-            
-            # Crear respuesta
-            resena_data = {
-                'id': resena.id,
-                'producto_id': resena.producto_id,
-                'usuario': {
-                    'id': resena.usuario.id,
-                    'username': resena.usuario.username,
-                    'first_name': resena.usuario.first_name,
-                    'last_name': resena.usuario.last_name
-                },
-                'valoracion': resena.valoracion,
-                'comentario': resena.comentario,
-                'nombre_autor': resena.nombre_autor,
-                'fecha_creacion': resena.fecha_creacion.isoformat()
+            # Obtener datos de la reseña (adaptando campos para el frontend)
+            author_name = request.data.get('author') or request.data.get('autor', 'Usuario Anónimo')
+            if not author_name or author_name.strip() == '':
+                author_name = 'Usuario Anónimo'
+                
+            nueva_resena = {
+                "id": len(RESENAS_TEMP.get(key, [])) + 1,
+                "autor": author_name,
+                "nombre_autor": author_name,  # Campo que busca el frontend
+                "valoracion": int(request.data.get('rating') or request.data.get('valoracion', 5)),
+                "comentario": request.data.get('comment') or request.data.get('comentario', ''),
+                "fecha": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "fecha_creacion": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),  # Campo que busca el frontend
+                "producto_id": producto_id,
+                "tienda": tienda_nombre.upper()
             }
             
+            # Guardar en memoria temporal
+            if key not in RESENAS_TEMP:
+                RESENAS_TEMP[key] = []
+            
+            RESENAS_TEMP[key].append(nueva_resena)
+            
             return Response({
-                "message": "Reseña creada exitosamente",
-                "resena": resena_data
+                "success": True,
+                "message": "¡Reseña guardada correctamente!",
+                "resena": nueva_resena
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
@@ -460,60 +193,7 @@ class ProductoResenasAPIView(APIView):
             )
 
 
-class ETLControlAPIView(APIView):
-    """Vista para control del pipeline ETL"""
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        try:
-            action = request.data.get('action')
-            tienda = request.data.get('tienda')
-            categoria = request.data.get('categoria')
-            
-            if action == 'run_scraper':
-                if not tienda:
-                    return Response(
-                        {"error": "Se requiere especificar la tienda"}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                
-                result = ETLService.run_scraper(tienda, categoria)
-                return Response(result, status=status.HTTP_200_OK)
-            
-            elif action == 'run_processor':
-                result = ETLService.run_processor()
-                return Response(result, status=status.HTTP_200_OK)
-            
-            elif action == 'run_full_pipeline':
-                result = ETLService.run_full_pipeline()
-                return Response(result, status=status.HTTP_200_OK)
-            
-            else:
-                return Response(
-                    {"error": "Acción no válida"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-                
-        except Exception as e:
-            return Response(
-                {"error": f"Error en pipeline ETL: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
-
-class ETLStatusAPIView(APIView):
-    """Vista para obtener el estado del pipeline ETL"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        try:
-            status_data = ETLService.get_pipeline_status()
-            return Response(status_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener estado del ETL: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
 
 class UnifiedProductsAPIView(APIView):
@@ -522,26 +202,17 @@ class UnifiedProductsAPIView(APIView):
     
     def get(self, request):
         try:
-            unified_data = UnifiedDataService.load_unified_products()
-            return Response(unified_data, status=status.HTTP_200_OK)
+            unified_data = load_unified_products()
+            productos = unified_data.get("productos", [])
+            
+            return Response({
+                "productos": productos,
+                "total": len(productos),
+                "timestamp": "2025-08-18T22:08:57"
+            }, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 {"error": f"Error al obtener productos unificados: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class UnifiedDashboardAPIView(APIView):
-    """Vista para dashboard unificado"""
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        try:
-            dashboard_data = UnifiedDataService.get_unified_dashboard()
-            return Response(dashboard_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {"error": f"Error al obtener dashboard unificado: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -553,21 +224,18 @@ class UnifiedDashboardAPIView(APIView):
 def load_unified_products():
     """Cargar productos unificados desde el archivo JSON"""
     try:
-        possible_paths = [
-            os.path.join(settings.BASE_DIR, 'data', 'processed', 'unified_products.json'),
-        ]
+        unified_path = os.path.join(settings.BASE_DIR, 'data', 'processed', 'unified_products.json')
         
-        for json_path in possible_paths:
-            if os.path.exists(json_path):
-                with open(json_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # Handle both array format and object format
-                    if isinstance(data, list):
-                        return {"productos": data}
-                    elif isinstance(data, dict) and "productos" in data:
-                        return data
-                    else:
-                        return {"productos": []}
+        if os.path.exists(unified_path):
+            with open(unified_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                # Handle both array format and object format
+                if isinstance(data, list):
+                    return {"productos": data}
+                elif isinstance(data, dict) and "productos" in data:
+                    return data
+                else:
+                    return {"productos": []}
         
         return {"productos": []}
     except (FileNotFoundError, json.JSONDecodeError) as e:

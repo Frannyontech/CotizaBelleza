@@ -292,7 +292,7 @@ def scrape_preunic_list(categoria: str = "maquillaje", headless: bool = True, ma
                     if 'sbpay' not in texto.lower():
                         # Buscar precio con formato $X.XXX
                         precio_match = re.search(r'\$[\d,\.]+', texto)
-                        if precio_match:
+                    if precio_match:
                             precio_normal = parse_precio(precio_match.group())
                 
                 # Precio vigente para compatibilidad
@@ -455,7 +455,7 @@ def scrapear_todas_categorias_preunic(headless=True, max_scrolls=20):
     categorias = ['maquillaje', 'skincare']
     
     for categoria in categorias:
-        print(f"\n🔄 Scrapeando categoría: {categoria}")
+        print(f"\n[SCRAPER] Scrapeando categoría: {categoria}")
         
         # Scrapear categoría sin guardar JSON automáticamente
         productos_categoria = scrape_preunic_list(
@@ -566,4 +566,384 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ Error durante el scraping: {e}")
         import traceback
+        traceback.print_exc()
+
+
+
+def guardar_resultados_por_categoria_preunic(resultados, tienda_prefix="preunic"):
+
+    """
+
+    Guarda los resultados en archivos JSON separados por categoría para Preunic
+
+    """
+
+    # Obtener la ruta correcta al directorio data
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    project_root = os.path.dirname(script_dir)
+
+    data_dir = os.path.join(project_root, "data")
+
+    os.makedirs(data_dir, exist_ok=True)
+
+    archivos_guardados = []
+
+    
+
+    # Extraer metadatos generales
+
+    metadatos = {
+
+        'fecha_extraccion': resultados.get('fecha_extraccion'),
+
+        'tienda': tienda_prefix.upper()
+
+    }
+
+    
+
+    # Guardar cada categoría en un archivo separado
+
+    for categoria, datos_categoria in resultados.items():
+
+        if categoria in ['fecha_extraccion', 'total_productos']:
+
+            continue  # Saltar metadatos
+
+            
+
+        # Crear estructura para archivo individual
+
+        estructura_categoria = {
+
+            **metadatos,
+
+            'categoria': categoria,
+
+            'total_productos': datos_categoria['cantidad'],
+
+            'productos': datos_categoria['productos']
+
+        }
+
+        
+
+        # Nombre del archivo: tienda_categoria.json
+
+        nombre_archivo = f"{tienda_prefix}_{categoria}.json"
+
+        ruta_archivo = os.path.join(data_dir, nombre_archivo)
+
+        
+
+        # Guardar archivo
+
+        with open(ruta_archivo, 'w', encoding='utf-8') as f:
+
+            json.dump(estructura_categoria, f, ensure_ascii=False, indent=2)
+
+        
+
+        print(f"Categoría '{categoria}' guardada en: {ruta_archivo}")
+
+        archivos_guardados.append(ruta_archivo)
+
+    
+
+    return archivos_guardados
+
+
+
+def extraer_marca_del_nombre(nombre: str) -> str:
+
+    """Extraer la marca del nombre del producto"""
+
+    if not nombre:
+
+        return "PREUNIC"
+
+    
+
+    # Lista de marcas conocidas
+
+    marcas_conocidas = [
+
+        'MAYBELLINE', 'REVLON', 'L\'OREAL', 'LOREAL', 'COVERGIRL', 'RIMMEL',
+
+        'BOURJOIS', 'MILANI', 'WET N WILD', 'NYX', 'ESSENCE', 'CATRICE',
+
+        'SKIN1004', 'MIXSOON', 'NEUTROGENA', 'TOCOBO', 'NIVEA', 'KIKO',
+
+        'CLINIQUE', 'ESTEE LAUDER', 'LANCOME', 'DIOR', 'CHANEL'
+
+    ]
+
+    
+
+    nombre_upper = nombre.upper()
+
+    
+
+    # Buscar marca en el nombre
+
+    for marca in marcas_conocidas:
+
+        if marca in nombre_upper:
+
+            return marca
+
+    
+
+    # Si no encuentra marca conocida, tomar la primera palabra
+
+    primera_palabra = nombre.split()[0] if nombre.split() else "PREUNIC"
+
+    return primera_palabra.upper()
+
+
+
+def scrapear_todas_categorias_preunic(headless=True, max_scrolls=20):
+
+    """
+
+    Scrapea todas las categorías de Preunic y genera archivos JSON separados
+
+    """
+
+    print("=== SCRAPING PREUNIC - TODAS LAS CATEGORÍAS ===")
+
+    
+
+    resultados = {}
+
+    categorias = ['maquillaje', 'skincare']
+
+    
+
+    for categoria in categorias:
+
+        print(f"\n🔄 Scrapeando categoría: {categoria}")
+
+        
+
+        # Scrapear categoría sin guardar JSON automáticamente
+
+        productos_categoria = scrape_preunic_list(
+
+            categoria=categoria,
+
+            headless=headless,
+
+            max_scrolls=max_scrolls,
+
+            scroll_delay=0.8,
+
+            save_json=False  # No guardar automáticamente
+
+        )
+
+        
+
+        # Adaptar estructura de productos para que coincida con el formato estándar
+
+        productos_adaptados = []
+
+        for producto in productos_categoria:
+
+            producto_adaptado = {
+
+                'nombre': producto.get('name', ''),
+
+                'marca': extraer_marca_del_nombre(producto.get('name', '')),
+
+                'precio': float(producto.get('price', 0)),
+
+                'precio_normal': producto.get('precio_normal'),
+
+                'precio_oferta': producto.get('precio_oferta'),
+
+                'categoria': categoria,  # Usar categoría estándar
+
+                'stock': "In stock" if producto.get('available', True) else "Out of stock",
+
+                'url': producto.get('url', ''),
+
+                'imagen': producto.get('image', ''),
+
+                'fuente': 'preunic'
+
+            }
+
+            productos_adaptados.append(producto_adaptado)
+
+        
+
+        resultados[categoria] = {
+
+            'cantidad': len(productos_adaptados),
+
+            'productos': productos_adaptados
+
+        }
+
+        
+
+        print(f"✅ {categoria}: {len(productos_adaptados)} productos extraídos")
+
+    
+
+    from datetime import datetime
+
+    data_completa = {
+
+        'fecha_extraccion': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+
+        'total_productos': sum(cat['cantidad'] for cat in resultados.values()),
+
+        **resultados
+
+    }
+
+    
+
+    # Guardar solo archivos separados por categoría
+
+    archivos_guardados = guardar_resultados_por_categoria_preunic(data_completa, "preunic")
+
+    print(f"\n=== RESUMEN PREUNIC ===")
+
+    print(f"Total archivos generados: {len(archivos_guardados)}")
+
+    for archivo in archivos_guardados:
+
+        print(f"  - {archivo}")
+
+    
+
+    return data_completa
+
+
+
+def main_scraper_preunic(categoria: str = "maquillaje", headless: bool = True):
+
+    """
+
+    Función principal que ejecuta el scraping
+
+    """
+
+    print(f"Scraper de Preunic - {categoria.upper()}")
+
+    print("Iniciando extracción de productos...")
+
+    
+
+    # Ejecutar scraping con configuración optimizada
+
+    productos = scrape_preunic_list(
+
+        categoria=categoria,
+
+        headless=headless,
+
+        max_scrolls=20,
+
+        scroll_delay=0.8,
+
+        save_json=True
+
+    )
+
+    
+
+    print(f"\nTotal de productos extraídos: {len(productos)}")
+
+    
+
+    if productos:
+
+        # Análisis de datos
+
+        precios = [p['price'] for p in productos if p['price'] > 0]
+
+        productos_con_imagen = sum(1 for p in productos if p['image'])
+
+        productos_con_oferta = sum(1 for p in productos if p.get('precio_oferta') is not None)
+
+        productos_con_precio_normal = sum(1 for p in productos if p.get('precio_normal') is not None)
+
+        
+
+        print(f"Productos con precio válido: {len(precios)}")
+
+        print(f"Productos con imagen: {productos_con_imagen}")
+
+        print(f"Productos con precio oferta: {productos_con_oferta}")
+
+        print(f"Productos con precio normal: {productos_con_precio_normal}")
+
+        if precios:
+
+            print(f"Precio promedio: ${sum(precios)//len(precios):,}")
+
+            print(f"Precio mínimo: ${min(precios):,}")
+
+            print(f"Precio máximo: ${max(precios):,}")
+
+    
+
+    return productos
+
+
+
+if __name__ == "__main__":
+
+    print("=== SCRAPER PREUNIC - ARCHIVOS SEPARADOS POR CATEGORÍA ===")
+
+    print("Iniciando scraping de Preunic con archivos separados...")
+
+    
+
+    # Configuración
+
+    headless = True  # Cambiar a False si quieres ver el navegador
+
+    max_scrolls = 20  # Número de scrolls por categoría
+
+    
+
+    try:
+
+        resultado = scrapear_todas_categorias_preunic(
+
+            headless=headless, 
+
+            max_scrolls=max_scrolls
+
+        )
+
+        
+
+        print(f"\n🎉 SCRAPING COMPLETADO")
+
+        print(f"Total productos extraídos: {resultado['total_productos']}")
+
+        
+
+        for categoria, datos in resultado.items():
+
+            if categoria not in ['fecha_extraccion', 'total_productos']:
+
+                print(f"  {categoria}: {datos['cantidad']} productos")
+
+        
+
+    except Exception as e:
+
+        print(f"❌ Error durante el scraping: {e}")
+
+        import traceback
+
         traceback.print_exc()
