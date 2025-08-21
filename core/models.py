@@ -359,3 +359,294 @@ class AlertaPrecioUnificada(models.Model):
     def __str__(self):
         return f"Alerta de {self.email} para {self.producto_nombre}"
 
+
+# ============================================================================
+# SISTEMA DE IDS PERSISTENTES
+# ============================================================================
+
+import hashlib
+import uuid
+
+
+class ProductoPersistente(models.Model):
+    """
+    Modelo principal de productos con IDs persistentes
+    Un producto mantiene su internal_id aunque cambien precios/stock
+    """
+    
+    # ID interno persistente (ej: cb_abc123def)
+    internal_id = models.CharField(max_length=50, unique=True, db_index=True)
+    
+    # Campos para identificación única
+    nombre_normalizado = models.CharField(max_length=500, db_index=True)
+    marca = models.CharField(max_length=200, db_index=True)
+    categoria = models.CharField(max_length=100, db_index=True)
+    
+    # Hash único para deduplicación
+    hash_unico = models.CharField(max_length=64, unique=True, db_index=True)
+    
+    # Información del producto
+    nombre_original = models.CharField(max_length=500)
+    descripcion = models.TextField(blank=True, null=True)
+    imagen_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    # Metadatos
+    primera_aparicion = models.DateTimeField(auto_now_add=True)
+    ultima_actualizacion = models.DateTimeField(auto_now=True)
+    activo = models.BooleanField(default=True)
+    
+    # Estadísticas
+    veces_encontrado = models.PositiveIntegerField(default=1)
+    
+    class Meta:
+        verbose_name = "Producto Persistente"
+        verbose_name_plural = "Productos Persistentes"
+        ordering = ['-ultima_actualizacion']
+        indexes = [
+            models.Index(fields=['internal_id']),
+            models.Index(fields=['hash_unico']),
+            models.Index(fields=['marca', 'categoria']),
+            models.Index(fields=['nombre_normalizado']),
+        ]
+    
+    def __str__(self):
+        return f"{self.internal_id}: {self.nombre_original} - {self.marca}"
+    
+    @classmethod
+    def generar_internal_id(cls):
+        """Genera un internal_id único con prefijo cb_"""
+        return f"cb_{uuid.uuid4().hex[:8]}"
+    
+    @classmethod
+    def generar_hash_unico(cls, nombre_normalizado, marca, categoria):
+        """Genera hash único para deduplicación"""
+        contenido = f"{nombre_normalizado.lower()}|{marca.lower()}|{categoria.lower()}"
+        return hashlib.sha256(contenido.encode('utf-8')).hexdigest()
+    
+    def actualizar_aparicion(self):
+        """Incrementa contador de apariciones"""
+        from django.utils import timezone
+        self.veces_encontrado += 1
+        self.ultima_actualizacion = timezone.now()
+        self.save(update_fields=['veces_encontrado', 'ultima_actualizacion'])
+
+
+class PrecioHistorico(models.Model):
+    """
+    Historial de precios por tienda para cada producto persistente
+    """
+    
+    # Relación con producto persistente
+    producto = models.ForeignKey(
+        ProductoPersistente, 
+        on_delete=models.CASCADE, 
+        related_name='precios_historicos'
+    )
+    
+    # Información de precio
+    tienda = models.CharField(max_length=100, db_index=True)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_original = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    tiene_descuento = models.BooleanField(default=False)
+    
+    # Estado del producto
+    stock = models.BooleanField(default=True)
+    disponible = models.BooleanField(default=True)
+    
+    # URLs y metadatos
+    url_producto = models.URLField(max_length=500, blank=True, null=True)
+    imagen_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    # Timestamps
+    fecha_extraccion = models.DateTimeField(auto_now_add=True)
+    fecha_scraping = models.DateTimeField()  # Fecha del scraping que lo generó
+    
+    # Información adicional del scraping
+    fuente_scraping = models.CharField(max_length=100)  # ej: "etl_2025_01_15"
+    
+    class Meta:
+        verbose_name = "Precio Histórico"
+        verbose_name_plural = "Precios Históricos"
+        ordering = ['-fecha_extraccion']
+        indexes = [
+            models.Index(fields=['producto', '-fecha_extraccion']),
+            models.Index(fields=['tienda', '-fecha_extraccion']),
+            models.Index(fields=['fecha_scraping']),
+            models.Index(fields=['stock', 'disponible']),
+        ]
+        
+        # Un producto solo puede tener un precio por tienda por fecha de scraping
+        unique_together = ['producto', 'tienda', 'fecha_scraping']
+    
+    def __str__(self):
+        return f"{self.producto.internal_id} - {self.tienda}: ${self.precio} ({self.fecha_extraccion.date()})"
+    
+    @property
+    def porcentaje_descuento(self):
+        """Calcula porcentaje de descuento si existe precio original"""
+        if self.precio_original and self.precio_original > self.precio:
+            return round(((self.precio_original - self.precio) / self.precio_original) * 100, 1)
+        return 0
+
+
+class ResenaProductoPersistente(models.Model):
+    """
+    Reseñas vinculadas a productos persistentes
+    """
+    
+    # Relación con producto persistente
+    producto = models.ForeignKey(
+        ProductoPersistente, 
+        on_delete=models.CASCADE, 
+        related_name='resenas'
+    )
+    
+    # Usuario y reseña
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resenas_productos_persistentes')
+    valoracion = models.SmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comentario = models.TextField()
+    nombre_autor = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Timestamps
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    # Metadatos
+    verificada = models.BooleanField(default=False)
+    activa = models.BooleanField(default=True)
+    
+    class Meta:
+        verbose_name = "Reseña de Producto Persistente"
+        verbose_name_plural = "Reseñas de Productos Persistentes"
+        unique_together = ['producto', 'usuario']
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['producto', '-fecha_creacion']),
+            models.Index(fields=['valoracion']),
+            models.Index(fields=['verificada', 'activa']),
+        ]
+    
+    def __str__(self):
+        autor = self.nombre_autor or self.usuario.username
+        return f"Reseña de {autor} para {self.producto.nombre_original} - {self.valoracion}/5"
+
+
+class AlertaPrecioProductoPersistente(models.Model):
+    """
+    Alertas de precio vinculadas a productos persistentes
+    """
+    
+    # Relación con producto persistente
+    producto = models.ForeignKey(
+        ProductoPersistente, 
+        on_delete=models.CASCADE, 
+        related_name='alertas_precio'
+    )
+    
+    # Configuración de alerta
+    email = models.EmailField(max_length=255)
+    precio_objetivo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    tienda_especifica = models.CharField(max_length=100, blank=True, null=True)  # opcional
+    
+    # Estado
+    activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_ultima_notificacion = models.DateTimeField(blank=True, null=True)
+    
+    # Configuración de notificaciones
+    frecuencia_max_horas = models.PositiveIntegerField(default=24)  # máximo una vez por día
+    notificaciones_enviadas = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Alerta de Precio Persistente"
+        verbose_name_plural = "Alertas de Precios Persistentes"
+        unique_together = ['producto', 'email']
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['activa', 'fecha_ultima_notificacion']),
+            models.Index(fields=['producto', 'activa']),
+        ]
+    
+    def __str__(self):
+        precio_txt = f" <= ${self.precio_objetivo}" if self.precio_objetivo else ""
+        tienda_txt = f" en {self.tienda_especifica}" if self.tienda_especifica else ""
+        return f"Alerta de {self.email}: {self.producto.nombre_original}{precio_txt}{tienda_txt}"
+
+
+class EstadisticaProducto(models.Model):
+    """
+    Estadísticas agregadas por producto para optimizar consultas
+    """
+    
+    producto = models.OneToOneField(
+        ProductoPersistente, 
+        on_delete=models.CASCADE, 
+        related_name='estadisticas'
+    )
+    
+    # Estadísticas de precios
+    precio_min_actual = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    precio_max_actual = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    precio_promedio = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    
+    # Estadísticas de tiendas
+    num_tiendas_disponible = models.PositiveIntegerField(default=0)
+    tiendas_con_stock = models.PositiveIntegerField(default=0)
+    
+    # Estadísticas de reseñas
+    num_resenas = models.PositiveIntegerField(default=0)
+    valoracion_promedio = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    
+    # Estadísticas de alertas
+    num_alertas_activas = models.PositiveIntegerField(default=0)
+    
+    # Última actualización
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Estadística de Producto"
+        verbose_name_plural = "Estadísticas de Productos"
+    
+    def actualizar_estadisticas(self):
+        """Recalcula todas las estadísticas del producto"""
+        from django.db.models import Min, Max, Avg, Count
+        
+        # Estadísticas de precios actuales (stock disponible)
+        precios_actuales = self.producto.precios_historicos.filter(
+            stock=True, 
+            disponible=True
+        ).values_list('precio', flat=True)
+        
+        if precios_actuales:
+            self.precio_min_actual = min(precios_actuales)
+            self.precio_max_actual = max(precios_actuales)
+            self.precio_promedio = sum(precios_actuales) / len(precios_actuales)
+        else:
+            self.precio_min_actual = None
+            self.precio_max_actual = None
+            self.precio_promedio = None
+        
+        # Estadísticas de tiendas
+        tiendas_stats = self.producto.precios_historicos.aggregate(
+            total=Count('tienda', distinct=True),
+            con_stock=Count('tienda', distinct=True, filter=models.Q(stock=True, disponible=True))
+        )
+        self.num_tiendas_disponible = tiendas_stats['total'] or 0
+        self.tiendas_con_stock = tiendas_stats['con_stock'] or 0
+        
+        # Estadísticas de reseñas
+        resenas_stats = self.producto.resenas.filter(activa=True).aggregate(
+            total=Count('id'),
+            promedio=Avg('valoracion')
+        )
+        self.num_resenas = resenas_stats['total'] or 0
+        self.valoracion_promedio = resenas_stats['promedio']
+        
+        # Estadísticas de alertas
+        self.num_alertas_activas = self.producto.alertas_precio.filter(activa=True).count()
+        
+        self.save()
+        return self
+

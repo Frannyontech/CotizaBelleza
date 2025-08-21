@@ -121,11 +121,9 @@ class ScraperOrchestrator:
                 elif store_name == "maicao":
                     kwargs["max_pages_per_category"] = self.config.max_pages
             else:
-                # Preunic usa scroll infinito
-                max_scrolls = None
-                if self.config.max_pages:
-                    max_scrolls = self.config.max_pages * store_config.get("scroll_multiplier", 5)
-                kwargs["max_scrolls"] = max_scrolls or 50
+                # Preunic usa API de Algolia - no necesita argumentos especiales
+                # El scraper maneja internamente la paginación de la API
+                pass
             
             # Ejecutar scraper
             resultado = scraper_function(**kwargs)

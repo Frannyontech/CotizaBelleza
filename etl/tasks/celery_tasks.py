@@ -33,9 +33,9 @@ def run_etl_task(self, mode='prod'):
         
         # Determinar argumentos según modo
         if mode == 'dev':
-            args = ['full', '--headless', '--max-pages', '2']
+            args = ['full', '--headless', '--max-pages', '5']
         elif mode == 'prod':
-            args = ['full', '--headless']  # Sin límites para producción
+            args = ['full', '--headless', '--max-pages', '5']  # 5 páginas para producción
         elif mode == 'test':
             args = ['full', '--headless', '--max-pages', '1']
         else:
@@ -149,3 +149,117 @@ def status_task(self):
     except Exception as e:
         logger.error(f"❌ [ETL Simple] Error verificando estado: {str(e)}")
         return {"status": "error", "error": str(e)}
+
+
+"""
+Nueva tarea de Celery para probar IDs persistentes
+"""
+
+@app.task(bind=True, name='etl.tasks.celery_tasks.run_etl_with_persistent_ids')
+def run_etl_with_persistent_ids(self, test_id='test_persistence'):
+    """
+    Tarea específica para probar IDs persistentes
+    Ejecuta ETL completo y procesa con sistema de IDs persistentes
+    """
+    try:
+        logger.info(f'[TEST IDs Persistentes] Iniciando prueba: {test_id}')
+        
+        # Obtener directorio base del proyecto
+        base_dir = Path(__file__).parent.parent.parent
+        
+        # 1. Ejecutar ETL completo con 5 páginas
+        args = ['full', '--headless', '--max-pages', '5']
+        cmd = [sys.executable, '-m', 'etl.etl_v2'] + args
+        
+        logger.info(f'[TEST] Ejecutando ETL: {" ".join(cmd)}')
+        
+        # Ejecutar scraping
+        result = subprocess.run(
+            cmd, 
+            capture_output=True, 
+            text=True, 
+            timeout=1800,
+            cwd=str(base_dir)
+        )
+        
+        if result.returncode != 0:
+            logger.error(f'[TEST] Error en ETL: {result.stderr}')
+            return {
+                "status": "error",
+                "test_id": test_id,
+                "error": result.stderr,
+                "timestamp": str(__import__('datetime').datetime.now())
+            }
+        
+        logger.info('[TEST] ETL completado, procesando con IDs persistentes...')
+        
+        # 2. Procesar con IDs persistentes
+        unified_file = base_dir / 'data' / 'processed' / 'unified_products.json'
+        
+        if not unified_file.exists():
+            logger.error('[TEST] Archivo unified_products.json no encontrado')
+            return {
+                "status": "error",
+                "test_id": test_id,
+                "error": "Archivo unified_products.json no encontrado",
+                "timestamp": str(__import__('datetime').datetime.now())
+            }
+        
+        # Ejecutar procesamiento de IDs persistentes
+        cmd_persistent = [
+            sys.executable, 'manage_persistent_ids.py', 
+            'procesar-json', str(unified_file)
+        ]
+        
+        result_persistent = subprocess.run(
+            cmd_persistent,
+            capture_output=True,
+            text=True,
+            cwd=str(base_dir)
+        )
+        
+        if result_persistent.returncode == 0:
+            logger.info(f'[TEST] IDs persistentes procesados correctamente para {test_id}')
+            
+            # Obtener estadísticas
+            cmd_stats = [sys.executable, 'manage_persistent_ids.py', 'estadisticas']
+            stats_result = subprocess.run(
+                cmd_stats,
+                capture_output=True,
+                text=True,
+                cwd=str(base_dir)
+            )
+            
+            return {
+                "status": "success",
+                "test_id": test_id,
+                "etl_output": result.stdout[-500:],
+                "persistent_output": result_persistent.stdout,
+                "stats": stats_result.stdout if stats_result.returncode == 0 else "Error obteniendo stats",
+                "timestamp": str(__import__('datetime').datetime.now())
+            }
+        else:
+            logger.error(f'[TEST] Error procesando IDs persistentes: {result_persistent.stderr}')
+            return {
+                "status": "error",
+                "test_id": test_id,
+                "error": f"Error IDs persistentes: {result_persistent.stderr}",
+                "timestamp": str(__import__('datetime').datetime.now())
+            }
+            
+    except subprocess.TimeoutExpired:
+        logger.error(f'[TEST] Timeout en prueba {test_id}')
+        return {
+            "status": "timeout",
+            "test_id": test_id,
+            "error": "Timeout después de 30 minutos",
+            "timestamp": str(__import__('datetime').datetime.now())
+        }
+    except Exception as e:
+        logger.error(f'[TEST] Error inesperado en {test_id}: {str(e)}')
+        return {
+            "status": "error",
+            "test_id": test_id,
+            "error": str(e),
+            "timestamp": str(__import__('datetime').datetime.now())
+        }

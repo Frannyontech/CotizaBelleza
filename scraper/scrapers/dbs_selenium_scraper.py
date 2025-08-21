@@ -59,15 +59,49 @@ class DBSSeleniumScraper:
 
     def setup_driver(self, headless: bool):
         options = Options()
+        
+        # Modo incógnito para evitar cookies
+        options.add_argument('--incognito')
+        
         if headless:
             options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
         options.add_argument('--window-size=1920,1080')
-        options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+        options.add_argument('--disable-web-security')
+        options.add_argument('--disable-features=VizDisplayCompositor')
+        options.add_argument('--disable-blink-features=AutomationControlled')
+        options.add_argument('--disable-extensions')
+        options.add_argument('--disable-plugins')
+        options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+        
+        # Configuraciones experimentales anti-detección
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        
+        # Logging reducido
+        options.add_argument('--log-level=3')
+        options.add_argument('--silent')
+        options.add_argument('--disable-logging')
         
         self.driver = webdriver.Chrome(options=options)
+        
+        # Limpiar cookies al inicio
+        self.driver.delete_all_cookies()
+        
+        # Ocultar propiedades de webdriver
+        self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        
+        # Configurar headers adicionales
+        self.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'DNT': '1',
+                'Sec-GPC': '1',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        })
 
     def _get_page_with_selenium(self, url: str) -> Optional[BeautifulSoup]:
         try:
@@ -588,10 +622,10 @@ def guardar_resultados_por_categoria(resultados, tienda_prefix="dbs"):
     """
     Guarda los resultados en archivos JSON separados por categoría
     """
-    # Obtener la ruta correcta al directorio data
+    # Obtener la ruta correcta al directorio data/raw
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)
-    data_dir = os.path.join(project_root, "data")
+    project_root = os.path.dirname(os.path.dirname(script_dir))  # Subir dos niveles: scraper/scrapers -> scraper -> raíz
+    data_dir = os.path.join(project_root, "data", "raw")
     os.makedirs(data_dir, exist_ok=True)
     archivos_guardados = []
     

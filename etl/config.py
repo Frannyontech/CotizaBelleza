@@ -57,10 +57,10 @@ class ETLConfig:
         "preunic": {
             "name": "Preunic",
             "scraper_module": "scraper.scrapers.preunic_selenium_scraper", 
-            "scraper_function": "scrapear_todas_categorias_preunic",
+            "scraper_function": "scrape_all_categories",
             "categories": ["maquillaje", "skincare"],
-            "uses_pages": False,  # Usa scroll infinito
-            "scroll_multiplier": 5
+            "uses_pages": False,  # Usa API de Algolia (no paginación tradicional)
+            "max_pages": 5
         }
     })
     
