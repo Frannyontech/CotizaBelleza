@@ -19,10 +19,14 @@ import {
   ClockCircleOutlined,
   BellOutlined
 } from '@ant-design/icons';
-import { dashboardService } from '../../services/api';
-import { processCategoriesForFrontend, processStoresForFrontend } from '../../utils/normalizeHelpers';
+import { unifiedProductsService } from '../../services/unifiedApi';
 import { resolveImageUrl, getDefaultThumbnail } from '../../utils/image';
 import './Dashboard.css';
+
+// Importar imágenes del carrusel
+import heroSlider1 from '../../assets/hero-slider-1.jpg';
+import heroSlider2 from '../../assets/hero-slider-2.jpg';
+import heroSlider3 from '../../assets/hero-slider-3.jpg';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -32,27 +36,83 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedStore, setSelectedStore] = useState('Todas');
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [categoriasDisponibles, setCategoriasDisponibles] = useState([]);
+  const [tiendasDisponibles, setTiendasDisponibles] = useState([]);
 
-  // Cargar datos del dashboard
+  // Cargar productos populares del dashboard
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const loadProducts = async () => {
       try {
         setLoading(true);
-
-        // Cargar datos del dashboard
-        const dashboardResponse = await dashboardService.getDashboardData();
-        setDashboardData(dashboardResponse);
-
+        // Cargar productos populares desde la API del dashboard
+        const response = await fetch('http://localhost:8000/api/dashboard/');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const dashboardData = await response.json();
+        const productosPopulares = dashboardData.productos_populares || [];
+        
+        // Convertir productos populares a formato del dashboard
+        const dashboardProducts = productosPopulares.map(product => {
+          const tiendas = product.tiendas || [];
+          let precio_min = null;
+          let imagen_url = '';
+          let tiendas_disponibles = [];
+          
+          // Extraer precio mínimo e imagen
+          tiendas.forEach(tienda => {
+            // Imagen - usar cualquier imagen disponible
+            if (tienda.imagen && !imagen_url) {
+              imagen_url = tienda.imagen;
+            }
+            
+            // Precio - convertir y validar
+            const precio = parseFloat(tienda.precio);
+            if (!isNaN(precio) && precio > 0 && (precio_min === null || precio < precio_min)) {
+              precio_min = precio;
+            }
+            
+            // Tienda - agregar fuente
+            if (tienda.fuente) {
+              tiendas_disponibles.push(tienda.fuente.toUpperCase());
+            }
+          });
+          
+          return {
+            id: product.product_id,
+            product_id: product.product_id,
+            nombre: product.nombre || 'Sin nombre',
+            marca: product.marca || '',
+            categoria: product.categoria || '',
+            precio_min: precio_min || 0,
+            imagen_url: imagen_url || '',
+            tiendas_disponibles: [...new Set(tiendas_disponibles)],
+            tiendasCount: tiendas.length
+          };
+        });
+        
+        setProducts(dashboardProducts);
+        
+        // Guardar categorías y tiendas disponibles del dashboard
+        const categoriasDisponibles = dashboardData.categorias_disponibles || [];
+        const tiendasDisponibles = dashboardData.tiendas_disponibles || [];
+        
+        // Actualizar las listas de filtros con datos del servidor
+        setCategoriasDisponibles(categoriasDisponibles.map(cat => cat.nombre));
+        setTiendasDisponibles(tiendasDisponibles.map(tienda => tienda.nombre));
+        
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('❌ Error loading dashboard data:', error);
         message.error('Error al cargar los datos del dashboard');
       } finally {
         setLoading(false);
       }
     };
 
-    loadDashboardData();
+    loadProducts();
   }, []);
 
   // Formatear precio en formato CLP sin decimales
@@ -64,20 +124,19 @@ const Dashboard = () => {
     }).format(price);
   };
 
-  // Obtener datos procesados
-  const allPopularProducts = dashboardData?.productos_populares || [];
+  // Usar categorías y tiendas del servidor, con fallback a las de productos
+  const categorias_unicas = categoriasDisponibles.length > 0 
+    ? categoriasDisponibles 
+    : [...new Set(products.map(product => product.categoria).filter(cat => cat))];
+  const tiendas_unicas = tiendasDisponibles.length > 0 
+    ? tiendasDisponibles 
+    : [...new Set(products.flatMap(product => product.tiendas_disponibles || []))];
   
-  // Extraer categorías y tiendas disponibles directamente de los productos
-  const categorias_unicas = [...new Set(allPopularProducts.map(product => product.categoria))];
-  const tiendas_unicas = [...new Set(allPopularProducts.flatMap(product => 
-    product.tiendas_disponibles || []
-  ))];
-  
-  const categoriesList = processCategoriesForFrontend(categorias_unicas);
-  const storesList = processStoresForFrontend(tiendas_unicas);
+  const categoriesList = ['Todos', ...categorias_unicas];
+  const storesList = ['Todas', ...tiendas_unicas];
 
-  // Aplicar filtros a los productos populares
-  const popularProducts = allPopularProducts.filter(product => {
+  // Aplicar filtros a los productos
+  const filteredProducts = products.filter(product => {
     // Filtro por categoría
     if (selectedCategory !== 'Todos' && product.categoria !== selectedCategory) {
       return false;
@@ -85,10 +144,10 @@ const Dashboard = () => {
     
     // Filtro por tienda
     if (selectedStore !== 'Todas') {
-      // Verificar si el producto está disponible en la tienda seleccionada
-      if (!product.tiendas_disponibles || !product.tiendas_disponibles.includes(selectedStore)) {
-        return false;
-      }
+      const storeMatch = product.tiendas_disponibles?.some(store => 
+        store.toUpperCase() === selectedStore
+      );
+      if (!storeMatch) return false;
     }
     
     return true;
@@ -128,121 +187,94 @@ const Dashboard = () => {
       <div className="hero-carousel-section">
         <Carousel autoplay>
           <div>
-            <div className="carousel-slide">
-              <img 
-                src="/src/assets/hero-slider-1.jpg" 
-                alt="Productos de belleza"
-                className="carousel-image"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
+            <div className="carousel-slide" style={{ backgroundImage: `url(${heroSlider1})` }}>
               <div className="carousel-content">
-                <h2>Revisa los productos disponibles</h2>
-                <p>Ya disponibles en Chile</p>
+                <h2>Productos de belleza unificados</h2>
+                <p>Comparación de precios en tiempo real</p>
               </div>
             </div>
           </div>
           <div>
-            <div className="carousel-slide">
-              <img 
-                src="/src/assets/hero-slider-2.jpg" 
-                alt="Ofertas especiales"
-                className="carousel-image"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
+            <div className="carousel-slide" style={{ backgroundImage: `url(${heroSlider2})` }}>
               <div className="carousel-content">
-                <h2>Ofertas especiales</h2>
-                <p>Hasta 50% de descuento</p>
+                <h2>Mejor precio garantizado</h2>
+                <p>Compara entre DBS, Preunic y Maicao</p>
               </div>
             </div>
           </div>
           <div>
-            <div className="carousel-slide">
-              <img 
-                src="/src/assets/hero-slider-3.jpg" 
-                alt="Productos destacados"
-                className="carousel-image"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
+            <div className="carousel-slide" style={{ backgroundImage: `url(${heroSlider3})` }}>
               <div className="carousel-content">
                 <h2>Productos destacados</h2>
                 <p>Las mejores marcas de belleza</p>
               </div>
             </div>
-        </div>
+          </div>
         </Carousel>
       </div>
 
       {/* Filter Section */}
-        <div className="filter-container">
-          <div className="filter-row">
+      <div className="filter-container">
+        <div className="filter-row">
           <Text strong>Categoría:</Text>
-            <Space wrap>
-              {categoriesList.map(category => (
-                <Tag
-                  key={category}
-                  className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Tag>
-              ))}
-            </Space>
-          </div>
+          <Space wrap>
+            {categoriesList.map(category => (
+              <Tag
+                key={category}
+                className={`filter-tag ${selectedCategory === category ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </Tag>
+            ))}
+          </Space>
+        </div>
 
-          <div className="filter-row">
-            <Text strong>Tienda:</Text>
-            <Space wrap>
-              {storesList.map(store => (
-                <Tag
-                  key={store}
-                  className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
-                  onClick={() => setSelectedStore(store)}
-                >
-                  {store}
-                </Tag>
-              ))}
-            </Space>
-            <Button 
-              type="link" 
-              className="clear-filters"
-              onClick={() => {
-                setSelectedCategory('Todos');
-                setSelectedStore('Todas');
-              }}
-            >
-              Limpiar filtros
-            </Button>
+        <div className="filter-row">
+          <Text strong>Tienda:</Text>
+          <Space wrap>
+            {storesList.map(store => (
+              <Tag
+                key={store}
+                className={`filter-tag ${selectedStore === store ? 'active' : ''}`}
+                onClick={() => setSelectedStore(store)}
+              >
+                {store}
+              </Tag>
+            ))}
+          </Space>
+          <Button 
+            type="link" 
+            className="clear-filters"
+            onClick={() => {
+              setSelectedCategory('Todos');
+              setSelectedStore('Todas');
+            }}
+          >
+            Limpiar filtros
+          </Button>
         </div>
       </div>
 
       {/* Popular Products Section */}
       <div className="products-section">
         <div className="section-header">
-          <Title level={3}>Productos más populares ({popularProducts.length})</Title>
-          <Button type="link" className="view-all">
-            Ver todos <LinkOutlined />
-          </Button>
+          <Title level={3}>Productos más populares ({products.length})</Title>
         </div>
 
         <div className="products-grid">
-          {popularProducts.length > 0 ? (
-            popularProducts.map(product => (
+          {products.length > 0 ? (
+            products.map(product => (
               <div 
-                key={product.id}
+                key={product.product_id}
                 className="product-card" 
-                onClick={() => navigate(`/detalle-producto/${product.id}`)}
+                onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="product-image">
                   <img 
-                    src={resolveImageUrl(product)} 
-                    alt={product.nombre || product.productName}
+                    src={product.imagen_url || getDefaultThumbnail()} 
+                    alt={product.nombre}
                     onError={(e) => {
                       e.target.src = getDefaultThumbnail();
                     }}
@@ -252,7 +284,7 @@ const Dashboard = () => {
                   <Text className="product-brand">{product.marca}</Text>
                   <Text className="product-name">{product.nombre}</Text>
                   <Text className="product-price">
-                    Desde {formatPriceCLP(product.precio_min || product.precio || 0)}
+                    {product.tiendasCount > 1 ? 'Desde ' : ''}{formatPriceCLP(product.precio_min || 0)}
                   </Text>
                   <Button 
                     type="primary" 
@@ -260,15 +292,17 @@ const Dashboard = () => {
                     className="view-more-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/detalle-producto/${product.id}`);
+                      navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`);
                     }}
                   >
                     Ver más <LinkOutlined />
                   </Button>
                   <div className="product-stores">
-                    <Text type="secondary">Disponible en:</Text>
-                    <Text className="store-list">
-                        {product.tiendas_disponibles?.join(', ') || 'DBS'}
+                    <Text type="secondary">
+                      {product.tiendasCount > 1 
+                        ? `${product.tiendasCount} tiendas` 
+                        : `Disponible en: ${product.tiendas_disponibles?.join(', ') || 'N/A'}`
+                      }
                     </Text>
                   </div>
                 </div>
@@ -287,22 +321,22 @@ const Dashboard = () => {
         <div className="benefits-container">
           <Title level={2} className="benefits-title">¿Por qué elegir CotizaBelleza?</Title>
           <Row gutter={[24, 24]}>
-          {benefits.map((benefit, index) => (
+            {benefits.map((benefit, index) => (
               <Col xs={24} sm={12} md={8} key={index}>
                 <Card className="benefit-card" hoverable>
-                <div className="benefit-icon">
-                  {benefit.icon}
-                </div>
+                  <div className="benefit-icon">
+                    {benefit.icon}
+                  </div>
                   <Title level={4} className="benefit-title">{benefit.title}</Title>
                   <Text className="benefit-description">{benefit.description}</Text>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         </div>
       </div>
     </Layout>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

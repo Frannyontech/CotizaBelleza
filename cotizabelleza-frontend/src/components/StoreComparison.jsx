@@ -72,6 +72,19 @@ const StoreComparison = ({
     return store.precio_original || store.originalPrice || productOriginalPrice || 0;
   };
 
+  // Función para obtener información de precios de Preunic
+  const getPreunicPriceInfo = (store) => {
+    if (store.fuente === 'preunic') {
+      return {
+        hasOffer: store.precio_oferta !== null && store.precio_oferta !== undefined,
+        normalPrice: store.precio_normal,
+        offerPrice: store.precio_oferta,
+        finalPrice: store.precio_oferta || store.precio_normal || store.precio
+      };
+    }
+    return null;
+  };
+
   // Función para verificar si está en stock
   const isInStock = (store) => {
     return store.stock || store.inStock || false;
@@ -158,7 +171,7 @@ const StoreComparison = ({
                        size={40}
                        src={storeLogo || getDefaultThumbnail()}
                        style={{ 
-                         backgroundColor: storeLogo ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                         backgroundColor: storeLogo ? 'transparent' : 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
                          fontSize: '16px',
                          fontWeight: 'bold',
                          color: 'white'
@@ -195,38 +208,70 @@ const StoreComparison = ({
                     {/* Precios */}
                     <Row align="middle" gutter={[8, 8]}>
                       <Col>
-                                                 <Title 
-                           level={4} 
-                           style={{ 
-                             margin: 0, 
-                             color: '#667eea',
-                             fontWeight: 'bold',
-                             fontSize: '20px'
-                           }}
-                         >
-                           {formatPrice ? formatPrice(finalPrice) : formatPriceCLP(finalPrice)}
-                         </Title>
+                        {(() => {
+                          const preunicInfo = getPreunicPriceInfo(store);
+                          
+                          if (preunicInfo && preunicInfo.hasOffer) {
+                            // Mostrar precio de oferta para Preunic
+                            return (
+                              <Space direction="vertical" size={2}>
+                                <Title 
+                                  level={4} 
+                                  style={{ 
+                                    margin: 0, 
+                                    color: '#e74c3c',
+                                    fontWeight: 'bold',
+                                    fontSize: '20px'
+                                  }}
+                                >
+                                  {formatPrice ? formatPrice(preunicInfo.offerPrice) : formatPriceCLP(preunicInfo.offerPrice)}
+                                  <Tag color="red" size="small" style={{ marginLeft: 8 }}>OFERTA</Tag>
+                                </Title>
+                                <Text 
+                                  type="secondary" 
+                                  delete 
+                                  style={{ fontSize: '14px', color: '#8c9bab' }}
+                                >
+                                  Normal: {formatPrice ? formatPrice(preunicInfo.normalPrice) : formatPriceCLP(preunicInfo.normalPrice)}
+                                </Text>
+                              </Space>
+                            );
+                          } else {
+                            // Precio normal para otras tiendas o Preunic sin oferta
+                            return (
+                              <Title 
+                                level={4} 
+                                style={{ 
+                                  margin: 0, 
+                                  color: '#ff6b9d',
+                                  fontWeight: 'bold',
+                                  fontSize: '20px'
+                                }}
+                              >
+                                {formatPrice ? formatPrice(finalPrice) : formatPriceCLP(finalPrice)}
+                              </Title>
+                            );
+                          }
+                        })()}
                       </Col>
                       
-                      {/* Precio original tachado si hay descuento */}
-                      {originalPrice > finalPrice && (
+                      {/* Precio original tachado si hay descuento (para tiendas que no son Preunic) */}
                         <Col>
-                                                     <Text 
-                             type="secondary" 
-                             delete 
-                             style={{ fontSize: '15px', color: '#8c9bab' }}
-                           >
-                             {formatPrice ? formatPrice(originalPrice) : formatPriceCLP(originalPrice)}
-                           </Text>
+                          <Text 
+                            type="secondary" 
+                            delete 
+                            style={{ fontSize: '15px', color: '#8c9bab' }}
+                          >
+                            {formatPrice ? formatPrice(originalPrice) : formatPriceCLP(originalPrice)}
+                          </Text>
                         </Col>
                       )}
                       
-                      {/* Tag de descuento */}
-                      {discountPercent && (
+                      {/* Tag de descuento para tiendas que no son Preunic */}
                         <Col>
-                                                   <Tag 
-                           color="red" 
-                           style={{ 
+                          <Tag 
+                            color="red" 
+                            style={{ 
                              fontWeight: 'bold',
                              borderRadius: '8px',
                              background: 'linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%)',
@@ -257,9 +302,9 @@ const StoreComparison = ({
                          height: '44px',
                          borderRadius: '12px',
                          fontWeight: 'bold',
-                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                         background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
                          border: 'none',
-                         boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                         boxShadow: '0 4px 12px rgba(255, 107, 157, 0.3)',
                          fontSize: '14px'
                        }}
                        aria-label={`Ir a tienda ${storeName} para ${productName}`}

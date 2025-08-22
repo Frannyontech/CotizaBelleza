@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuración base de axios
-const API_BASE_URL = '/api/';
+const API_BASE_URL = 'http://localhost:8000/api/';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -196,7 +196,9 @@ export const productService = {
   // Obtener reseñas de producto
   getProductReviews: async (productId) => {
     try {
-      const response = await api.get(`productos-dbs/${productId}/resenas/`);
+      // Usar la API general de reseñas (sistema de IDs persistentes)
+      const endpoint = `productos/${productId}/resenas/`;
+      const response = await api.get(endpoint);
       return response.data;
     } catch (error) {
       console.error('Error fetching product reviews:', error);
@@ -207,7 +209,9 @@ export const productService = {
   // Crear nueva reseña de producto
   createProductReview: async (reviewData) => {
     try {
-      const response = await api.post(`productos-dbs/${reviewData.productId}/resenas/`, {
+      // Usar la API general de reseñas (sistema de IDs persistentes)
+      const endpoint = `productos/${reviewData.productId}/resenas/`;
+      const response = await api.post(endpoint, {
         valoracion: reviewData.rating,
         comentario: reviewData.comment,
         autor: reviewData.author

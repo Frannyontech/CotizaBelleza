@@ -1,22 +1,31 @@
+"""
+URLs para CotizaBelleza - Arquitectura MVT/MVC
+"""
 from django.urls import path
-from . import views
-
-app_name = 'core'
+from .views import (
+    home,
+    DashboardAPIView,
+    UnifiedProductsAPIView,
+    TiendaProductosAPIView,
+    ProductoResenasAPIView,
+)
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('dashboard/', views.DashboardAPIView.as_view(), name='dashboard'),
-    path('productos/', views.ProductoListAPIView.as_view(), name='productos-list'),
-    path('productos-dbs/', views.DBSProductosAPIView.as_view(), name='productos-dbs'),
-    path('productos-preunic/', views.PREUNICProductosAPIView.as_view(), name='productos-preunic'),
-    path('productos-preunic/<str:producto_id>/', views.PREUNICProductoDetalleAPIView.as_view(), name='producto-preunic-detalle'),
-    path('productos-maicao/', views.MAICAOProductosAPIView.as_view(), name='productos-maicao'),
-    path('productos-maicao/<str:producto_id>/', views.MAICAOProductoDetalleAPIView.as_view(), name='producto-maicao-detalle'),
-    path('productos-dbs/<int:producto_id>/', views.ProductoDetalleAPIView.as_view(), name='producto-detalle'),
-    path('categorias/', views.CategoriaListAPIView.as_view(), name='categorias-list'),
-    path('tiendas/', views.TiendaListAPIView.as_view(), name='tiendas-list'),
-    path('precios/', views.PreciosPorProductoAPIView.as_view(), name='precios-producto'),
-    path('usuarios/', views.UsuarioCreateAPIView.as_view(), name='usuario-create'),
-    path('alertas-precio/', views.AlertaPrecioCreateAPIView.as_view(), name='alerta-precio-create'),
-    path('productos-dbs/<int:producto_id>/resenas/', views.ProductoResenasAPIView.as_view(), name='producto-resenas'),
-] 
+    # Vista principal
+    path('', home, name='home'),
+    
+    # Dashboard API
+    path('api/dashboard/', DashboardAPIView.as_view(), name='dashboard-api'),
+    
+    # Productos unificados
+    path('api/unified/', UnifiedProductsAPIView.as_view(), name='unified-products-api'),
+    
+    # Productos por tienda
+    path('api/productos-<str:tienda_nombre>/', TiendaProductosAPIView.as_view(), name='tienda-productos-api'),
+    
+    # Reseñas de productos (compatible con todas las tiendas)
+    path('api/productos-dbs/<str:producto_id>/resenas/', ProductoResenasAPIView.as_view(), {'tienda_nombre': 'dbs'}, name='resenas-dbs-api'),
+    path('api/productos-preunic/<str:producto_id>/resenas/', ProductoResenasAPIView.as_view(), {'tienda_nombre': 'preunic'}, name='resenas-preunic-api'),
+    path('api/productos-maicao/<str:producto_id>/resenas/', ProductoResenasAPIView.as_view(), {'tienda_nombre': 'maicao'}, name='resenas-maicao-api'),
+    path('api/productos/<str:producto_id>/resenas/', ProductoResenasAPIView.as_view(), {'tienda_nombre': 'general'}, name='resenas-general-api'),
+]

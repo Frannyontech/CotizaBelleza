@@ -8,7 +8,6 @@ import {
   Col,
   Typography,
   Space,
-  Tag,
   Rate,
   Breadcrumb,
   message,
@@ -17,13 +16,11 @@ import {
 import {
   ShareAltOutlined,
   BellOutlined,
-  StarFilled,
-  ArrowDownOutlined
+  HeartOutlined
 } from '@ant-design/icons';
-import axios from 'axios';
-import { productService } from '../../services/api';
+import { unifiedProductsService } from '../../services/unifiedApi';
+import { resolveImageUrl } from '../../utils/image';
 import PriceAlertModal from '../../components/PriceAlertModal';
-import StoreComparison from '../../components/StoreComparison';
 import ProductReviews from '../../components/ProductReviews';
 import './DetalleProducto.css';
 
@@ -32,183 +29,72 @@ const { Title, Text, Paragraph } = Typography;
 
 const DetalleProducto = () => {
   const { id } = useParams();
-  const [producto, setProducto] = useState(null);
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [reviewsData, setReviewsData] = useState(null);
-  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    const fetchProducto = async () => {
+    const fetchProduct = async () => {
       try {
         setLoading(true);
+        // Decodificar el ID (puede venir URL-encoded)
+        const decodedId = decodeURIComponent(id);
         
-        // Detectar el tipo de producto basándose en el ID
-        const isPreunicProduct = id && id.startsWith('preunic_');
-        const isMaicaoProduct = id && id.startsWith('maicao_');
-        const isDBSProduct = id && id.startsWith('dbs_');
+        // Buscar en productos unificados exclusivamente
+        const foundProduct = await unifiedProductsService.getProductById(decodedId);
         
-        let response;
-        if (isPreunicProduct) {
-          // Para Preunic, necesitamos buscar el producto por ID
-          const productId = id.replace('preunic_', '');
-          const searchResponse = await axios.get(`/api/productos-preunic/`);
-          const productos = searchResponse.data.productos || [];
-          const producto = productos.find(p => p.id.toString() === productId);
+        if (foundProduct) {
           
-          if (!producto) {
-            throw new Error('Producto no encontrado');
-          }
-          
-          // Adaptar el formato para que sea compatible con el resto del componente
-          response = {
-            data: {
-              id: producto.id,
-              nombre: producto.nombre,
-              marca: producto.marca || '',
-              categoria: producto.categoria,
-              precio: producto.precio,
-              stock: producto.stock,
-              url_producto: producto.url_producto,
-              imagen_url: producto.imagen_url,
-              descripcion: producto.descripcion || producto.nombre,
-              tienda: 'PREUNIC',
-              tiendas_disponibles: ['PREUNIC'],
-              tiendas_detalladas: [{
-                tienda: 'PREUNIC',
-                precio: producto.precio,
-                stock: producto.stock,
-                url_producto: producto.url_producto
-              }],
-              num_precios: 1
-            }
-          };
-        } else if (isMaicaoProduct) {
-          // Para Maicao, necesitamos buscar el producto por ID
-          const productId = id.replace('maicao_', '');
-          const searchResponse = await axios.get(`/api/productos-maicao/`);
-          const productos = searchResponse.data.productos || [];
-          const producto = productos.find(p => p.id.toString() === productId);
-          
-          if (!producto) {
-            throw new Error('Producto no encontrado');
-          }
-          
-          // Adaptar el formato para que sea compatible con el resto del componente
-          response = {
-            data: {
-              id: producto.id,
-              nombre: producto.nombre,
-              marca: producto.marca || '',
-              categoria: producto.categoria,
-              precio: producto.precio,
-              stock: producto.stock,
-              url_producto: producto.url_producto,
-              imagen_url: producto.imagen_url,
-              descripcion: producto.descripcion || producto.nombre,
-              tienda: 'MAICAO',
-              tiendas_disponibles: ['MAICAO'],
-              tiendas_detalladas: [{
-                tienda: 'MAICAO',
-                precio: producto.precio,
-                stock: producto.stock,
-                url_producto: producto.url_producto
-              }],
-              num_precios: 1
-            }
-          };
-        } else if (isDBSProduct) {
-          // Para DBS, necesitamos buscar el producto por ID
-          const productId = id.replace('dbs_', '');
-          const searchResponse = await axios.get(`/api/productos-dbs/`);
-          const productos = searchResponse.data.productos || [];
-          const producto = productos.find(p => p.id.toString() === productId);
-          
-          if (!producto) {
-            throw new Error('Producto no encontrado');
-          }
-          
-          // Adaptar el formato para que sea compatible con el resto del componente
-          response = {
-            data: {
-              id: producto.id,
-              nombre: producto.nombre,
-              marca: producto.marca || '',
-              categoria: producto.categoria,
-              precio: producto.precio,
-              stock: producto.stock,
-              url_producto: producto.url_producto,
-              imagen_url: producto.imagen_url,
-              descripcion: producto.descripcion || producto.nombre,
-              tienda: 'DBS',
-              tiendas_disponibles: ['DBS'],
-              tiendas_detalladas: [{
-                tienda: 'DBS',
-                precio: producto.precio,
-                stock: producto.stock,
-                url_producto: producto.url_producto
-              }],
-              num_precios: 1
-            }
-          };
+          // Usar los datos directamente del JSON unificado
+          setProduct({
+            product_id: foundProduct.product_id,
+            nombre: foundProduct.nombre,
+            marca: foundProduct.marca,
+            categoria: foundProduct.categoria,
+            imagen_url: foundProduct.imagen || foundProduct.tiendas?.[0]?.imagen,
+            precio_min: Math.min(...foundProduct.tiendas.map(t => parseFloat(t.precio))),
+            tiendasCount: foundProduct.tiendas.length,
+            tiendas_disponibles: foundProduct.tiendas.map(t => t.fuente.toUpperCase()),
+            tiendas: foundProduct.tiendas // Datos completos de tiendas
+          });
         } else {
-          // Fallback para IDs antiguos sin prefijo
-          response = await axios.get(`/api/productos-dbs/${id}/`);
+          message.error('Producto no encontrado');
         }
         
-        setProducto(response.data);
-        
-        // Obtener reseñas solo para productos DBS
-        if (isDBSProduct) {
-          const productId = id.replace('dbs_', '');
-          await fetchReviews(productId);
-        } else if (!isPreunicProduct && !isMaicaoProduct) {
-          // Fallback para IDs antiguos sin prefijo
-          await fetchReviews(id);
-        }
       } catch (error) {
-        console.error('Error fetching producto:', error);
+        console.error('Error loading product:', error);
         message.error('Error al cargar el producto');
       } finally {
         setLoading(false);
       }
     };
     
-    const fetchReviews = async (productId) => {
-      try {
-        setReviewsLoading(true);
-        const reviews = await productService.getProductReviews(productId);
-        setReviewsData(reviews);
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-        // No mostrar error al usuario ya que las reseñas son opcionales
-      } finally {
-        setReviewsLoading(false);
-      }
-    };
-
     if (id) {
-      fetchProducto();
+      fetchProduct();
     }
   }, [id]);
 
+
+
+  // Las reseñas se manejan directamente en el componente ProductReviews
+  // No necesitamos cargar reseñas aquí ya que el componente las maneja
+
   const getImageUrl = (imagenUrl) => {
-    if (!imagenUrl || imagenUrl === '') {
-      return '/image-not-found.png';
+    return resolveImageUrl({ imagen_url: imagenUrl });
+  };
+
+  const getStoreDisplayName = (tienda) => {
+    switch (tienda?.toUpperCase()) {
+      case 'DBS':
+        return '🛍️ DBS';
+      case 'PREUNIC':
+        return '🛒 Preunic';
+      case 'MAICAO':
+        return '💄 Maicao';
+      default:
+        return tienda || 'Tienda';
     }
-    
-    // Si la URL ya es completa (incluyendo Preunic), usarla directamente
-    if (imagenUrl.startsWith('http')) {
-      return imagenUrl;
-    }
-    
-    // Si es una ruta relativa, agregar el dominio de DBS
-    if (imagenUrl.startsWith('/')) {
-      return `https://dbs.cl${imagenUrl}`;
-    }
-    
-    return '/image-not-found.png';
   };
 
   const formatPrice = (price) => {
@@ -218,42 +104,51 @@ const DetalleProducto = () => {
     }).format(price);
   };
 
-  const calculateDiscount = (originalPrice, currentPrice) => {
-    if (!originalPrice || !currentPrice) return null;
-    const discount = ((originalPrice - currentPrice) / originalPrice) * 100;
-    return Math.round(discount);
+  const getStockColor = (stock) => {
+    if (!stock || typeof stock !== 'string') return '#fa8c16';
+    return stock.toLowerCase().includes('stock') ? '#52c41a' : '#fa8c16';
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
+      <div style={{ textAlign: 'center', padding: '50px', minHeight: '400px' }}>
         <Spin size="large" />
+        <br />
         <Text>Cargando producto...</Text>
       </div>
     );
   }
 
-  if (!producto) {
+  if (!product) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
+      <div style={{ textAlign: 'center', padding: '50px', minHeight: '400px' }}>
         <Text>Producto no encontrado</Text>
+        <br />
+        <Text type="secondary">ID buscado: {id}</Text>
+        <br />
+        <Button onClick={() => window.location.href = '/'}>
+          Volver al inicio
+        </Button>
       </div>
     );
   }
 
-  const breadcrumbItems = [
-    { title: 'Inicio', href: '/' },
-    { title: producto.categoria || 'Productos', href: '/productos' },
-    { title: producto.marca, href: `/productos?marca=${producto.marca}` },
-    { title: producto.nombre }
-  ];
+  const isMultiStore = product.tiendasCount > 1;
 
   return (
     <Layout className="detalle-producto-layout">
-      <Content className="detalle-producto-content">
+      <Content style={{ padding: '0', background: '#f5f5f5' }}>
+        <div className="detalle-producto-content">
         {/* Breadcrumbs */}
         <div className="breadcrumb-container">
-          <Breadcrumb items={breadcrumbItems} />
+            <Breadcrumb items={[
+              { title: 'Inicio', href: '/' },
+              { 
+                title: product.categoria || 'Productos', 
+                href: product.categoria ? `/categorias/${product.categoria.toLowerCase()}` : '/productos' 
+              },
+              { title: product.nombre }
+            ]} />
         </div>
 
         {/* Product Information Section */}
@@ -263,8 +158,8 @@ const DetalleProducto = () => {
             <Col xs={24} md={12}>
               <div className="product-image-container">
                 <img 
-                  src={getImageUrl(producto.imagen_url)} 
-                  alt={producto.nombre}
+                    src={getImageUrl(product.imagen_url)} 
+                    alt={product.nombre}
                   className="product-image"
                   onError={(e) => {
                     e.target.src = '/image-not-found.png';
@@ -276,25 +171,14 @@ const DetalleProducto = () => {
             {/* Product Details */}
             <Col xs={24} md={12}>
               <div className="product-details">
-                <div className="brand-name">
-                  {producto.marca}
-                  {producto.tienda && (
-                    <span style={{ 
-                      marginLeft: '10px', 
-                      fontSize: '12px', 
-                      backgroundColor: producto.tienda === 'PREUNIC' ? '#f6ffed' : '#e6f7ff',
-                      color: producto.tienda === 'PREUNIC' ? '#52c41a' : '#1890ff',
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontWeight: 'bold'
-                    }}>
-                      {producto.tienda === 'PREUNIC' ? '🛒 Preunic' : '🛍️ DBS'}
-                    </span>
+                  <Title level={2} className="product-name">{product.nombre}</Title>
+                  
+                  {/* Product Brand */}
+                  {product.marca && (
+                    <Text className="product-brand">{product.marca}</Text>
                   )}
-                </div>
-                <Title level={2} className="product-name">{producto.nombre}</Title>
-                
-                {/* Rating - Solo mostrar si hay reseñas reales */}
+                  
+                  {/* Rating */}
                 {reviewsData && reviewsData.total_resenas > 0 && (
                   <div className="rating-section">
                     <Rate 
@@ -311,77 +195,54 @@ const DetalleProducto = () => {
 
                 {/* Price Information */}
                 <div className="price-section">
+                    {isMultiStore ? (
+                      <>
                   <div className="price-info">
                     <Text className="price-label">Mejor precio</Text>
-                    <Text className="best-price">{formatPrice(producto.precio_min || producto.precio)}</Text>
+                          <Text className="best-price">{formatPrice(product.precio_min)}</Text>
                   </div>
-                  {producto.precio_max && producto.precio_max !== producto.precio_min && (
                     <div className="price-info">
-                      <Text className="price-label">Precio más alto</Text>
-                      <Text className="highest-price" delete>{formatPrice(producto.precio_max)}</Text>
+                          <Text className="price-label">Disponible en</Text>
+                          <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>
+                            {product.tiendasCount} {product.tiendasCount === 1 ? 'tienda' : 'tiendas'}
+                          </Text>
                     </div>
+                      </>
+                    ) : (
+                      <Text className="best-price">{formatPrice(product.precio_min)}</Text>
                   )}
                 </div>
 
                 {/* Product Description */}
                 <div className="description-section">
                   <Paragraph className="product-description">
-                    {producto.descripcion || `${producto.nombre} de ${producto.marca}. Producto de calidad disponible en las mejores tiendas.`}
+                      {isMultiStore 
+                        ? `${product.nombre}. Producto de calidad disponible en ${product.tiendasCount} ${product.tiendasCount === 1 ? 'tienda' : 'tiendas'}.`
+                        : `${product.nombre}. Producto de calidad de la marca ${product.marca || 'reconocida'}.`
+                      }
                   </Paragraph>
-                  <Button 
-                    type="link" 
-                    className="expand-description"
-                    onClick={() => setExpanded(!expanded)}
-                  >
-                    Ver más <ArrowDownOutlined style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                  </Button>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="action-buttons">
-                  {/* Solo mostrar alerta de precio para productos DBS */}
-                  {!id.startsWith('preunic_') && !id.startsWith('maicao_') && (
+                    <Space className="action-icons">
                     <Button 
-                      type="primary" 
-                      size="large" 
                       icon={<BellOutlined />}
+                        onClick={() => setModalVisible(true)}
                       className="alert-button"
-                      onClick={() => setModalVisible(true)}
-                    >
-                      Activar alerta de precio
+                      >
+                        Alerta de precio
                     </Button>
-                  )}
-                  
-                  {/* Para productos de Preunic, mostrar botón de ir a tienda */}
-                  {id.startsWith('preunic_') && producto.url_producto && (
-                    <Button 
-                      type="primary" 
-                      size="large" 
-                      className="store-button"
-                      onClick={() => window.open(producto.url_producto, '_blank')}
-                    >
-                      🛒 Ver en Preunic
-                    </Button>
-                  )}
-                  
-                  {/* Para productos de Maicao, mostrar botón de ir a tienda */}
-                  {id.startsWith('maicao_') && producto.url_producto && (
-                    <Button 
-                      type="primary" 
-                      size="large" 
-                      className="store-button"
-                      onClick={() => window.open(producto.url_producto, '_blank')}
-                    >
-                      💄 Ver en Maicao
-                    </Button>
-                  )}
-                  
-                  <Space className="action-icons">
                     <Button 
                       type="text" 
                       icon={<ShareAltOutlined />} 
                       className="share-button"
                     />
+                      <Button 
+                        type="text" 
+                        icon={<HeartOutlined />} 
+                        className="wishlist-button"
+                      />
                   </Space>
                 </div>
               </div>
@@ -389,27 +250,81 @@ const DetalleProducto = () => {
           </Row>
         </div>
 
-        {/* Price Comparison Section */}
-        <StoreComparison
-          offers={producto.tiendas_detalladas || []}
-          productName={producto.nombre}
-          loading={loading}
-          formatPrice={formatPrice}
-          calculateDiscount={calculateDiscount}
-        />
+          {/* Store Information Section */}
+          <section className="store-info-section">
+            {isMultiStore ? (
+              <>
+                <Title level={3}>
+                  Comparación de tiendas ({product.tiendas?.length || 0})
+                </Title>
+                <div className="comparacion" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {(product.tiendas || []).map((tienda, index) => (
+                    <Card key={index} className="store-info-card">
+                      <div className="store-row">
+                        <span className="store-name">
+                          {getStoreDisplayName(tienda.fuente)}
+                        </span>
+                        <span className="store-stock" style={{ color: getStockColor(tienda.stock) }}>
+                          {tienda.stock || 'Desconocido'}
+                        </span>
+                        <strong className="store-price">
+                          ${parseFloat(tienda.precio).toLocaleString("es-CL")}
+                        </strong>
+                        <a 
+                          href={tienda.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="store-button"
+                        >
+                          Ir a tienda
+                        </a>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <Title level={3}>Información de la tienda</Title>
+                <Card className="store-info-card">
+                  <div className="store-row">
+                    <span className="store-name">
+                      {getStoreDisplayName(product.tiendas?.[0]?.fuente)}
+                    </span>
+                    <span className="store-stock" style={{ color: getStockColor(product.tiendas?.[0]?.stock) }}>
+                      {product.tiendas?.[0]?.stock || 'Desconocido'}
+                    </span>
+                    <strong className="store-price">
+                      ${(product.precio_min || 0).toLocaleString("es-CL")}
+                    </strong>
+                    <a 
+                      href={product.tiendas?.[0]?.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="store-button"
+                    >
+                      Ir a tienda
+                    </a>
+                  </div>
+                </Card>
+              </>
+            )}
+          </section>
 
-        {/* Product Reviews Section - Solo para productos DBS */}
-        {!id.startsWith('preunic_') && !id.startsWith('maicao_') && <ProductReviews productId={id} />}
-      </Content>
-      
-      {/* Price Alert Modal - Solo para productos DBS */}
-      {!id.startsWith('preunic_') && !id.startsWith('maicao_') && (
+          {/* Product Reviews Section */}
+          {product && (
+            <ProductReviews productId={id} />
+          )}
+
+          {/* Price Alert Modal */}
         <PriceAlertModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
-          producto={producto}
+            producto={product}
         />
-      )}
+
+        </div>
+      </Content>
     </Layout>
   );
 };

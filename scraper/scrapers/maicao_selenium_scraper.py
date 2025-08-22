@@ -54,6 +54,10 @@ class MaicaoSeleniumScraper:
 
     def setup_driver(self, headless: bool):
         options = Options()
+        
+        # Modo incógnito para evitar cookies
+        options.add_argument('--incognito')
+        
         if headless:
             options.add_argument('--headless=new')
         
@@ -80,8 +84,21 @@ class MaicaoSeleniumScraper:
         
         self.driver = webdriver.Chrome(options=options)
         
+        # Limpiar cookies al inicio
+        self.driver.delete_all_cookies()
+        
         # Ocultar propiedades de webdriver
         self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        
+        # Configurar headers adicionales
+        self.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'DNT': '1',
+                'Sec-GPC': '1',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        })
 
     def _detect_total_pages(self, categoria_url: str) -> int:
         """Detecta el número total de páginas disponibles"""
@@ -600,8 +617,8 @@ def guardar_resultados_por_categoria_maicao(resultados, tienda_prefix="maicao"):
     """
     # Obtener la ruta absoluta desde el directorio del script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)
-    data_dir = os.path.join(project_root, "data")
+    project_root = os.path.dirname(os.path.dirname(script_dir))  # Subir dos niveles: scraper/scrapers -> scraper -> raíz
+    data_dir = os.path.join(project_root, "data", "raw")
     os.makedirs(data_dir, exist_ok=True)
     
     archivos_guardados = []
@@ -643,7 +660,7 @@ if __name__ == "__main__":
     print("Iniciando scraping de Maicao con archivos separados...")
     
     # Configuración
-    max_pages = 2  # Cambiar a None para scrapear todas las páginas
+    max_pages = 5  # Limitado a 5 páginas por categoría
     headless = True  # Cambiar a False si quieres ver el navegador
     
     if max_pages:

@@ -15,6 +15,20 @@
   overflow: hidden;
   border-radius: 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.carousel-slide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%);
+  z-index: 1;
 }
 
 .carousel-image {
@@ -36,7 +50,7 @@
   color: white;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-  z-index: 2;
+  z-index: 3;
   width: 80%;
   max-width: 600px;
 }

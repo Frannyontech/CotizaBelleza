@@ -32,13 +32,25 @@ const Navbar = () => {
   const storeMenu = (
     <Menu>
       <Menu.Item key="dbs">
-        <Link to="/productos-dbs">🛍️ DBS</Link>
+        <Link to="/productos-dbs">DBS</Link>
       </Menu.Item>
       <Menu.Item key="preunic">
-        <Link to="/productos-preunic">🛒 Preunic</Link>
+        <Link to="/productos-preunic">Preunic</Link>
       </Menu.Item>
       <Menu.Item key="maicao">
-        <Link to="/productos-maicao">💄 Maicao</Link>
+        <Link to="/productos-maicao">Maicao</Link>
+      </Menu.Item>
+    </Menu>
+  );
+
+  // Menú de categorías
+  const categoriesMenu = (
+    <Menu>
+      <Menu.Item key="maquillaje">
+        <Link to="/categorias/maquillaje">Maquillaje</Link>
+      </Menu.Item>
+      <Menu.Item key="skincare">
+        <Link to="/categorias/skincare">Skincare</Link>
       </Menu.Item>
     </Menu>
   );
@@ -85,12 +97,12 @@ const Navbar = () => {
         {/* Navigation Icons */}
         <div className="nav-icons">
           <Space size="large">
-            <Link to="/buscador" className="nav-icon-link">
-              <div className="nav-icon-item">
+            <Dropdown overlay={categoriesMenu} placement="bottomRight">
+              <div className="nav-icon-item nav-icon-link">
                 <AppstoreOutlined className="nav-icon" />
                 <span className="nav-label">Categorías</span>
               </div>
-            </Link>
+            </Dropdown>
             
             <Dropdown overlay={storeMenu} placement="bottomRight">
               <div className="nav-icon-item nav-icon-link">

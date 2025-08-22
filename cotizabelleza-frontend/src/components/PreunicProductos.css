@@ -8,7 +8,7 @@
 }
 
 .preunic-header {
-  background: var(--primary-gradient);
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
   color: white;
   padding: 24px;
   border-radius: var(--border-radius);
@@ -180,7 +180,11 @@
 .precio {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: #ff6b9d;
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .producto-stock .stock {
@@ -497,4 +501,110 @@
   .filtro-grupo {
     min-width: auto;
   }
+}
+
+/* Contador de resultados */
+.resultados-contador {
+  background: white;
+  padding: 20px 30px;
+  margin: 0;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.resultados-contador p {
+  margin: 0;
+  color: #718096;
+  font-weight: 500;
+}
+
+.pagination-info {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+/* Paginación */
+.pagination-container {
+  background: white;
+  padding: 30px;
+  margin: 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #e2e8f0;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #ff6b9d;
+  color: #ff6b9d;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  background: #f7fafc;
+  color: #a0aec0;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+}
+
+.pagination-numbers {
+  display: flex;
+  gap: 4px;
+  margin: 0 12px;
+}
+
+.pagination-number {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-number:hover {
+  border-color: #ff6b9d;
+  color: #ff6b9d;
+  transform: translateY(-1px);
+}
+
+.pagination-number.active {
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  border-color: #ff6b9d;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+}
+
+.pagination-summary {
+  text-align: center;
+  color: #718096;
+  font-weight: 500;
+  font-size: 0.9rem;
 }

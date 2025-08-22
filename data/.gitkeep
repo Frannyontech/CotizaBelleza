@@ -1,0 +1,4 @@
+# Este archivo mantiene la estructura de carpetas data/ en git
+# Los contenidos de data/ son ignorados por .gitignore pero la estructura se preserva
+
+

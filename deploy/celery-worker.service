@@ -1,0 +1,21 @@
+# Archivo systemd para Celery Worker
+# Ubicación: /etc/systemd/system/celery-worker.service
+
+[Unit]
+Description=Celery Worker Service - CotizaBelleza ETL
+After=network.target redis.service postgresql.service
+
+[Service]
+Type=forking
+User=www-data
+Group=www-data
+EnvironmentFile=/path/to/your/project/.env
+WorkingDirectory=/path/to/your/project
+ExecStart=/path/to/your/project/venv/bin/celery -A etl.celery_app:app worker --loglevel=info --detach --pidfile=/var/run/celery/worker.pid
+ExecStop=/bin/kill -s TERM $MAINPID
+PIDFile=/var/run/celery/worker.pid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
