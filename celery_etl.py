@@ -8,6 +8,8 @@ import os
 import sys
 import subprocess
 import argparse
+import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -60,6 +62,65 @@ def start_celery_worker():
         print("\n⏹️  Worker detenido")
     except Exception as e:
         print(f"❌ Error: {e}")
+
+def start_celery_beat():
+    """Iniciar beat Celery simplificado"""
+    print("⏰ Iniciando Celery Beat Simple...")
+    print("📅 Programador de tareas ETL")
+    print("=" * 40)
+    
+    cmd = [
+        sys.executable, '-m', 'celery',
+        '--app=etl.celery_app:app',
+        'beat',
+        '--loglevel=info'
+    ]
+    
+    try:
+        subprocess.run(cmd, check=True)
+    except KeyboardInterrupt:
+        print("\n⏹️  Beat detenido")
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
+def start_celery_services():
+    """Iniciar worker y beat juntos"""
+    print("🚀 Iniciando servicios de Celery (Worker + Beat)")
+    print("=" * 50)
+    print("📋 Servicios que se iniciarán:")
+    print("   • Celery Worker (procesa tareas)")
+    print("   • Celery Beat (programa tareas)")
+    print("=" * 50)
+    
+    def run_worker():
+        start_celery_worker()
+    
+    def run_beat():
+        start_celery_beat()
+    
+    # Crear threads para ejecutar ambos servicios
+    worker_thread = threading.Thread(target=run_worker, daemon=True)
+    beat_thread = threading.Thread(target=run_beat, daemon=True)
+    
+    try:
+        print("🔄 Iniciando Worker...")
+        worker_thread.start()
+        time.sleep(2)  # Pequeña pausa para que el worker se inicie
+        
+        print("🔄 Iniciando Beat...")
+        beat_thread.start()
+        
+        print("✅ Ambos servicios iniciados")
+        print("💡 Presiona Ctrl+C para detener ambos servicios")
+        print("=" * 50)
+        
+        # Mantener el script vivo
+        while True:
+            time.sleep(1)
+            
+    except KeyboardInterrupt:
+        print("\n⏹️  Deteniendo servicios...")
+        print("✅ Servicios detenidos")
 
 def run_celery_task(task_mode='dev'):
     """Ejecutar tarea ETL con Celery"""
@@ -174,7 +235,7 @@ def main():
     parser = argparse.ArgumentParser(description='ETL v2.0 Simplificado')
     parser.add_argument('command', choices=[
         'dev', 'prod', 'test', 'status',           # Ejecución directa
-        'worker',                                   # Celery worker
+        'worker', 'beat', 'services',              # Celery services
         'celery-dev', 'celery-prod', 'celery-status', # Tareas Celery
         'check',                                    # Estado del sistema
         'stop', 'kill',                            # Detener servicios
@@ -191,9 +252,13 @@ def main():
         success = run_etl_direct(args.command)
         sys.exit(0 if success else 1)
     
-    # Worker Celery
+    # Servicios Celery
     elif args.command == 'worker':
         start_celery_worker()
+    elif args.command == 'beat':
+        start_celery_beat()
+    elif args.command == 'services':
+        start_celery_services()
     
     # Tareas Celery
     elif args.command.startswith('celery-'):

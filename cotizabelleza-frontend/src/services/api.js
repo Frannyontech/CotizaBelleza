@@ -196,19 +196,8 @@ export const productService = {
   // Obtener reseñas de producto
   getProductReviews: async (productId) => {
     try {
-      // Primero, obtener el producto del servicio unificado para determinar la tienda correcta
-      const { unifiedProductsService } = await import('./unifiedApi');
-      const product = await unifiedProductsService.getProductById(productId);
-      
-      if (!product || !product.tiendas || product.tiendas.length === 0) {
-        throw new Error('Producto no encontrado o sin tiendas asociadas');
-      }
-      
-      // Usar la primera tienda disponible (la que tiene el precio más bajo)
-      const primaryStore = product.tiendas[0].fuente;
-      
-      // Construir la URL correcta basada en la tienda
-      const endpoint = `productos-${primaryStore}/${productId}/resenas/`;
+      // Usar la API general de reseñas (sistema de IDs persistentes)
+      const endpoint = `productos/${productId}/resenas/`;
       const response = await api.get(endpoint);
       return response.data;
     } catch (error) {
@@ -220,19 +209,8 @@ export const productService = {
   // Crear nueva reseña de producto
   createProductReview: async (reviewData) => {
     try {
-      // Primero, obtener el producto del servicio unificado para determinar la tienda correcta
-      const { unifiedProductsService } = await import('./unifiedApi');
-      const product = await unifiedProductsService.getProductById(reviewData.productId);
-      
-      if (!product || !product.tiendas || product.tiendas.length === 0) {
-        throw new Error('Producto no encontrado o sin tiendas asociadas');
-      }
-      
-      // Usar la primera tienda disponible (la que tiene el precio más bajo)
-      const primaryStore = product.tiendas[0].fuente;
-      
-      // Construir la URL correcta basada en la tienda
-      const endpoint = `productos-${primaryStore}/${reviewData.productId}/resenas/`;
+      // Usar la API general de reseñas (sistema de IDs persistentes)
+      const endpoint = `productos/${reviewData.productId}/resenas/`;
       const response = await api.post(endpoint, {
         valoracion: reviewData.rating,
         comentario: reviewData.comment,

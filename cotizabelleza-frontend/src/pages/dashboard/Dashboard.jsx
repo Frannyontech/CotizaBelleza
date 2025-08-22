@@ -38,52 +38,23 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
 
-  // Cargar productos unificados
+  // Cargar productos populares del dashboard
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        // Cargar productos unificados directamente desde el backend
-        const response = await fetch('http://localhost:8000/api/unified/');
+        // Cargar productos populares desde la API del dashboard
+        const response = await fetch('http://localhost:8000/api/dashboard/');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const unifiedData = await response.json();
-        const productos = unifiedData.productos || [];
+        const dashboardData = await response.json();
+        const productosPopulares = dashboardData.productos_populares || [];
         
-        // Función para seleccionar productos mixtos (priorizar multi-tienda)
-        const selectMixedProducts = (productos, count) => {
-          const multiStore = productos.filter(p => (p.tiendas || []).length > 1);
-          const singleStore = productos.filter(p => (p.tiendas || []).length === 1);
-          
-          const selected = [];
-          
-          // Agregar productos multi-tienda primero
-          selected.push(...multiStore.slice(0, Math.min(count, multiStore.length)));
-          
-          // Completar con productos de tienda única, balanceado
-          const remaining = count - selected.length;
-          if (remaining > 0) {
-            const dbsProducts = singleStore.filter(p => p.tiendas?.[0]?.fuente === 'dbs');
-            const maicaoProducts = singleStore.filter(p => p.tiendas?.[0]?.fuente === 'maicao');
-            const preunicProducts = singleStore.filter(p => p.tiendas?.[0]?.fuente === 'preunic');
-            
-            const perStore = Math.ceil(remaining / 3);
-            selected.push(...dbsProducts.slice(0, perStore));
-            selected.push(...maicaoProducts.slice(0, perStore));
-            selected.push(...preunicProducts.slice(0, perStore));
-          }
-          
-          return selected.slice(0, count);
-        };
-        
-        // Seleccionar 10 productos mixtos
-        const selectedProducts = selectMixedProducts(productos, 10);
-        
-        // Convertir productos a formato simple para dashboard
-        const dashboardProducts = selectedProducts.map(product => {
+        // Convertir productos populares a formato del dashboard
+        const dashboardProducts = productosPopulares.map(product => {
           const tiendas = product.tiendas || [];
           let precio_min = null;
           let imagen_url = '';
@@ -114,8 +85,8 @@ const Dashboard = () => {
             nombre: product.nombre || 'Sin nombre',
             marca: product.marca || '',
             categoria: product.categoria || '',
-            precio_min: precio_min || 0, // Default a 0 en lugar de null
-            imagen_url: imagen_url || '', // Default a string vacío
+            precio_min: precio_min || 0,
+            imagen_url: imagen_url || '',
             tiendas_disponibles: [...new Set(tiendas_disponibles)],
             tiendasCount: tiendas.length
           };
@@ -274,12 +245,12 @@ const Dashboard = () => {
       {/* Popular Products Section */}
       <div className="products-section">
         <div className="section-header">
-          <Title level={3}>Productos más populares ({filteredProducts.length})</Title>
+          <Title level={3}>Productos más populares ({products.length})</Title>
         </div>
 
         <div className="products-grid">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => (
+          {products.length > 0 ? (
+            products.map(product => (
               <div 
                 key={product.product_id}
                 className="product-card" 

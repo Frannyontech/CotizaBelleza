@@ -129,6 +129,17 @@ logs/*.log
 stats/*.json
 scraper/data/*.json
 
+# Archivos temporales y de prueba
+debug_*.py
+verificar_*.py
+test_*.py
+flujo_completo.py
+*_temp.py
+*_debug.py
+
+# Archivos de Celery
+celerybeat-schedule*
+
 # Archivos de configuración sensibles
 .env.local
 .env.production

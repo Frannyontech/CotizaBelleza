@@ -7,6 +7,7 @@ Corrige problemas de URL (usando slug y sku) y precios (solo normal y oferta)
 import requests
 import json
 import time
+import os
 from typing import List, Dict, Optional
 from datetime import datetime
 
@@ -177,13 +178,13 @@ class PreunicAlgoliaScraper:
             if not response_data:
                 print(f"❌ No se pudo obtener datos de la página {page + 1}")
                 break
-            
+                
             # Extraer productos de la respuesta
             results = response_data.get('results', [])
             if not results:
                 print(f"⚠️ No hay resultados en la página {page + 1}")
                 break
-            
+                
             # Procesar productos de esta página
             productos_pagina = results[0].get('hits', [])
             productos_nuevos = 0
@@ -251,7 +252,6 @@ class PreunicAlgoliaScraper:
         archivos_guardados = []
         
         # Crear directorio data/raw si no existe
-        import os
         raw_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "raw")
         os.makedirs(raw_dir, exist_ok=True)
         
@@ -277,7 +277,7 @@ class PreunicAlgoliaScraper:
             archivos_guardados.append(filepath)
         
         return archivos_guardados
-    
+
     def print_summary(self, productos_por_categoria: Dict[str, List[Dict]]):
         """Imprime resumen de la extracción"""
         print("\n" + "="*60)

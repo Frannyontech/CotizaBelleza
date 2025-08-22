@@ -66,8 +66,8 @@ class ETLConfig:
     
     # Configuración del processor
     processor_config: Dict = field(default_factory=lambda: {
-        "module": "processor.normalize",
-        "function": "main",
+        "module": "processor.persistent_processor",
+        "function": "procesar_etl_con_ids_persistentes",
         "output_file": "unified_products.json"
     })
     

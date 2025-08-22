@@ -151,25 +151,18 @@ class PersistentETLProcessor:
     
     def combinar_productos_por_tienda(self, todos_productos: List[Dict]) -> List[Dict]:
         """
-        Combina productos que son el mismo pero de diferentes tiendas
+        Combina productos que son el mismo pero de diferentes tiendas usando deduplicación avanzada
         """
-        productos_combinados = {}
+        # Usar el sistema de deduplicación avanzado
+        from core.services.deduplication import deduplicar_productos_avanzado
         
-        for producto in todos_productos:
-            # Generar clave única para el producto
-            nombre_norm = self.id_manager.normalizar_nombre(producto['nombre'])
-            marca_norm = self.id_manager.normalizar_marca(producto['marca'])
-            categoria_norm = self.id_manager.normalizar_categoria(producto['categoria'])
-            
-            clave = f"{nombre_norm}|{marca_norm}|{categoria_norm}"
-            
-            if clave in productos_combinados:
-                # Combinar tiendas del mismo producto
-                productos_combinados[clave]['tiendas'].extend(producto['tiendas'])
-            else:
-                productos_combinados[clave] = producto.copy()
+        print("Aplicando deduplicación avanzada por similitud...")
+        productos_deduplicados, estadisticas = deduplicar_productos_avanzado(todos_productos, umbral_similitud=0.75)
         
-        return list(productos_combinados.values())
+        print(f"Productos después de deduplicación: {len(productos_deduplicados)} (original: {len(todos_productos)})")
+        print(f"Duplicados eliminados: {estadisticas['duplicados_eliminados']}")
+        
+        return productos_deduplicados
     
     def procesar_todos_archivos_raw(self) -> List[Dict]:
         """
@@ -273,18 +266,107 @@ class PersistentETLProcessor:
     def guardar_json_compatible(self, productos: List[Dict], archivo_salida: Path):
         """
         Guarda JSON en formato compatible con sistema existente
+        Incluye TODOS los productos activos de la BD, no solo los del scraping actual
         """
-        # Crear estructura compatible (sin internal_id visible en el JSON público)
+        # Obtener TODOS los productos activos de la BD, incluyendo los que no aparecieron en este scraping
+        productos_bd_activos = self.obtener_todos_productos_activos()
+        
+        # Crear estructura compatible
         productos_compatibles = []
+        
+        # Agregar productos del scraping actual
         for producto in productos:
             producto_compatible = {k: v for k, v in producto.items() 
-                                 if k not in ['internal_id', 'es_nuevo', 'error']}
+                                 if k not in ['es_nuevo', 'error']}
+            # Cambiar internal_id por product_id para compatibilidad
+            if 'internal_id' in producto_compatible:
+                producto_compatible['product_id'] = producto_compatible.pop('internal_id')
             productos_compatibles.append(producto_compatible)
+        
+        # Agregar productos existentes que no aparecieron en este scraping pero tienen reseñas/alertas
+        productos_existentes = self.obtener_productos_con_resenas_o_alertas()
+        for producto_bd in productos_existentes:
+            # Verificar si ya está en la lista
+            ya_incluido = any(p.get('product_id') == producto_bd.internal_id for p in productos_compatibles)
+            
+            if not ya_incluido:
+                # Agregar producto existente con datos de la BD
+                producto_compatible = self.convertir_producto_bd_a_json(producto_bd)
+                productos_compatibles.append(producto_compatible)
         
         with open(archivo_salida, 'w', encoding='utf-8') as f:
             json.dump(productos_compatibles, f, ensure_ascii=False, indent=2)
         
         print(f"Guardado JSON compatible: {archivo_salida}")
+        print(f"  - Productos del scraping: {len(productos)}")
+        print(f"  - Productos existentes preservados: {len(productos_compatibles) - len(productos)}")
+        print(f"  - Total productos en JSON: {len(productos_compatibles)}")
+    
+    def obtener_todos_productos_activos(self) -> List[ProductoPersistente]:
+        """
+        Obtiene todos los productos activos de la BD
+        """
+        return list(ProductoPersistente.objects.filter(activo=True))
+    
+    def obtener_productos_con_resenas_o_alertas(self) -> List[ProductoPersistente]:
+        """
+        Obtiene productos que tienen reseñas o alertas, aunque no aparezcan en el scraping actual
+        """
+        from core.models import ResenaProductoPersistente, AlertaPrecioProductoPersistente
+        
+        # Productos con reseñas
+        productos_con_resenas = ProductoPersistente.objects.filter(
+            resenas__isnull=False
+        ).distinct()
+        
+        # Productos con alertas
+        productos_con_alertas = ProductoPersistente.objects.filter(
+            alertas_precio__isnull=False
+        ).distinct()
+        
+        # Combinar y eliminar duplicados
+        todos_productos = list(productos_con_resenas) + list(productos_con_alertas)
+        productos_unicos = list({p.internal_id: p for p in todos_productos}.values())
+        
+        print(f"Productos con reseñas encontrados: {productos_con_resenas.count()}")
+        print(f"Productos con alertas encontrados: {productos_con_alertas.count()}")
+        print(f"Total productos a preservar: {len(productos_unicos)}")
+        
+        return productos_unicos
+    
+    def convertir_producto_bd_a_json(self, producto_bd: ProductoPersistente) -> Dict:
+        """
+        Convierte un producto de la BD al formato JSON compatible
+        """
+        # Obtener el precio más reciente
+        precio_reciente = PrecioHistorico.objects.filter(
+            producto=producto_bd
+        ).order_by('-fecha_scraping').first()
+        
+        producto_json = {
+            'product_id': producto_bd.internal_id,
+            'nombre': producto_bd.nombre_original,
+            'marca': producto_bd.marca,
+            'categoria': producto_bd.categoria,
+            'tiendas': []
+        }
+        
+        if precio_reciente:
+            tienda_data = {
+                'fuente': precio_reciente.tienda,
+                'precio': float(precio_reciente.precio),
+                'stock': 'In stock' if precio_reciente.stock else 'Out of stock',
+                'url': precio_reciente.url_producto or '',
+                'imagen': precio_reciente.imagen_url or '',
+                'marca_origen': producto_bd.marca
+            }
+            
+            if precio_reciente.precio_original:
+                tienda_data['precio_normal'] = float(precio_reciente.precio_original)
+            
+            producto_json['tiendas'].append(tienda_data)
+        
+        return producto_json
     
     def imprimir_resumen(self, resultado: Dict):
         """

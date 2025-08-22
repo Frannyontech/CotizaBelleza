@@ -54,6 +54,46 @@ class DashboardAPIView(APIView):
             categorias_disponibles = [{"id": i+1, "nombre": nombre, "cantidad_productos": count} 
                                      for i, (nombre, count) in enumerate(categorias.items())]
             
+            # Seleccionar productos populares balanceados por tienda
+            def seleccionar_productos_balanceados(productos, count=10):
+                # Agrupar productos por tienda
+                productos_por_tienda = {}
+                productos_multi_tienda = []
+                
+                for producto in productos:
+                    tiendas_producto = producto.get('tiendas', [])
+                    if len(tiendas_producto) > 1:
+                        productos_multi_tienda.append(producto)
+                    else:
+                        for tienda in tiendas_producto:
+                            fuente = tienda.get('fuente', 'unknown').lower()
+                            if fuente not in productos_por_tienda:
+                                productos_por_tienda[fuente] = []
+                            productos_por_tienda[fuente].append(producto)
+                
+                # Seleccionar productos balanceados
+                seleccionados = []
+                
+                # 1. Agregar productos multi-tienda (prioridad alta)
+                seleccionados.extend(productos_multi_tienda[:3])
+                
+                # 2. Agregar productos de cada tienda de forma balanceada
+                tiendas_disponibles = list(productos_por_tienda.keys())
+                productos_restantes = count - len(seleccionados)
+                
+                if tiendas_disponibles:
+                    productos_por_tienda_cantidad = productos_restantes // len(tiendas_disponibles)
+                    productos_extra = productos_restantes % len(tiendas_disponibles)
+                    
+                    for i, tienda in enumerate(tiendas_disponibles):
+                        productos_tienda = productos_por_tienda[tienda]
+                        cantidad = productos_por_tienda_cantidad + (1 if i < productos_extra else 0)
+                        seleccionados.extend(productos_tienda[:cantidad])
+                
+                return seleccionados[:count]
+            
+            productos_populares = seleccionar_productos_balanceados(productos, 10)
+            
             return Response({
                 "estadisticas": {
                     "total_productos": len(productos),
@@ -62,7 +102,7 @@ class DashboardAPIView(APIView):
                     "total_tiendas": len(tiendas),
                     "multi_store_products": multi_store
                 },
-                "productos_populares": productos[:8],
+                "productos_populares": productos_populares,
                 "productos_por_categoria": [{"nombre": k, "cantidad_productos": v} for k, v in categorias.items()],
                 "tiendas_disponibles": tiendas_disponibles,
                 "categorias_disponibles": categorias_disponibles
@@ -114,21 +154,40 @@ class TiendaProductosAPIView(APIView):
 
 
 
-# Almacén temporal de reseñas en memoria (se pierde al reiniciar Django)
-RESENAS_TEMP = {}
-
 class ProductoResenasAPIView(APIView):
-    """Vista para reseñas de productos usando almacén temporal"""
+    """Vista para reseñas de productos usando sistema de IDs persistentes"""
     permission_classes = [AllowAny]
     
     def get(self, request, producto_id, **kwargs):
         try:
-            global RESENAS_TEMP
-            tienda_nombre = kwargs.get('tienda_nombre', 'general')
-            key = f"{tienda_nombre}_{producto_id}"
+            from core.models import ProductoPersistente, ResenaProductoPersistente
             
-            # Obtener reseñas existentes para este producto
-            resenas_producto = RESENAS_TEMP.get(key, [])
+            # Buscar el producto por internal_id
+            producto = ProductoPersistente.objects.filter(internal_id=producto_id).first()
+            
+            if not producto:
+                return Response(
+                    {"error": f"Producto no encontrado: {producto_id}"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Obtener reseñas de la base de datos
+            resenas_db = ResenaProductoPersistente.objects.filter(producto=producto).order_by('-fecha_creacion')
+            
+            # Convertir a formato esperado por el frontend
+            resenas_producto = []
+            for resena in resenas_db:
+                resenas_producto.append({
+                    "id": resena.id,
+                    "autor": resena.nombre_autor or resena.usuario.username if resena.usuario else "Usuario Anónimo",
+                    "nombre_autor": resena.nombre_autor or resena.usuario.username if resena.usuario else "Usuario Anónimo",
+                    "valoracion": resena.valoracion,
+                    "comentario": resena.comentario,
+                    "fecha": resena.fecha_creacion.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "fecha_creacion": resena.fecha_creacion.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "producto_id": producto_id,
+                    "tienda": "GENERAL"
+                })
             
             # Calcular promedio de valoración
             promedio = 0
@@ -151,39 +210,60 @@ class ProductoResenasAPIView(APIView):
     
     def post(self, request, producto_id, **kwargs):
         try:
-            global RESENAS_TEMP
-            from datetime import datetime
+            from core.models import ProductoPersistente, ResenaProductoPersistente
+            from django.contrib.auth.models import User
             
-            tienda_nombre = kwargs.get('tienda_nombre', 'general')
-            key = f"{tienda_nombre}_{producto_id}"
+            # Buscar el producto por internal_id
+            producto = ProductoPersistente.objects.filter(internal_id=producto_id).first()
             
-            # Obtener datos de la reseña (adaptando campos para el frontend)
+            if not producto:
+                return Response(
+                    {"error": f"Producto no encontrado: {producto_id}"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Obtener o crear usuario (para reseñas anónimas)
             author_name = request.data.get('author') or request.data.get('autor', 'Usuario Anónimo')
             if not author_name or author_name.strip() == '':
                 author_name = 'Usuario Anónimo'
-                
-            nueva_resena = {
-                "id": len(RESENAS_TEMP.get(key, [])) + 1,
+            
+            # Buscar usuario existente o crear uno temporal
+            usuario, created = User.objects.get_or_create(
+                username=author_name,
+                defaults={
+                    'email': f'{author_name.lower().replace(" ", "_")}@anonimo.com',
+                    'first_name': author_name,
+                    'is_active': True
+                }
+            )
+            
+            # Crear la reseña en la base de datos
+            nueva_resena = ResenaProductoPersistente.objects.create(
+                producto=producto,
+                usuario=usuario,
+                valoracion=int(request.data.get('rating') or request.data.get('valoracion', 5)),
+                comentario=request.data.get('comment') or request.data.get('comentario', ''),
+                nombre_autor=author_name,
+                verificada=True
+            )
+            
+            # Convertir a formato esperado por el frontend
+            resena_response = {
+                "id": nueva_resena.id,
                 "autor": author_name,
-                "nombre_autor": author_name,  # Campo que busca el frontend
-                "valoracion": int(request.data.get('rating') or request.data.get('valoracion', 5)),
-                "comentario": request.data.get('comment') or request.data.get('comentario', ''),
-                "fecha": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-                "fecha_creacion": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),  # Campo que busca el frontend
+                "nombre_autor": author_name,
+                "valoracion": nueva_resena.valoracion,
+                "comentario": nueva_resena.comentario,
+                "fecha": nueva_resena.fecha_creacion.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "fecha_creacion": nueva_resena.fecha_creacion.strftime('%Y-%m-%dT%H:%M:%SZ'),
                 "producto_id": producto_id,
-                "tienda": tienda_nombre.upper()
+                "tienda": "GENERAL"
             }
-            
-            # Guardar en memoria temporal
-            if key not in RESENAS_TEMP:
-                RESENAS_TEMP[key] = []
-            
-            RESENAS_TEMP[key].append(nueva_resena)
             
             return Response({
                 "success": True,
                 "message": "¡Reseña guardada correctamente!",
-                "resena": nueva_resena
+                "resena": resena_response
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:

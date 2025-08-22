@@ -50,7 +50,12 @@ class PersistentIdManager:
         palabras = nombre_limpio.split()
         palabras_filtradas = [p for p in palabras if p not in palabras_ignorar]
         
-        return ' '.join(palabras_filtradas)
+        # Eliminar variantes de color al final (después del guión)
+        nombre_sin_color = ' '.join(palabras_filtradas)
+        if ' - ' in nombre_sin_color:
+            nombre_sin_color = nombre_sin_color.split(' - ')[0]
+        
+        return nombre_sin_color
     
     @staticmethod
     def normalizar_marca(marca: str) -> str:
@@ -139,7 +144,7 @@ class PersistentIdManager:
             self.productos_actualizados.append(producto)
             return producto, False
         
-        # Buscar en base de datos
+        # Buscar en base de datos por hash exacto
         try:
             producto = ProductoPersistente.objects.get(hash_unico=hash_unico)
             self.productos_cache[hash_unico] = producto
@@ -148,7 +153,17 @@ class PersistentIdManager:
             return producto, False
             
         except ProductoPersistente.DoesNotExist:
-            # Crear nuevo producto
+            # Buscar por similitud antes de crear nuevo producto
+            producto_similar = self.buscar_producto_similar(nombre_normalizado, marca_normalizada, categoria_normalizada)
+            
+            if producto_similar:
+                # Usar el producto similar encontrado
+                self.productos_cache[hash_unico] = producto_similar
+                producto_similar.actualizar_aparicion()
+                self.productos_actualizados.append(producto_similar)
+                return producto_similar, False
+            
+            # Crear nuevo producto si no se encontró similar
             producto = self.crear_nuevo_producto(
                 nombre_normalizado=nombre_normalizado,
                 marca_normalizada=marca_normalizada,
@@ -160,6 +175,54 @@ class PersistentIdManager:
             self.productos_cache[hash_unico] = producto
             self.nuevos_productos.append(producto)
             return producto, True
+    
+    def buscar_producto_similar(self, nombre_normalizado: str, marca_normalizada: str, categoria_normalizada: str) -> Optional[ProductoPersistente]:
+        """
+        Busca un producto similar basado en similitud de nombre, marca y categoría
+        
+        Args:
+            nombre_normalizado: Nombre normalizado del producto
+            marca_normalizada: Marca normalizada
+            categoria_normalizada: Categoría normalizada
+            
+        Returns:
+            ProductoPersistente si se encuentra uno similar, None en caso contrario
+        """
+        from difflib import SequenceMatcher
+        
+        # Buscar productos con la misma marca y categoría
+        productos_candidatos = ProductoPersistente.objects.filter(
+            marca=marca_normalizada,
+            categoria=categoria_normalizada
+        )
+        
+        mejor_similitud = 0.8  # Umbral mínimo de similitud
+        mejor_producto = None
+        productos_similares = []
+        
+        for producto in productos_candidatos:
+            # Calcular similitud entre nombres normalizados
+            similitud = SequenceMatcher(None, nombre_normalizado, producto.nombre_normalizado).ratio()
+            
+            # Si la similitud es alta, considerar este producto
+            if similitud > mejor_similitud:
+                productos_similares.append((producto, similitud))
+        
+        if not productos_similares:
+            return None
+        
+        # Ordenar por similitud (mayor primero)
+        productos_similares.sort(key=lambda x: x[1], reverse=True)
+        
+        # Priorizar productos con reseñas
+        productos_con_resenas = [(p, s) for p, s in productos_similares if p.resenas.count() > 0]
+        
+        if productos_con_resenas:
+            # Si hay productos con reseñas, usar el más similar
+            return productos_con_resenas[0][0]
+        else:
+            # Si no hay productos con reseñas, usar el más similar
+            return productos_similares[0][0]
     
     def crear_nuevo_producto(self, nombre_normalizado: str, marca_normalizada: str, 
                            categoria_normalizada: str, hash_unico: str, 
@@ -195,27 +258,48 @@ class PersistentIdManager:
         precio = precio_data.get('precio', 0)
         precio_original = precio_data.get('precio_normal') or precio_data.get('precio_original')
         tiene_descuento = bool(precio_original and precio_original > precio)
+        tienda = precio_data.get('fuente', 'desconocida')
         
-        precio_historico = PrecioHistorico.objects.create(
+        # Verificar si ya existe un precio para este producto, tienda y fecha
+        precio_existente = PrecioHistorico.objects.filter(
             producto=producto,
-            tienda=precio_data.get('fuente', 'desconocida'),
-            precio=precio,
-            precio_original=precio_original,
-            tiene_descuento=tiene_descuento,
-            stock=precio_data.get('stock', 'in stock').lower() == 'in stock',
-            disponible=True,
-            url_producto=precio_data.get('url', ''),
-            imagen_url=precio_data.get('imagen', ''),
-            fecha_scraping=fecha_scraping,
-            fuente_scraping=f"etl_{fecha_scraping.strftime('%Y_%m_%d')}"
-        )
+            tienda=tienda,
+            fecha_scraping__date=fecha_scraping.date()
+        ).first()
         
-        return precio_historico
+        if precio_existente:
+            # Actualizar precio existente
+            precio_existente.precio = precio
+            precio_existente.precio_original = precio_original
+            precio_existente.tiene_descuento = tiene_descuento
+            precio_existente.stock = precio_data.get('stock', 'in stock').lower() == 'in stock'
+            precio_existente.disponible = True
+            precio_existente.url_producto = precio_data.get('url', '')
+            precio_existente.imagen_url = precio_data.get('imagen', '')
+            precio_existente.save()
+            return precio_existente
+        else:
+            # Crear nuevo precio
+            precio_historico = PrecioHistorico.objects.create(
+                producto=producto,
+                tienda=tienda,
+                precio=precio,
+                precio_original=precio_original,
+                tiene_descuento=tiene_descuento,
+                stock=precio_data.get('stock', 'in stock').lower() == 'in stock',
+                disponible=True,
+                url_producto=precio_data.get('url', ''),
+                imagen_url=precio_data.get('imagen', ''),
+                fecha_scraping=fecha_scraping,
+                fuente_scraping=f"etl_{fecha_scraping.strftime('%Y_%m_%d')}"
+            )
+            return precio_historico
     
     def procesar_productos_json(self, productos_json: List[Dict], 
                               fecha_scraping: Optional[datetime] = None) -> Dict:
         """
         Procesa una lista de productos del JSON unificado y asigna IDs persistentes
+        PRESERVA productos existentes con reseñas/alertas
         
         Args:
             productos_json: Lista de productos del JSON
@@ -233,14 +317,23 @@ class PersistentIdManager:
             'productos_nuevos': 0,
             'productos_actualizados': 0,
             'precios_agregados': 0,
+            'productos_preservados': 0,
             'errores': []
         }
+        
+        # Obtener productos que deben preservarse (con reseñas o alertas)
+        productos_a_preservar = self.obtener_productos_con_resenas_o_alertas()
+        print(f"Productos con reseñas/alertas que se preservarán: {len(productos_a_preservar)}")
+        
+        # Marcar productos encontrados en este scraping
+        productos_encontrados = set()
         
         for producto_data in productos_json:
             try:
                 with transaction.atomic():
                     # Buscar o crear producto
                     producto, es_nuevo = self.buscar_o_crear_producto(producto_data)
+                    productos_encontrados.add(producto.internal_id)
                     
                     # Procesar precios por tienda
                     tiendas = producto_data.get('tiendas', [])
@@ -261,10 +354,55 @@ class PersistentIdManager:
                 estadisticas['errores'].append(error_msg)
                 print(f"Error: {error_msg}")
         
+        # Preservar productos con reseñas/alertas que no aparecieron en este scraping
+        productos_preservados = self.preservar_productos_con_resenas_alertas(productos_encontrados)
+        estadisticas['productos_preservados'] = productos_preservados
+        
         # Actualizar estadísticas de productos afectados
         self.actualizar_estadisticas_productos()
         
         return estadisticas
+    
+    def obtener_productos_con_resenas_o_alertas(self) -> List[ProductoPersistente]:
+        """
+        Obtiene productos que tienen reseñas o alertas
+        """
+        from core.models import ResenaProductoPersistente, AlertaPrecioProductoPersistente
+        
+        # Productos con reseñas
+        productos_con_resenas = ProductoPersistente.objects.filter(
+            resenas__isnull=False
+        ).distinct()
+        
+        # Productos con alertas
+        productos_con_alertas = ProductoPersistente.objects.filter(
+            alertas_precio__isnull=False
+        ).distinct()
+        
+        # Combinar y eliminar duplicados
+        todos_productos = list(productos_con_resenas) + list(productos_con_alertas)
+        productos_unicos = list({p.internal_id: p for p in todos_productos}.values())
+        
+        return productos_unicos
+    
+    def preservar_productos_con_resenas_alertas(self, productos_encontrados: set) -> int:
+        """
+        Preserva productos con reseñas/alertas que no aparecieron en el scraping actual
+        """
+        productos_a_preservar = self.obtener_productos_con_resenas_o_alertas()
+        productos_preservados = 0
+        
+        for producto in productos_a_preservar:
+            if producto.internal_id not in productos_encontrados:
+                # Reactivar producto si estaba desactivado
+                if not producto.activo:
+                    producto.activo = True
+                    producto.ultima_actualizacion = timezone.now()
+                    producto.save()
+                    productos_preservados += 1
+                    print(f"Producto preservado: {producto.internal_id} - {producto.nombre_original}")
+        
+        return productos_preservados
     
     def actualizar_estadisticas_productos(self):
         """

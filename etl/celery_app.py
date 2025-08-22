@@ -45,7 +45,7 @@ app.conf.beat_schedule = {
         "task": "etl.tasks.celery_tasks.run_etl_task",
         "schedule": crontab(
             minute=int(os.getenv('ETL_SCHEDULE_MINUTE', '45')), 
-            hour=int(os.getenv('ETL_SCHEDULE_HOUR', '19'))
+            hour=int(os.getenv('ETL_SCHEDULE_HOUR', '20'))
         ),  # Programado vía variables de entorno
         "args": ("prod",),
     },

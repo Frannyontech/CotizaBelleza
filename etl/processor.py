@@ -115,12 +115,11 @@ class ProcessorOrchestrator:
                 # Configurar argumentos para el processor
                 output_path = str(self.config.unified_products_path)
                 
-                # Configurar sys.argv para el processor
+                # Configurar sys.argv para el processor (solo si es necesario)
                 old_argv = sys.argv.copy()
-                sys.argv = [
-                    'normalize.py',
-                    '--out', output_path
-                ]
+                
+                # El processor de IDs persistentes no usa argumentos de línea de comandos
+                # así que no necesitamos configurar sys.argv
                 
                 self.logger.info(f"[PROCESANDO] Ejecutando processor con salida: {output_path}")
                 
@@ -131,7 +130,7 @@ class ProcessorOrchestrator:
                 sys.argv = old_argv
                 
                 # Verificar resultado
-                if result == 0 or result is None:
+                if result == 0 or result is None or (isinstance(result, dict) and result.get('exito', False)):
                     # Verificar que se generó el archivo
                     if self.config.unified_products_path.exists():
                         file_size = self.config.unified_products_path.stat().st_size

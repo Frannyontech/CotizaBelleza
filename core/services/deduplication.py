@@ -28,8 +28,8 @@ class AdvancedDeduplicator:
     """
     
     def __init__(self):
-        self.umbral_similitud = 0.85  # Umbral para considerar productos similares
-        self.umbral_nombre = 0.80     # Umbral específico para nombres
+        self.umbral_similitud = 0.75  # Umbral para considerar productos similares
+        self.umbral_nombre = 0.70     # Umbral específico para nombres
         self.productos_procesados = []
         self.duplicados_encontrados = []
         self.estadisticas = {
@@ -66,6 +66,72 @@ class AdvancedDeduplicator:
         
         return ' '.join(palabras_filtradas)
     
+    def extraer_tamanio_producto(self, texto: str) -> str:
+        """
+        Extrae el tamaño del producto (ml, gr, etc.) para normalización
+        """
+        if not texto:
+            return ""
+        
+        # Patrones para detectar tamaños
+        patrones_tamanio = [
+            r'(\d+)\s*ml',  # 500ml, 100 ml
+            r'(\d+)\s*gr',  # 50gr, 100 gr
+            r'(\d+)\s*gramos',  # 50 gramos
+            r'(\d+)\s*mililitros',  # 500 mililitros
+            r'(\d+)\s*und',  # 25 und
+            r'(\d+)\s*unidades',  # 25 unidades
+        ]
+        
+        for patron in patrones_tamanio:
+            match = re.search(patron, texto.lower())
+            if match:
+                return match.group(1)
+        
+        return ""
+    
+    def normalizar_nombre_sin_tamanio(self, texto: str) -> str:
+        """
+        Normaliza el nombre eliminando información de tamaño
+        """
+        if not texto:
+            return ""
+        
+        # Convertir a minúsculas
+        texto = texto.lower()
+        
+        # Eliminar patrones de tamaño
+        patrones_eliminar = [
+            r'\d+\s*ml\b',
+            r'\d+\s*gr\b', 
+            r'\d+\s*gramos\b',
+            r'\d+\s*mililitros\b',
+            r'\d+\s*und\b',
+            r'\d+\s*unidades\b',
+            r'\d+\s*pack\b',
+            r'\d+\s*x\b',
+        ]
+        
+        for patron in patrones_eliminar:
+            texto = re.sub(patron, '', texto)
+        
+        # Eliminar caracteres especiales pero mantener números y letras
+        texto = re.sub(r'[^\w\s]', ' ', texto)
+        
+        # Normalizar espacios
+        texto = ' '.join(texto.split())
+        
+        # Eliminar palabras comunes que añaden ruido
+        palabras_ruido = {
+            'ml', 'gr', 'gramos', 'mililitros', 'und', 'unidades', 'pack',
+            'x', 'de', 'del', 'la', 'el', 'para', 'con', 'sin', 'y'
+        }
+        
+        palabras = texto.split()
+        palabras_filtradas = [p for p in palabras if p not in palabras_ruido]
+        
+        return ' '.join(palabras_filtradas)
+    
     def calcular_similitud_nombre(self, nombre1: str, nombre2: str) -> float:
         """
         Calcula similitud entre nombres usando múltiples métricas
@@ -73,9 +139,9 @@ class AdvancedDeduplicator:
         if not nombre1 or not nombre2:
             return 0.0
         
-        # Normalizar nombres
-        norm1 = self.normalizar_texto_avanzado(nombre1)
-        norm2 = self.normalizar_texto_avanzado(nombre2)
+        # Normalizar nombres sin tamaño
+        norm1 = self.normalizar_nombre_sin_tamanio(nombre1)
+        norm2 = self.normalizar_nombre_sin_tamanio(nombre2)
         
         if norm1 == norm2:
             return 1.0
