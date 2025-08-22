@@ -37,6 +37,8 @@ const Dashboard = () => {
   const [selectedStore, setSelectedStore] = useState('Todas');
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [categoriasDisponibles, setCategoriasDisponibles] = useState([]);
+  const [tiendasDisponibles, setTiendasDisponibles] = useState([]);
 
   // Cargar productos populares del dashboard
   useEffect(() => {
@@ -94,6 +96,14 @@ const Dashboard = () => {
         
         setProducts(dashboardProducts);
         
+        // Guardar categorías y tiendas disponibles del dashboard
+        const categoriasDisponibles = dashboardData.categorias_disponibles || [];
+        const tiendasDisponibles = dashboardData.tiendas_disponibles || [];
+        
+        // Actualizar las listas de filtros con datos del servidor
+        setCategoriasDisponibles(categoriasDisponibles.map(cat => cat.nombre));
+        setTiendasDisponibles(tiendasDisponibles.map(tienda => tienda.nombre));
+        
       } catch (error) {
         console.error('❌ Error loading dashboard data:', error);
         message.error('Error al cargar los datos del dashboard');
@@ -114,9 +124,13 @@ const Dashboard = () => {
     }).format(price);
   };
 
-  // Extraer categorías y tiendas disponibles
-  const categorias_unicas = [...new Set(products.map(product => product.categoria).filter(cat => cat))];
-  const tiendas_unicas = [...new Set(products.flatMap(product => product.tiendas_disponibles || []))];
+  // Usar categorías y tiendas del servidor, con fallback a las de productos
+  const categorias_unicas = categoriasDisponibles.length > 0 
+    ? categoriasDisponibles 
+    : [...new Set(products.map(product => product.categoria).filter(cat => cat))];
+  const tiendas_unicas = tiendasDisponibles.length > 0 
+    ? tiendasDisponibles 
+    : [...new Set(products.flatMap(product => product.tiendas_disponibles || []))];
   
   const categoriesList = ['Todos', ...categorias_unicas];
   const storesList = ['Todas', ...tiendas_unicas];
