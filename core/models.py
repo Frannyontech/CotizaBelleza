@@ -534,45 +534,98 @@ class ResenaProductoPersistente(models.Model):
 
 
 class AlertaPrecioProductoPersistente(models.Model):
-    """
-    Alertas de precio vinculadas a productos persistentes
-    """
-    
-    # Relación con producto persistente
-    producto = models.ForeignKey(
-        ProductoPersistente, 
-        on_delete=models.CASCADE, 
-        related_name='alertas_precio'
-    )
-    
-    # Configuración de alerta
-    email = models.EmailField(max_length=255)
-    precio_objetivo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    tienda_especifica = models.CharField(max_length=100, blank=True, null=True)  # opcional
-    
-    # Estado
+    """Alerta de precio para un producto específico"""
+    producto = models.ForeignKey(ProductoPersistente, on_delete=models.CASCADE, related_name='alertas_precio')
+    email = models.EmailField(max_length=255)  # Email del usuario (requerido)
+    precio_inicial = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Precio al crear alerta
     activa = models.BooleanField(default=True)
+    notificada = models.BooleanField(default=False)  # Para evitar duplicados
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_ultima_notificacion = models.DateTimeField(blank=True, null=True)
-    
-    # Configuración de notificaciones
-    frecuencia_max_horas = models.PositiveIntegerField(default=24)  # máximo una vez por día
-    notificaciones_enviadas = models.PositiveIntegerField(default=0)
+    fecha_activacion = models.DateTimeField(auto_now_add=True)  # Fecha cuando se activa la alerta
+    fecha_fin = models.DateTimeField(null=True, blank=True)  # 1 semana después
+    fecha_ultima_notificacion = models.DateTimeField(null=True, blank=True)
+    ultima_revision = models.DateTimeField(null=True, blank=True)
+    notificaciones_enviadas = models.IntegerField(default=0)
     
     class Meta:
-        verbose_name = "Alerta de Precio Persistente"
-        verbose_name_plural = "Alertas de Precios Persistentes"
-        unique_together = ['producto', 'email']
-        ordering = ['-fecha_creacion']
-        indexes = [
-            models.Index(fields=['activa', 'fecha_ultima_notificacion']),
-            models.Index(fields=['producto', 'activa']),
-        ]
+        unique_together = ['producto', 'email']  # Una alerta por producto por email
+        verbose_name = 'Alerta de Precio'
+        verbose_name_plural = 'Alertas de Precio'
+    
+    def save(self, *args, **kwargs):
+        if not self.fecha_fin:
+            # Calcular fecha de fin (1 semana después)
+            from django.utils import timezone
+            from datetime import timedelta
+            self.fecha_fin = timezone.now() + timedelta(days=7)
+        super().save(*args, **kwargs)
     
     def __str__(self):
-        precio_txt = f" <= ${self.precio_objetivo}" if self.precio_objetivo else ""
-        tienda_txt = f" en {self.tienda_especifica}" if self.tienda_especifica else ""
-        return f"Alerta de {self.email}: {self.producto.nombre_original}{precio_txt}{tienda_txt}"
+        return f"Alerta {self.id}: {self.producto.nombre_original} - ${self.precio_inicial}"
+    
+    def get_user_email(self):
+        """Obtener email del usuario"""
+        return self.email
+    
+    def esta_activa(self):
+        """Verifica si la alerta está dentro del período de 1 semana"""
+        from django.utils import timezone
+        return self.activa and timezone.now() <= self.fecha_fin
+    
+    def dias_restantes(self):
+        """Calcula días restantes de la alerta"""
+        from django.utils import timezone
+        if self.fecha_fin:
+            delta = self.fecha_fin - timezone.now()
+            return max(0, delta.days)
+        return 0
+
+
+class MailLog(models.Model):
+    """Registro de emails enviados"""
+    STATUS_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('sent', 'Enviado'),
+        ('failed', 'Fallido'),
+        ('cancelled', 'Cancelado'),
+    ]
+    
+    alerta = models.ForeignKey(AlertaPrecioProductoPersistente, on_delete=models.CASCADE, related_name='mail_logs')
+    producto = models.ForeignKey(ProductoPersistente, on_delete=models.CASCADE, related_name='mail_logs')
+    user_email = models.EmailField()
+    precio_actual = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_objetivo = models.DecimalField(max_digits=10, decimal_places=2)
+    tienda_url = models.URLField(max_length=500, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    sent_at = models.DateTimeField(auto_now_add=True)
+    error_message = models.TextField(blank=True)
+    retry_count = models.IntegerField(default=0)
+    
+    class Meta:
+        verbose_name = 'Log de Email'
+        verbose_name_plural = 'Logs de Email'
+        ordering = ['-sent_at']
+    
+    def __str__(self):
+        return f"Mail {self.id}: {self.user_email} - {self.producto.nombre_original}"
+
+
+class EmailTemplate(models.Model):
+    """Plantillas de email para diferentes tipos de notificaciones"""
+    name = models.CharField(max_length=100, unique=True)
+    subject = models.CharField(max_length=200)
+    html_content = models.TextField()
+    text_content = models.TextField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Plantilla de Email'
+        verbose_name_plural = 'Plantillas de Email'
+    
+    def __str__(self):
+        return self.name
 
 
 class EstadisticaProducto(models.Model):

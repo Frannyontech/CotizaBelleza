@@ -98,34 +98,44 @@ Ejemplos:
         sys.exit(1)
 
 
-def execute_command(orchestrator: ETLOrchestrator, command: str) -> bool:
-    """
-    Ejecuta el comando especificado
-    
-    Args:
-        orchestrator: Instancia del orquestador ETL
-        command: Comando a ejecutar
-        
-    Returns:
-        True si el comando fue exitoso
-    """
-    if command == 'full':
-        return orchestrator.run_full_pipeline()
-    
-    elif command == 'scrapers':
-        return orchestrator.run_scrapers_only()
-    
-    elif command == 'process':
-        return orchestrator.run_processor_only()
-    
-    elif command == 'validate':
-        return orchestrator.validate_only()
-    
-    elif command == 'status':
-        return show_status(orchestrator)
-    
-    else:
-        print(f"[ERROR] Comando desconocido: {command}")
+def execute_command(orchestrator, command):
+    """Ejecuta el comando especificado"""
+    try:
+        if command == 'full':
+            # Ejecutar pipeline completo
+            success = orchestrator.run_full_pipeline()
+            
+            # Si el ETL fue exitoso, configurar sistema de observadores
+            if success:
+                print("\n" + "="*60)
+                print("🔧 CONFIGURANDO SISTEMA DE OBSERVADORES")
+                print("="*60)
+                
+                try:
+                    from core.services.observer_service import ObserverService
+                    total_observers = ObserverService.setup_all_observers()
+                    print(f"✅ Sistema configurado: {total_observers} observadores activos")
+                    print("👁️ Los productos notificarán automáticamente a las alertas")
+                except Exception as e:
+                    print(f"⚠️ Error configurando observadores: {e}")
+                    print("💡 El sistema seguirá funcionando sin notificaciones automáticas")
+            
+            return success
+            
+        elif command == 'scrapers':
+            return orchestrator.run_scrapers()
+        elif command == 'process':
+            return orchestrator.run_processing()
+        elif command == 'validate':
+            return orchestrator.run_validation()
+        elif command == 'status':
+            return orchestrator.show_status()
+        else:
+            print(f"❌ Comando no reconocido: {command}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error ejecutando comando {command}: {e}")
         return False
 
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout } from 'antd';
+import { Layout, App as AntApp } from 'antd';
 import './App.css';
 
 // Import Navbar
@@ -22,8 +22,9 @@ const { Content } = Layout;
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <AntApp>
+      <Router>
+        <Routes>
         <Route path="/" element={
           <Layout style={{ minHeight: '100vh' }}>
             <Navbar />
@@ -113,8 +114,9 @@ function App() {
             </Content>
           </Layout>
         } />
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </AntApp>
   );
 }
 
