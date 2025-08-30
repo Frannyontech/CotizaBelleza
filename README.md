@@ -207,3 +207,106 @@ Para reportar problemas o solicitar features:
 - Abre un issue en GitHub
 - Incluye logs y pasos de reproducción
 - Especifica la versión del sistema 
+
+## Estado Actual de Testing
+
+### ✅ **Problema de Configuración RESUELTO:**
+- **Configuración de testing específica**: Creado `cotizabelleza/test_settings.py`
+- **Scripts de ejecución**: Múltiples opciones para ejecutar tests
+- **Base de datos en memoria**: SQLite optimizada para testing
+- **Celery en modo eager**: Sin dependencias externas
+
+### ✅ **Progreso Completado:**
+- **Infraestructura de testing configurada**: pytest, pytest-django, pytest-cov, factory-boy
+- **74 tests creados** organizados en 5 archivos principales:
+  - `tests/test_models.py` - Tests para modelos Django
+  - `tests/test_views.py` - Tests para vistas DRF
+  - `tests/test_serializers.py` - Tests para serializers
+  - `tests/test_tasks.py` - Tests para tareas Celery
+  - `tests/test_business_logic.py` - Tests para lógica de negocio
+- **Configuración de coverage**: HTML y terminal reports configurados
+- **Factories y fixtures**: Configurados para crear datos de prueba
+- **Correcciones de compatibilidad**: Campos requeridos, imports correctos, signaturas de métodos
+
+### 🚀 **Cómo Ejecutar los Tests:**
+
+#### **Opción 1: Script Principal (Recomendado)**
+```bash
+python run_tests.py
+```
+
+#### **Opción 2: Verificar Configuración**
+```bash
+python verify_config.py
+```
+
+#### **Opción 3: Test Específico**
+```bash
+python run_single_test.py
+```
+
+#### **Opción 4: Makefile (Si tienes make instalado)**
+```bash
+make test          # Ejecutar todos los tests
+make test-single   # Ejecutar test específico
+make verify        # Verificar configuración
+make coverage      # Ejecutar con cobertura
+make help          # Ver todos los comandos
+```
+
+### 🎯 **Próximos Pasos:**
+1. ✅ **Resolver configuración de Django** - COMPLETADO
+2. 🔄 **Ejecutar tests completos** para obtener cobertura real
+3. 🔄 **Corregir tests fallando** basándose en errores específicos
+4. 🔄 **Agregar tests faltantes** para alcanzar 80% de cobertura
+
+### 📈 **Métricas Objetivo:**
+- **Backend**: ≥ 80% cobertura (actual: pendiente de ejecución)
+- **Frontend**: ≥ 80% cobertura (pendiente de implementar)
+- **Tests ejecutándose**: 100% sin errores de configuración
+- **Tiempo de ejecución**: < 2 minutos para suite completa
+
+### 🛠️ **Herramientas Configuradas:**
+- **Backend**: pytest, pytest-django, pytest-cov, factory-boy, freezegun
+- **Frontend**: Jest, React Testing Library, MSW (Mock Service Worker)
+- **CI/CD**: GitHub Actions workflow configurado
+- **Reports**: HTML coverage reports en `htmlcov/`
+
+### 📋 **Archivos de Testing Creados:**
+```
+tests/
+├── __init__.py
+├── conftest.py              # Fixtures globales
+├── test_models.py           # 15 tests - Modelos Django
+├── test_views.py            # 12 tests - Vistas DRF
+├── test_serializers.py      # 12 tests - Serializers
+├── test_tasks.py            # 20 tests - Tareas Celery
+└── test_business_logic.py   # 15 tests - Lógica de negocio
+
+Scripts Universales:
+├── run_tests.py             # Script principal
+├── run_single_test.py       # Test específico
+├── verify_config.py         # Verificación
+└── Makefile                 # Comandos simples
+```
+
+### 🚀 **Comandos para Ejecutar Tests:**
+```bash
+# Opción 1: Script principal (recomendado)
+python run_tests.py
+
+# Opción 2: Verificar configuración
+python verify_config.py
+
+# Opción 3: Makefile (si tienes make instalado)
+make test
+
+# Opción 4: Comando manual
+export DJANGO_SETTINGS_MODULE=cotizabelleza.test_settings  # Linux/Mac
+set DJANGO_SETTINGS_MODULE=cotizabelleza.test_settings     # Windows
+python -m pytest --nomigrations --cov=. --cov-report=html:htmlcov
+
+# Ver reporte de cobertura
+open htmlcov/index.html  # Linux/Mac
+start htmlcov/index.html # Windows
+``` 
