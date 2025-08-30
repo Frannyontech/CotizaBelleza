@@ -185,3 +185,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 300.0,  # Cada 5 minutos
     },
 }
+
+# Security Configuration
+EMAIL_SECRET_KEY = env('EMAIL_SECRET_KEY', default=None)

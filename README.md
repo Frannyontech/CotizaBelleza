@@ -54,27 +54,39 @@ git clone <url-del-repositorio>
 cd CotizaBelleza
 ```
 
-2. **Instala las dependencias Python:**
+2. **Configura las variables de entorno:**
+```bash
+# Copia el archivo de ejemplo
+cp env.example .env
+
+# Edita .env con tus configuraciones
+# IMPORTANTE: Genera la clave secreta para emails
+python manage.py generate_email_secret_key
+```
+
+3. **Instala las dependencias Python:**
 ```bash
 py -m pip install -r requirements.txt
 ```
 
-3. **Instala las dependencias del frontend:**
+4. **Instala las dependencias del frontend:**
 ```bash
 cd cotizabelleza-frontend
 npm install
 cd ..
 ```
 
-4. **Ejecuta las migraciones:**
+5. **Ejecuta las migraciones:**
 ```bash
 py manage.py migrate
 ```
 
-5. **Crea un superusuario (opcional):**
+6. **Crea un superusuario (opcional):**
 ```bash
 py manage.py createsuperuser
 ```
+
+
 
 ## 🚀 Uso
 
@@ -147,6 +159,8 @@ py manage.py setup_observer test --product-id cb_0444195a --test-price 8000
 # Limpiar observadores inactivos
 py manage.py setup_observer cleanup
 ```
+
+
 
 ### Limpiar Cachés
 ```bash

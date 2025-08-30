@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica tu Email - CotizaBelleza</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f5f5f5; 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background-color: white; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        .header { 
+            background: linear-gradient(135deg, #e91e63 0%, #ff6b9d 100%); 
+            padding: 30px; 
+            text-align: center; 
+            color: white; 
+        }
+        .content { 
+            padding: 40px 30px; 
+        }
+        .verification-box { 
+            background-color: #f8f9fa; 
+            padding: 25px; 
+            border-radius: 10px; 
+            margin: 25px 0; 
+            text-align: center; 
+            border-left: 4px solid #e91e63; 
+        }
+        .btn { 
+            display: inline-block; 
+            background-color: #e91e63; 
+            color: white; 
+            padding: 15px 30px; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 16px; 
+            margin: 20px 0; 
+        }
+        .footer { 
+            background-color: #f5f5f5; 
+            padding: 25px; 
+            text-align: center; 
+            border-top: 1px solid #eee; 
+            color: #666; 
+            font-size: 14px; 
+        }
+        .warning { 
+            background-color: #fff3cd; 
+            border: 1px solid #ffeaa7; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 20px 0; 
+            color: #856404; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">Verifica tu Email</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">CotizaBelleza - Tu plataforma de comparación de precios</p>
+        </div>
+        
+        <div class="content">
+            <h2 style="color: #e91e63; margin-top: 0;">¡Hola!</h2>
+            
+            <p style="font-size: 16px; margin-bottom: 20px;">
+                Gracias por registrarte en <strong>CotizaBelleza</strong>. Para completar tu registro y comenzar a recibir alertas de precio, necesitamos verificar tu dirección de email.
+            </p>
+            
+            <div class="verification-box">
+                <h3 style="color: #e91e63; margin-top: 0;">📧 Email a verificar</h3>
+                <p style="font-size: 18px; font-weight: bold; color: #333;">{{ email }}</p>
+                
+                <p style="margin: 20px 0;">
+                    Haz clic en el botón de abajo para verificar tu email:
+                </p>
+                
+                <a href="{{ verification_url }}" class="btn">
+                    ✅ Verificar Email
+                </a>
+                
+                <p style="font-size: 14px; color: #666; margin-top: 20px;">
+                    <strong>Importante:</strong> Este enlace expira el {{ expires_at }}
+                </p>
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ ¿No solicitaste esta verificación?</strong><br>
+                Si no solicitaste esta verificación, puedes ignorar este email de forma segura.
+            </div>
+            
+            <h3 style="color: #333;">¿Qué pasa después de la verificación?</h3>
+            <ul style="margin: 20px 0; padding-left: 20px;">
+                <li style="margin-bottom: 10px;">Podrás crear alertas de precio para productos</li>
+                <li style="margin-bottom: 10px;">Recibirás notificaciones cuando los precios cambien</li>
+                <li style="margin-bottom: 10px;">Tendrás acceso a todas las funciones de CotizaBelleza</li>
+                <li style="margin-bottom: 10px;">Podrás gestionar tus preferencias de email</li>
+            </ul>
+            
+            <p style="font-size: 16px; margin-top: 30px;">
+                Si tienes problemas con el botón, copia y pega este enlace en tu navegador:
+            </p>
+            <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 14px; color: #666;">
+                {{ verification_url }}
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0 0 15px 0;">
+                <strong>CotizaBelleza</strong> - Tu plataforma de comparación de precios de belleza
+            </p>
+            <p style="margin: 0; color: #999; font-size: 12px;">
+                Este email fue enviado a {{ email }}<br>
+                Si no solicitaste esta verificación, puedes ignorar este mensaje.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

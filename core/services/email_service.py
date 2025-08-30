@@ -6,13 +6,246 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils import timezone
-from core.models import MailLog, EmailTemplate
+from core.models import MailLog, EmailTemplate, EmailVerification, EmailPreference, EmailBounce
+from utils.security import mask_email
+import secrets
+import hashlib
 
 logger = logging.getLogger(__name__)
 
 
 class EmailService:
     """Servicio para manejo de emails"""
+    
+    @staticmethod
+    def create_email_verification(email):
+        """
+        Crea un token de verificación para un email
+        
+        Args:
+            email (str): Email a verificar
+            
+        Returns:
+            EmailVerification: Objeto de verificación creado
+        """
+        try:
+            # Generar token único
+            token = secrets.token_urlsafe(32)
+            
+            # Crear verificación
+            verification = EmailVerification.objects.create(
+                email=email,
+                token=token,
+                expires_at=timezone.now() + timezone.timedelta(hours=24)
+            )
+            
+            logger.info(f"Verificación creada para {mask_email(email)}")
+            return verification
+            
+        except Exception as e:
+            logger.error(f"Error creando verificación para {mask_email(email)}: {e}")
+            return None
+    
+    @staticmethod
+    def verify_email_token(token):
+        """
+        Verifica un token de email
+        
+        Args:
+            token (str): Token a verificar
+            
+        Returns:
+            tuple: (success, message, email)
+        """
+        try:
+            verification = EmailVerification.objects.get(token=token)
+            
+            if verification.is_expired():
+                return False, "Token expirado", None
+            
+            if verification.verified:
+                return False, "Email ya verificado", None
+            
+            # Marcar como verificado
+            verification.verify()
+            
+            # Crear preferencias por defecto
+            EmailPreference.objects.get_or_create(
+                email=verification.email,
+                defaults={
+                    'unsubscribe_token': secrets.token_urlsafe(32)
+                }
+            )
+            
+            logger.info(f"Email verificado: {mask_email(verification.email)}")
+            return True, "Email verificado exitosamente", verification.email
+            
+        except EmailVerification.DoesNotExist:
+            return False, "Token inválido", None
+        except Exception as e:
+            logger.error(f"Error verificando token: {e}")
+            return False, "Error interno", None
+    
+    @staticmethod
+    def send_verification_email(email):
+        """
+        Envía email de verificación
+        
+        Args:
+            email (str): Email a verificar
+            
+        Returns:
+            bool: True si se envió exitosamente
+        """
+        try:
+            # Crear verificación
+            verification = EmailService.create_email_verification(email)
+            if not verification:
+                return False
+            
+            # Preparar contexto
+            context = {
+                'email': email,
+                'verification_url': f"http://localhost:5173/verify-email?token={verification.token}",
+                'expires_at': verification.expires_at.strftime('%d/%m/%Y %H:%M'),
+            }
+            
+            # Renderizar templates
+            html_message = render_to_string('emails/email_verification.html', context)
+            text_message = render_to_string('emails/email_verification.txt', context)
+            
+            # Enviar email
+            email_msg = EmailMultiAlternatives(
+                subject='Verifica tu email - CotizaBelleza',
+                body=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email]
+            )
+            email_msg.attach_alternative(html_message, "text/html")
+            
+            # Agregar headers de seguridad
+            email_msg.extra_headers.update({
+                'List-Unsubscribe': f'<mailto:unsubscribe@cotizabelleza.com?subject=unsubscribe_{email}>',
+                'Precedence': 'bulk',
+                'X-Auto-Response-Suppress': 'OOF, AutoReply',
+            })
+            
+            email_msg.send()
+            
+            logger.info(f"Email de verificación enviado a {mask_email(email)}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error enviando email de verificación a {mask_email(email)}: {e}")
+            return False
+    
+    @staticmethod
+    def check_email_preferences(email):
+        """
+        Verifica las preferencias de email de un usuario
+        
+        Args:
+            email (str): Email a verificar
+            
+        Returns:
+            tuple: (can_send, reason)
+        """
+        try:
+            # Verificar si el email está verificado
+            verification = EmailVerification.objects.filter(
+                email=email, 
+                verified=True
+            ).first()
+            
+            if not verification:
+                return False, "Email no verificado"
+            
+            # Verificar preferencias
+            preference = EmailPreference.objects.filter(email=email).first()
+            if not preference:
+                return False, "Sin preferencias configuradas"
+            
+            if not preference.alerts_enabled:
+                return False, "Alertas deshabilitadas"
+            
+            if not preference.can_send_email():
+                return False, "Frecuencia de email no permitida"
+            
+            # Verificar bounces recientes
+            recent_bounce = EmailBounce.objects.filter(
+                email=email,
+                bounce_type__in=['hard', 'spam'],
+                occurred_at__gte=timezone.now() - timezone.timedelta(days=30)
+            ).first()
+            
+            if recent_bounce:
+                return False, "Email con bounces recientes"
+            
+            return True, "OK"
+            
+        except Exception as e:
+            logger.error(f"Error verificando preferencias de {mask_email(email)}: {e}")
+            return False, "Error interno"
+    
+    @staticmethod
+    def record_bounce(email, bounce_type, reason=""):
+        """
+        Registra un bounce de email
+        
+        Args:
+            email (str): Email que rebotó
+            bounce_type (str): Tipo de bounce
+            reason (str): Razón del bounce
+        """
+        try:
+            EmailBounce.objects.create(
+                email=email,
+                bounce_type=bounce_type,
+                bounce_reason=reason
+            )
+            
+            # Si es hard bounce o spam, deshabilitar alertas
+            if bounce_type in ['hard', 'spam']:
+                EmailPreference.objects.filter(email=email).update(
+                    alerts_enabled=False
+                )
+            
+            logger.warning(f"Bounce registrado: {mask_email(email)} - {bounce_type}")
+            
+        except Exception as e:
+            logger.error(f"Error registrando bounce: {e}")
+    
+    @staticmethod
+    def unsubscribe_email(token):
+        """
+        Desuscribe un email usando token
+        
+        Args:
+            token (str): Token de unsubscribe
+            
+        Returns:
+            tuple: (success, message)
+        """
+        try:
+            preference = EmailPreference.objects.get(unsubscribe_token=token)
+            preference.alerts_enabled = False
+            preference.save()
+            
+            # Registrar como unsubscribe
+            EmailService.record_bounce(
+                preference.email, 
+                'unsubscribe', 
+                'Usuario se desuscribió'
+            )
+            
+            logger.info(f"Email desuscrito: {mask_email(preference.email)}")
+            return True, "Email desuscrito exitosamente"
+            
+        except EmailPreference.DoesNotExist:
+            return False, "Token de unsubscribe inválido"
+        except Exception as e:
+            logger.error(f"Error desuscribiendo email: {e}")
+            return False, "Error interno"
     
     @staticmethod
     def send_price_alert_email(alert, precio_actual, precio_anterior=None, tipo_cambio=None, 
@@ -37,7 +270,7 @@ class EmailService:
                 usuario=alert.usuario,
                 user_email=alert.usuario.email,
                 precio_actual=precio_actual,
-                precio_objetivo=alert.precio_objetivo,
+                precio_inicial=alert.precio_inicial,
                 tienda_url=tienda_url or '',
                 status='pending'
             )
@@ -48,8 +281,8 @@ class EmailService:
                 'product_brand': alert.producto.marca,
                 'current_price': precio_actual,
                 'previous_price': precio_anterior,
-                'target_price': alert.precio_objetivo,
-                'price_difference': alert.precio_objetivo - precio_actual,
+                'target_price': alert.precio_inicial,
+                'price_difference': alert.precio_inicial - precio_actual,
                 'change_type': tipo_cambio,
                 'change_percentage': porcentaje_cambio,
                 'change_amount': monto_cambio,

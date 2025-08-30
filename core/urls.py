@@ -10,6 +10,8 @@ from .views import (
     ProductoResenasAPIView,
     ProductosFiltradosAPIView,
     AlertasAPIView,
+    EmailVerificationAPIView,
+    UnsubscribeAPIView,
 )
 
 urlpatterns = [
@@ -37,6 +39,13 @@ urlpatterns = [
     # Alertas de precio
     path('api/alertas/', AlertasAPIView.as_view(), name='alertas-api'),
     path('api/alertas/<int:alerta_id>/', AlertasAPIView.as_view(), name='alerta-detail-api'),
+    
+    # Verificación de emails
+    path('api/email/verify/', EmailVerificationAPIView.as_view(), name='email-verify-api'),
+    path('api/email/verify/<str:token>/', EmailVerificationAPIView.as_view(), name='email-verify-token-api'),
+    
+    # Unsubscribe de emails
+    path('api/email/unsubscribe/<str:token>/', UnsubscribeAPIView.as_view(), name='email-unsubscribe-api'),
     
 
 ]

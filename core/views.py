@@ -9,8 +9,12 @@ from rest_framework.permissions import AllowAny
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
+from utils.security import mask_email, decrypt_email
 import json
 import os
+import re
+import hashlib
+from django.core.cache import cache
 
 
 def home(request):
@@ -442,20 +446,117 @@ class AlertasAPIView(APIView):
     """API para gestionar alertas de precio"""
     permission_classes = [AllowAny]
     
+    def _get_client_ip(self, request):
+        """Obtiene la IP del cliente"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+    
+    def _check_rate_limit(self, request, email, action='create_alert'):
+        """Verifica límites de rate para prevenir spam"""
+        client_ip = self._get_client_ip(request)
+        
+        # Límites por IP
+        ip_key = f"rate_limit_ip_{action}_{client_ip}"
+        ip_count = cache.get(ip_key, 0)
+        
+        # Límites por email
+        email_key = f"rate_limit_email_{action}_{hashlib.md5(email.encode()).hexdigest()}"
+        email_count = cache.get(email_key, 0)
+        
+        # Límites: 5 alertas por hora por IP, 3 por email
+        if action == 'create_alert':
+            ip_limit = 5
+            email_limit = 3
+            window = 3600  # 1 hora
+        else:
+            ip_limit = 20
+            email_limit = 10
+            window = 3600
+        
+        if ip_count >= ip_limit:
+            return False, f"Demasiadas solicitudes desde esta IP. Límite: {ip_limit} por hora"
+        
+        if email_count >= email_limit:
+            return False, f"Demasiadas solicitudes para este email. Límite: {email_limit} por hora"
+        
+        # Incrementar contadores
+        cache.set(ip_key, ip_count + 1, window)
+        cache.set(email_key, email_count + 1, window)
+        
+        return True, None
+    
+    def _is_valid_email(self, email):
+        """Valida formato de email de forma estricta"""
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return bool(re.match(pattern, email)) and len(email) <= 254
+    
     def get(self, request):
-        """Obtener alertas por email"""
+        """Obtener alertas por email o todas las alertas del sistema"""
         try:
+            # Verificar si se solicita ver todas las alertas
+            show_all = request.GET.get('all', '').lower() == 'true'
+            
+            if show_all:
+                # Mostrar todas las alertas del sistema (para administración)
+                from core.models import AlertaPrecioProductoPersistente
+                
+                alertas = AlertaPrecioProductoPersistente.objects.filter(
+                    activa=True
+                ).select_related('producto').order_by('-fecha_creacion')
+                
+                alertas_data = []
+                for alerta in alertas:
+                    # Obtener precio actual del producto
+                    precio_actual = alerta.producto.precios_historicos.filter(
+                        disponible=True
+                    ).order_by('-fecha_scraping').first()
+                    
+                    # Obtener email enmascarado
+                    email_enmascarado = alerta.get_email_enmascarado()
+                    
+                    alertas_data.append({
+                        'id': alerta.id,
+                        'email': email_enmascarado,  # Email enmascarado para seguridad
+                        'producto': {
+                            'id': alerta.producto.internal_id,
+                            'nombre': alerta.producto.nombre_original,
+                            'marca': alerta.producto.marca,
+                            'imagen': alerta.producto.imagen_url or '',
+                        },
+                        'precio_inicial': float(alerta.precio_inicial) if alerta.precio_inicial else None,
+                        'precio_actual': float(precio_actual.precio) if precio_actual else None,
+                        'activa': alerta.activa,
+                        'notificada': alerta.notificada,
+                        'fecha_creacion': alerta.fecha_creacion.isoformat(),
+                        'fecha_ultima_notificacion': alerta.fecha_ultima_notificacion.isoformat() if alerta.fecha_ultima_notificacion else None,
+                    })
+                
+                return Response({
+                    'alertas': alertas_data,
+                    'total': len(alertas_data),
+                    'nota': 'Emails enmascarados por seguridad'
+                })
+            
+            # Comportamiento original: obtener alertas por email específico
             email = request.GET.get('email')
             if not email:
                 return Response(
-                    {'error': 'email requerido'}, 
+                    {'error': 'email requerido o usar all=true para ver todas las alertas'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
             from core.models import AlertaPrecioProductoPersistente
+            from utils.security import encrypt_email
+            
+            # Encriptar email para la búsqueda
+            email_encrypted = encrypt_email(email)
             
             alertas = AlertaPrecioProductoPersistente.objects.filter(
-                email=email,
+                email=email_encrypted,
                 activa=True
             ).select_related('producto')
             
@@ -504,13 +605,28 @@ class AlertasAPIView(APIView):
             print(f"DEBUG: email={email}, producto_id={producto_id}")
             
             if not all([email, producto_id]):
-                print(f"DEBUG: Faltan datos requeridos")
                 return Response(
                     {'error': 'email y producto_id son requeridos'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+            # Validar formato de email
+            if not self._is_valid_email(email):
+                return Response(
+                    {'error': 'Formato de email inválido'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Verificar rate limiting
+            rate_ok, rate_error = self._check_rate_limit(request, email, 'create_alert')
+            if not rate_ok:
+                return Response(
+                    {'error': rate_error}, 
+                    status=status.HTTP_429_TOO_MANY_REQUESTS
+                )
+            
             from core.models import AlertaPrecioProductoPersistente, ProductoPersistente
+            from utils.security import encrypt_email
             
             try:
                 producto = ProductoPersistente.objects.get(internal_id=producto_id)
@@ -531,10 +647,13 @@ class AlertasAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Verificar si ya existe una alerta activa
+            # Encriptar email para la búsqueda
+            email_encrypted = encrypt_email(email)
+            
+            # Verificar si ya existe una alerta activa usando email encriptado
             alerta_existente = AlertaPrecioProductoPersistente.objects.filter(
                 producto=producto,
-                email=email,
+                email=email_encrypted,
                 activa=True
             ).first()
             
@@ -544,18 +663,16 @@ class AlertasAPIView(APIView):
                     'error': 'email_already_subscribed'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # Crear o actualizar alerta (solo si no existe una activa)
-            alerta, created = AlertaPrecioProductoPersistente.objects.get_or_create(
+            # Crear nueva alerta con email encriptado
+            alerta = AlertaPrecioProductoPersistente.objects.create(
                 producto=producto,
-                email=email,
-                defaults={
-                    'precio_inicial': float(precio_actual.precio),  # Precio al crear la alerta
-                    'activa': True,
-                    'notificada': False
-                }
+                email=email_encrypted,  # El modelo se encargará de la encriptación
+                precio_inicial=float(precio_actual.precio),
+                activa=True,
+                notificada=False
             )
             
-            # Enviar email de confirmación (solo para nuevas alertas)
+            # Enviar email de confirmación
             try:
                 # Email de confirmación
                 subject = '¡Alerta de Precio Creada!'
@@ -602,29 +719,23 @@ class AlertasAPIView(APIView):
                 message = render_to_string('emails/alert_created.txt', context)
                 
                 # Crear email con HTML
-                email = EmailMessage(
+                email_msg = EmailMessage(
                     subject=subject,
                     body=html_message,
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     to=[email],
                 )
-                email.content_subtype = "html"  # Indicar que es HTML
+                email_msg.content_subtype = "html"  # Indicar que es HTML
                 
-                success = email.send(fail_silently=False)
+                success = email_msg.send(fail_silently=False)
                 
                 if success:
-                    print(f"✅ Email de confirmación enviado a {email}")
+                    print(f"✅ Email de confirmación enviado a {mask_email(email)}")
                 else:
-                    print(f"❌ Error enviando email de confirmación a {email}")
+                    print(f"❌ Error enviando email de confirmación a {mask_email(email)}")
                     
             except Exception as e:
                 print(f"❌ Error en email de confirmación: {e}")
-            
-            if not created:
-                # Actualizar alerta existente (significa que estaba inactiva y se reactivó)
-                alerta.activa = True
-                alerta.notificada = False
-                alerta.save()
             
             return Response({
                 'message': 'alert_created'
@@ -687,6 +798,163 @@ class AlertasAPIView(APIView):
                 'message': 'Alerta eliminada exitosamente'
             })
             
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class EmailVerificationAPIView(APIView):
+    """API para verificación de emails"""
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        """Solicitar verificación de email"""
+        try:
+            email = request.data.get('email')
+            
+            if not email:
+                return Response(
+                    {'error': 'email requerido'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Validar formato de email
+            if not self._is_valid_email(email):
+                return Response(
+                    {'error': 'Formato de email inválido'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Verificar rate limiting
+            rate_ok, rate_error = self._check_rate_limit(request, email, 'verify_email')
+            if not rate_ok:
+                return Response(
+                    {'error': rate_error}, 
+                    status=status.HTTP_429_TOO_MANY_REQUESTS
+                )
+            
+            from core.services.email_service import EmailService
+            
+            # Enviar email de verificación
+            success = EmailService.send_verification_email(email)
+            
+            if success:
+                return Response({
+                    'message': 'Email de verificación enviado'
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'error': 'Error enviando email de verificación'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def get(self, request):
+        """Verificar token de email"""
+        try:
+            token = request.GET.get('token')
+            
+            if not token:
+                return Response(
+                    {'error': 'token requerido'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            from core.services.email_service import EmailService
+            
+            success, message, email = EmailService.verify_email_token(token)
+            
+            if success:
+                return Response({
+                    'message': message,
+                    'email': mask_email(email) if email else None
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'error': message
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def _is_valid_email(self, email):
+        """Valida formato de email"""
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return bool(re.match(pattern, email)) and len(email) <= 254
+    
+    def _check_rate_limit(self, request, email, action='verify_email'):
+        """Verifica rate limiting"""
+        client_ip = self._get_client_ip(request)
+        
+        ip_key = f"rate_limit_ip_{action}_{client_ip}"
+        email_key = f"rate_limit_email_{action}_{hashlib.md5(email.encode()).hexdigest()}"
+        
+        ip_count = cache.get(ip_key, 0)
+        email_count = cache.get(email_key, 0)
+        
+        # Límites más estrictos para verificación
+        ip_limit = 3  # 3 verificaciones por hora por IP
+        email_limit = 2  # 2 verificaciones por hora por email
+        window = 3600
+        
+        if ip_count >= ip_limit:
+            return False, f"Demasiadas solicitudes de verificación desde esta IP. Límite: {ip_limit} por hora"
+        
+        if email_count >= email_limit:
+            return False, f"Demasiadas solicitudes de verificación para este email. Límite: {email_limit} por hora"
+        
+        cache.set(ip_key, ip_count + 1, window)
+        cache.set(email_key, email_count + 1, window)
+        
+        return True, None
+    
+    def _get_client_ip(self, request):
+        """Obtiene la IP del cliente"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+
+class UnsubscribeAPIView(APIView):
+    """API para unsubscribe de emails"""
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """Unsubscribe usando token"""
+        try:
+            token = request.GET.get('token')
+            
+            if not token:
+                return Response(
+                    {'error': 'token requerido'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            from core.services.email_service import EmailService
+            
+            success, message = EmailService.unsubscribe_email(token)
+            
+            if success:
+                return Response({
+                    'message': message
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'error': message
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
         except Exception as e:
             return Response(
                 {'error': str(e)}, 
