@@ -125,6 +125,25 @@ class ETLOrchestrator:
             # Mostrar resumen
             self.stats_generator.print_execution_summary(stats)
             
+            # Paso 6: Trigger de alertas de precio (solo si el pipeline fue exitoso)
+            if processor_success and validation_success:
+                alert_step_logger = get_pipeline_logger(self.config, "ALERTAS")
+                alert_step_logger.start("Disparando alertas de precio")
+                
+                try:
+                    # Importar aquí para evitar dependencias circulares
+                    from core.tasks import check_price_alerts
+                    
+                    # Disparar tarea de Celery para revisar alertas
+                    task_result = check_price_alerts.delay()
+                    alert_step_logger.finish(True, f"Tarea de alertas disparada: {task_result.id}")
+                    
+                except Exception as e:
+                    alert_step_logger.error(f"Error disparando alertas: {e}")
+                    alert_step_logger.finish(False, "Error en alertas")
+            else:
+                self.logger.info("[ALERTAS] Saltado por error en pipeline")
+            
             # Resumen final
             final_success = processor_success and validation_success
             self.logger.log_execution_summary(
@@ -198,6 +217,14 @@ class ETLOrchestrator:
             # Validar resultado
             validation_success, validation_errors = self.validator.validate_unified_data()
             if validation_success:
+                # Trigger de alertas de precio
+                try:
+                    from core.tasks import check_price_alerts
+                    task_result = check_price_alerts.delay()
+                    self.logger.info(f"[ALERTAS] Tarea de alertas disparada: {task_result.id}")
+                except Exception as e:
+                    self.logger.error(f"[ALERTAS] Error disparando alertas: {e}")
+                
                 self.logger.log_success("Procesamiento y validación exitosos")
                 return True
             else:

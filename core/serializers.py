@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import (
     Producto, Categoria, Tienda, PrecioProducto, 
-    Alerta, AlertaUsuario, Resena, AlertaPrecio
+    Resena, AlertaPrecio, AlertaPrecioProductoPersistente
 )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -43,23 +43,25 @@ class ResenaSerializer(serializers.ModelSerializer):
         model = Resena
         fields = '__all__'
 
-class AlertaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Alerta
-        fields = '__all__'
-
-class AlertaUsuarioSerializer(serializers.ModelSerializer):
-    producto = ProductoSerializer(read_only=True)
-    usuario = UserSerializer(read_only=True)
-    alerta = AlertaSerializer(read_only=True)
-    
-    class Meta:
-        model = AlertaUsuario
-        fields = '__all__'
-
 class AlertaPrecioSerializer(serializers.ModelSerializer):
     producto = ProductoSerializer(read_only=True)
+    email = serializers.SerializerMethodField()
     
     class Meta:
         model = AlertaPrecio
-        fields = '__all__' 
+        fields = '__all__'
+    
+    def get_email(self, obj):
+        """Retorna el email enmascarado en lugar del encriptado"""
+        return obj.get_email_masked()
+
+class AlertaPrecioProductoPersistenteSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AlertaPrecioProductoPersistente
+        fields = '__all__'
+    
+    def get_email(self, obj):
+        """Retorna el email enmascarado en lugar del encriptado"""
+        return obj.get_email_enmascarado() 

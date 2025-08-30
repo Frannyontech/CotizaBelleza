@@ -1,0 +1,34 @@
+¡Precio alcanzado! 🎉
+
+Hola {{ user_name }},
+
+¡Excelentes noticias! El producto que estás monitoreando ha alcanzado tu precio objetivo. ¡No pierdas esta oportunidad!
+
+PRODUCTO: {{ product_name }}
+MARCA: {{ product_brand }}
+PRECIO ACTUAL: ${{ current_price }}
+TU PRECIO OBJETIVO: ${{ target_price }}
+AHORRO: ${{ price_difference }}
+
+{% if store_url %}
+Ver producto: {{ store_url }}
+{% endif %}
+
+¿Por qué recibiste este email?
+Creaste una alerta de precio para este producto en CotizaBelleza. 
+Cuando el precio bajó a tu objetivo, te notificamos automáticamente.
+
+Enlaces útiles:
+- Visitar CotizaBelleza: https://cotizabelleza.cl
+- Mi Cuenta: https://cotizabelleza.cl/mi-cuenta
+- Mis Alertas: https://cotizabelleza.cl/alertas
+
+---
+Este email fue enviado por CotizaBelleza
+ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
+Cancelar suscripción: https://cotizabelleza.cl/unsubscribe
+
+
+
+
+

@@ -16,6 +16,7 @@ from core.models import (
     PrecioHistorico, 
     EstadisticaProducto
 )
+from core.patterns.product_subject import ProductoSubject
 
 
 class PersistentIdManager:
@@ -93,10 +94,11 @@ class PersistentIdManager:
         mapeo_categorias = {
             'maquillaje': 'maquillaje',
             'makeup': 'maquillaje',
-            'skincare': 'cuidado_piel',
-            'cuidado de la piel': 'cuidado_piel',
-            'cuidado del rostro': 'cuidado_piel',
-            'facial': 'cuidado_piel',
+            'skincare': 'skincare',
+            'cuidado_piel': 'skincare',
+            'cuidado de la piel': 'skincare',
+            'cuidado del rostro': 'skincare',
+            'facial': 'skincare',
             'perfumes': 'fragancias',
             'fragancias': 'fragancias',
         }
@@ -226,12 +228,12 @@ class PersistentIdManager:
     
     def crear_nuevo_producto(self, nombre_normalizado: str, marca_normalizada: str, 
                            categoria_normalizada: str, hash_unico: str, 
-                           producto_data: Dict) -> ProductoPersistente:
+                           producto_data: Dict) -> ProductoSubject:
         """
-        Crea un nuevo producto persistente
+        Crea un nuevo producto persistente como ProductoSubject
         """
         
-        producto = ProductoPersistente.objects.create(
+        producto = ProductoSubject.objects.create(
             internal_id=self.generar_internal_id(),
             nombre_normalizado=nombre_normalizado,
             marca=marca_normalizada,
@@ -248,10 +250,10 @@ class PersistentIdManager:
         
         return producto
     
-    def agregar_precio_historico(self, producto: ProductoPersistente, 
+    def agregar_precio_historico(self, producto: ProductoSubject, 
                                precio_data: Dict, fecha_scraping: datetime) -> PrecioHistorico:
         """
-        Agrega un nuevo precio histórico para un producto
+        Agrega un nuevo precio histórico para un producto y notifica a observadores
         """
         
         # Extraer información de precio
@@ -259,6 +261,10 @@ class PersistentIdManager:
         precio_original = precio_data.get('precio_normal') or precio_data.get('precio_original')
         tiene_descuento = bool(precio_original and precio_original > precio)
         tienda = precio_data.get('fuente', 'desconocida')
+        url_producto = precio_data.get('url', '')
+        
+        # Obtener precio anterior para comparación
+        precio_anterior = producto.get_current_price(tienda)
         
         # Verificar si ya existe un precio para este producto, tienda y fecha
         precio_existente = PrecioHistorico.objects.filter(
@@ -274,21 +280,25 @@ class PersistentIdManager:
             precio_existente.tiene_descuento = tiene_descuento
             precio_existente.stock = precio_data.get('stock', 'in stock').lower() == 'in stock'
             precio_existente.disponible = True
-            precio_existente.url_producto = precio_data.get('url', '')
+            precio_existente.url_producto = url_producto
             precio_existente.imagen_url = precio_data.get('imagen', '')
             precio_existente.save()
+            
+            # Notificar cambio de precio si es diferente
+            if precio_anterior is not None and abs(precio_anterior - precio) > 0.01:
+                producto.notify_price_change(precio_anterior, precio, tienda, url_producto)
+            
             return precio_existente
         else:
-            # Crear nuevo precio
-            precio_historico = PrecioHistorico.objects.create(
-                producto=producto,
-                tienda=tienda,
-                precio=precio,
+            # Crear nuevo precio usando el método del ProductoSubject
+            precio_historico = producto.update_price_and_notify(
+                new_price=precio,
+                store=tienda,
+                url=url_producto,
                 precio_original=precio_original,
                 tiene_descuento=tiene_descuento,
                 stock=precio_data.get('stock', 'in stock').lower() == 'in stock',
                 disponible=True,
-                url_producto=precio_data.get('url', ''),
                 imagen_url=precio_data.get('imagen', ''),
                 fecha_scraping=fecha_scraping,
                 fuente_scraping=f"etl_{fecha_scraping.strftime('%Y_%m_%d')}"

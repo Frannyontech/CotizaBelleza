@@ -9,6 +9,7 @@ Sistema completo de cotizaciones de belleza con ETL automatizado, API REST y fro
 - **API REST** funcionando correctamente  
 - **Frontend React** operativo
 - **Sistema de IDs persistentes** preservando reseñas y alertas
+- **Patrón Observer** para notificaciones automáticas de precio
 - **360 productos unificados** de 3 tiendas (PREUNIC, DBS, MAICAO)
 
 ## 🚀 Características Principales
@@ -18,6 +19,12 @@ Sistema completo de cotizaciones de belleza con ETL automatizado, API REST y fro
 - ✅ **Alertas de precio preservadas** automáticamente
 - ✅ **URLs existentes siguen funcionando** sin cambios
 - ✅ **Compatibilidad total** con frontend y APIs existentes
+
+### Sistema de Notificaciones con Patrón Observer
+- ✅ **Notificaciones automáticas** cuando cambian los precios
+- ✅ **Desacoplamiento total** entre productos y alertas
+- ✅ **Escalabilidad** para múltiples tipos de observadores
+- ✅ **Integración con Celery** para emails asíncronos
 
 ### ETL Pipeline Avanzado
 - **Scrapers optimizados**: Preunic (Algolia API), DBS, Maicao
@@ -47,27 +54,39 @@ git clone <url-del-repositorio>
 cd CotizaBelleza
 ```
 
-2. **Instala las dependencias Python:**
+2. **Configura las variables de entorno:**
+```bash
+# Copia el archivo de ejemplo
+cp env.example .env
+
+# Edita .env con tus configuraciones
+# IMPORTANTE: Genera la clave secreta para emails
+python manage.py generate_email_secret_key
+```
+
+3. **Instala las dependencias Python:**
 ```bash
 py -m pip install -r requirements.txt
 ```
 
-3. **Instala las dependencias del frontend:**
+4. **Instala las dependencias del frontend:**
 ```bash
 cd cotizabelleza-frontend
 npm install
 cd ..
 ```
 
-4. **Ejecuta las migraciones:**
+5. **Ejecuta las migraciones:**
 ```bash
 py manage.py migrate
 ```
 
-5. **Crea un superusuario (opcional):**
+6. **Crea un superusuario (opcional):**
 ```bash
 py manage.py createsuperuser
 ```
+
+
 
 ## 🚀 Uso
 
@@ -126,6 +145,23 @@ CotizaBelleza/
 py -c "import requests; r=requests.get('http://localhost:8000/api/unified/'); print(f'API: {r.status_code}, Productos: {len(r.json().get(\"productos\", []))}')"
 ```
 
+### Sistema de Observadores
+```bash
+# Configurar sistema de observadores
+py manage.py setup_observer setup
+
+# Ver estadísticas de observadores
+py manage.py setup_observer stats
+
+# Probar notificación
+py manage.py setup_observer test --product-id cb_0444195a --test-price 8000
+
+# Limpiar observadores inactivos
+py manage.py setup_observer cleanup
+```
+
+
+
 ### Limpiar Cachés
 ```bash
 # Limpiar cachés de Python
@@ -163,6 +199,7 @@ Producto `cb_0444195a` ("Rubor Líquido Maybelline...") preservado con reseñas 
 - **ETL**: Python + Selenium + BeautifulSoup
 - **Cola de Tareas**: Celery + Redis
 - **Deduplicación**: TF-IDF + Similitud de cadenas
+- **Patrones de Diseño**: Observer Pattern para notificaciones
 
 ## 📞 Soporte
 

@@ -48,12 +48,12 @@ class PreunicAlgoliaScraper:
     def search_products(self, categoria: str, page: int = 0) -> Optional[Dict]:
         """
         Busca productos en la API de Algolia
-        
-        Args:
+    
+    Args:
             categoria: Categoría a buscar ('skincare' o 'maquillaje')
             page: Número de página (0-based)
-            
-        Returns:
+    
+    Returns:
             Respuesta de la API o None si hay error
         """
         try:

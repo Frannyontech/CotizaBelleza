@@ -1,0 +1,22 @@
+¡Hola!
+
+Tu alerta de precio ha sido creada exitosamente.
+
+📦 **Detalles del Producto:**
+• Nombre: {{ producto.nombre_original }}
+• Marca: {{ producto.marca|default:"No especificada" }}
+• Precio inicial: ${{ precio_actual.precio|floatformat:0 }} CLP
+• Tienda: {{ nombre_tienda }}
+
+🖼️ **Imagen del Producto:**
+{% if imagen_url %}{{ imagen_url }}{% else %}No disponible{% endif %}
+
+🔗 **Ver Producto:**
+{{ producto_url }}
+
+📧 **Notificaciones:** Te enviaremos emails cuando detectemos cambios de precio
+
+¡Gracias por usar CotizaBelleza!
+
+Saludos,
+Equipo CotizaBelleza

@@ -259,12 +259,12 @@ const Dashboard = () => {
       {/* Popular Products Section */}
       <div className="products-section">
         <div className="section-header">
-          <Title level={3}>Productos más populares ({products.length})</Title>
+          <Title level={3}>Productos más populares ({filteredProducts.length})</Title>
         </div>
 
         <div className="products-grid">
-          {products.length > 0 ? (
-            products.map(product => (
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(product => (
               <div 
                 key={product.product_id}
                 className="product-card" 

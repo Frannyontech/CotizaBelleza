@@ -1,0 +1,26 @@
+Verifica tu Email - CotizaBelleza
+
+¡Hola!
+
+Gracias por registrarte en CotizaBelleza. Para completar tu registro y comenzar a recibir alertas de precio, necesitamos verificar tu dirección de email.
+
+📧 Email a verificar: {{ email }}
+
+Para verificar tu email, visita este enlace:
+{{ verification_url }}
+
+IMPORTANTE: Este enlace expira el {{ expires_at }}
+
+¿Qué pasa después de la verificación?
+• Podrás crear alertas de precio para productos
+• Recibirás notificaciones cuando los precios cambien
+• Tendrás acceso a todas las funciones de CotizaBelleza
+• Podrás gestionar tus preferencias de email
+
+⚠️ ¿No solicitaste esta verificación?
+Si no solicitaste esta verificación, puedes ignorar este email de forma segura.
+
+---
+CotizaBelleza - Tu plataforma de comparación de precios de belleza
+Este email fue enviado a {{ email }}
+
