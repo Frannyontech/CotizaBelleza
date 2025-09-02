@@ -24,3 +24,10 @@ Si no solicitaste esta verificación, puedes ignorar este email de forma segura.
 CotizaBelleza - Tu plataforma de comparación de precios de belleza
 Este email fue enviado a {{ email }}
 
+
+
+
+
+
+
+
