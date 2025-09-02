@@ -43,9 +43,11 @@ urlpatterns = [
     # Verificación de emails
     path('api/email/verify/', EmailVerificationAPIView.as_view(), name='email-verify-api'),
     path('api/email/verify/<str:token>/', EmailVerificationAPIView.as_view(), name='email-verify-token-api'),
+    path('api/email-verification/', EmailVerificationAPIView.as_view(), name='email-verification-api'),
     
     # Unsubscribe de emails
     path('api/email/unsubscribe/<str:token>/', UnsubscribeAPIView.as_view(), name='email-unsubscribe-api'),
+    path('api/unsubscribe/', UnsubscribeAPIView.as_view(), name='unsubscribe-api'),
     
 
 ]

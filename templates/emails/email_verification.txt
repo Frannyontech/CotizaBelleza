@@ -25,3 +25,7 @@ CotizaBelleza - Tu plataforma de comparación de precios de belleza
 Este email fue enviado a {{ email }}
 
 
+
+
+
+
