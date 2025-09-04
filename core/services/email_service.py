@@ -361,11 +361,11 @@ class EmailService:
     def _get_subject_for_change(tipo_cambio, product_name):
         """Obtiene el asunto del email según el tipo de cambio"""
         if tipo_cambio == 'decreased':
-            return f"¡Precio bajó! {product_name} 🎉"
+            return f"¡Precio bajó! {product_name}"
         elif tipo_cambio == 'increased':
-            return f"Precio subió: {product_name} ⚠️"
+            return f"Precio subió: {product_name}"
         elif tipo_cambio == 'new_price':
-            return f"Nuevo precio disponible: {product_name} 📢"
+            return f"Nuevo precio disponible: {product_name}"
         else:
             return f"Actualización de precio: {product_name}"
     
@@ -405,7 +405,7 @@ class EmailService:
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #e91e63;">¡Precio alcanzado! 🎉</h2>
+                <h2 style="color: #e91e63;">¡Precio alcanzado!</h2>
                 
                 <p>Hola {{ user_name }},</p>
                 
@@ -443,7 +443,7 @@ class EmailService:
     def _get_default_text_template():
         """Plantilla de texto por defecto"""
         return """
-¡Precio alcanzado! 🎉
+        ¡Precio alcanzado!
 
 Hola {{ user_name }},
 
@@ -478,7 +478,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #4caf50;">¡Precio bajó! 🎉</h2>
+                <h2 style="color: #4caf50;">¡Precio bajó!</h2>
                 
                 <p>Hola {{ user_name }},</p>
                 
@@ -518,7 +518,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
     def _get_decreased_price_text_template():
         """Plantilla de texto para precio que bajó"""
         return """
-¡Precio bajó! 🎉
+        ¡Precio bajó!
 
 Hola {{ user_name }},
 
@@ -555,7 +555,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #ff9800;">Precio subió ⚠️</h2>
+                <h2 style="color: #ff9800;">Precio subió</h2>
                 
                 <p>Hola {{ user_name }},</p>
                 
@@ -595,7 +595,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
     def _get_increased_price_text_template():
         """Plantilla de texto para precio que subió"""
         return """
-Precio subió ⚠️
+        Precio subió
 
 Hola {{ user_name }},
 
@@ -707,7 +707,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
             <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #e91e63 0%, #ff6b9d 100%); padding: 30px; text-align: center;">
-                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">¡Bienvenido a CotizaBelleza! 🎉</h1>
+                    <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">¡Bienvenido a CotizaBelleza!</h1>
                     <p style="color: white; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Tu plataforma de comparación de precios de belleza</p>
                 </div>
                 
@@ -761,7 +761,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
                     
                     <!-- Quick Start -->
                     <div style="background-color: #e3f2fd; padding: 25px; border-radius: 10px; margin: 25px 0; border-left: 4px solid #2196f3;">
-                        <h3 style="color: #2196f3; margin-top: 0; font-size: 20px;">🚀 Comienza ahora mismo</h3>
+                        <h3 style="color: #2196f3; margin-top: 0; font-size: 20px;">Comienza ahora mismo</h3>
                         <p style="margin-bottom: 20px;">
                             <strong>Paso 1:</strong> Explora nuestro catálogo de productos<br>
                             <strong>Paso 2:</strong> Encuentra el producto que te interesa<br>
@@ -825,7 +825,7 @@ ID de alerta: {{ alert_id }} | ID de producto: {{ product_id }}
     def _get_welcome_text_template():
         """Plantilla de texto de bienvenida"""
         return """
-¡Bienvenido a CotizaBelleza! 🎉
+        ¡Bienvenido a CotizaBelleza!
 
 ¡Hola {{ user_name }}!
 
@@ -845,7 +845,7 @@ Nos alegra mucho que te hayas unido a CotizaBelleza. Estamos aquí para ayudarte
 4. PRODUCTOS DE CALIDAD
    Solo productos auténticos de marcas reconocidas
 
-🚀 Comienza ahora mismo:
+        Comienza ahora mismo:
 
 Paso 1: Explora nuestro catálogo de productos
 Paso 2: Encuentra el producto que te interesa
@@ -885,13 +885,13 @@ Este email fue enviado a {{ user_email }}
             },
             {
                 'name': 'price_alert_decreased',
-                'subject': '¡Precio bajó! {product_name} 🎉',
+                'subject': '¡Precio bajó! {product_name}',
                 'html_content': EmailService._get_decreased_price_html_template(),
                 'text_content': EmailService._get_decreased_price_text_template(),
             },
             {
                 'name': 'price_alert_increased',
-                'subject': 'Precio subió: {product_name} ⚠️',
+                'subject': 'Precio subió: {product_name}',
                 'html_content': EmailService._get_increased_price_html_template(),
                 'text_content': EmailService._get_increased_price_text_template(),
             },
@@ -903,7 +903,7 @@ Este email fue enviado a {{ user_email }}
             },
             {
                 'name': 'welcome_email',
-                'subject': '¡Bienvenido a CotizaBelleza! 🎉',
+                'subject': '¡Bienvenido a CotizaBelleza!',
                 'html_content': EmailService._get_welcome_html_template(),
                 'text_content': EmailService._get_welcome_text_template(),
             }
@@ -956,7 +956,7 @@ Este email fue enviado a {{ user_email }}
                 text_content = template.text_content
             else:
                 # Plantilla por defecto
-                subject = '¡Bienvenido a CotizaBelleza! 🎉'
+                subject = '¡Bienvenido a CotizaBelleza!'
                 html_content = EmailService._get_welcome_html_template()
                 text_content = EmailService._get_welcome_text_template()
             
@@ -1115,7 +1115,7 @@ Este email fue enviado a {{ user_email }}
             return f"""
             <html>
             <body>
-                <h2>📈 El precio ha subido</h2>
+                <h2>El precio ha subido</h2>
                 <p>El precio de <strong>{cambio.get('producto', 'el producto')}</strong> ha subido desde que creaste tu alerta.</p>
                 <div style="background: #f5f5f5; padding: 15px; margin: 20px 0;">
                     <h3>Resumen del Cambio:</h3>
@@ -1155,7 +1155,7 @@ Este email fue enviado a {{ user_email }}
         """Plantilla de texto por defecto para alertas históricas"""
         if cambio['tipo'] == 'subio':
             return f"""
-            📈 El precio ha subido
+            El precio ha subido
 
             El precio de {cambio.get('producto', 'el producto')} ha subido desde que creaste tu alerta.
 

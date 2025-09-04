@@ -44,7 +44,7 @@ def run_etl_task(self, mode='prod'):
         # Ejecutar etl_v2.py directamente para mayor control
         cmd = [sys.executable, '-m', 'etl.etl_v2'] + args
         
-        logger.info(f"📝 [ETL Programado] Ejecutando comando: {' '.join(cmd)}")
+        logger.info(f"[ETL Programado] Ejecutando comando: {' '.join(cmd)}")
         
         # Ejecutar el comando con timeout de 30 minutos
         result = subprocess.run(
@@ -56,7 +56,7 @@ def run_etl_task(self, mode='prod'):
         )
         
         if result.returncode == 0:
-            logger.info("✅ [ETL Programado] Completado exitosamente")
+            logger.info("[ETL Programado] Completado exitosamente")
             
             # Verificar que se generó el archivo unified_products.json
             unified_file = base_dir / 'data' / 'processed' / 'unified_products.json'
@@ -73,7 +73,7 @@ def run_etl_task(self, mode='prod'):
                 "timestamp": str(__import__('datetime').datetime.now())
             }
         else:
-            logger.error(f"❌ [ETL Programado] Error en ejecución: {result.stderr}")
+            logger.error(f"[ETL Programado] Error en ejecución: {result.stderr}")
             return {
                 "status": "error", 
                 "mode": mode, 
@@ -84,7 +84,7 @@ def run_etl_task(self, mode='prod'):
             }
             
     except subprocess.TimeoutExpired:
-        logger.error("❌ [ETL Programado] Timeout después de 30 minutos")
+        logger.error("[ETL Programado] Timeout después de 30 minutos")
         return {
             "status": "timeout", 
             "mode": mode, 
@@ -93,7 +93,7 @@ def run_etl_task(self, mode='prod'):
             "timestamp": str(__import__('datetime').datetime.now())
         }
     except Exception as e:
-        logger.error(f"❌ [ETL Programado] Error inesperado: {str(e)}")
+        logger.error(f"[ETL Programado] Error inesperado: {str(e)}")
         return {
             "status": "error", 
             "mode": mode, 
@@ -143,11 +143,11 @@ def status_task(self):
             except:
                 status_info["products_count"] = 0
         
-        logger.info("✅ [ETL Simple] Estado verificado")
+        logger.info("[ETL Simple] Estado verificado")
         return status_info
         
     except Exception as e:
-        logger.error(f"❌ [ETL Simple] Error verificando estado: {str(e)}")
+        logger.error(f"[ETL Simple] Error verificando estado: {str(e)}")
         return {"status": "error", "error": str(e)}
 
 

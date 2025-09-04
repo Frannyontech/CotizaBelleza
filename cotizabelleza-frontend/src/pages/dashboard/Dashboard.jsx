@@ -96,13 +96,24 @@ const Dashboard = () => {
         
         setProducts(dashboardProducts);
         
+        // Debug: mostrar qué productos se están cargando
+        console.log('🔍 Debug productos:', dashboardProducts.map(p => ({
+          nombre: p.nombre,
+          product_id: p.product_id,
+          id: p.id
+        })));
+        
         // Guardar categorías y tiendas disponibles del dashboard
         const categoriasDisponibles = dashboardData.categorias_disponibles || [];
         const tiendasDisponibles = dashboardData.tiendas_disponibles || [];
         
+        // Extraer solo los nombres de las categorías y tiendas
+        const nombresCategorias = categoriasDisponibles.map(cat => cat.nombre || cat);
+        const nombresTiendas = tiendasDisponibles.map(tienda => tienda.nombre || tienda);
+        
         // Actualizar las listas de filtros con datos del servidor
-        setCategoriasDisponibles(categoriasDisponibles.map(cat => cat.nombre));
-        setTiendasDisponibles(tiendasDisponibles.map(tienda => tienda.nombre));
+        setCategoriasDisponibles(nombresCategorias);
+        setTiendasDisponibles(nombresTiendas);
         
       } catch (error) {
         console.error('❌ Error loading dashboard data:', error);
@@ -126,32 +137,50 @@ const Dashboard = () => {
 
   // Usar categorías y tiendas del servidor, con fallback a las de productos
   const categorias_unicas = categoriasDisponibles.length > 0 
-    ? categoriasDisponibles 
-    : [...new Set(products.map(product => product.categoria).filter(cat => cat))];
+    ? [...new Set(categoriasDisponibles)].filter(cat => cat !== 'cuidado_piel')
+    : [...new Set(products.map(product => product.categoria).filter(cat => cat && cat.trim() !== ''))].filter(cat => cat !== 'cuidado_piel');
   const tiendas_unicas = tiendasDisponibles.length > 0 
-    ? tiendasDisponibles 
-    : [...new Set(products.flatMap(product => product.tiendas_disponibles || []))];
+    ? [...new Set(tiendasDisponibles)]
+    : [...new Set(products.flatMap(product => product.tiendas_disponibles || []).filter(tienda => tienda && tienda.trim() !== ''))];
   
   const categoriesList = ['Todos', ...categorias_unicas];
   const storesList = ['Todas', ...tiendas_unicas];
 
-  // Aplicar filtros a los productos
-  const filteredProducts = products.filter(product => {
-    // Filtro por categoría
-    if (selectedCategory !== 'Todos' && product.categoria !== selectedCategory) {
-      return false;
-    }
-    
-    // Filtro por tienda
-    if (selectedStore !== 'Todas') {
-      const storeMatch = product.tiendas_disponibles?.some(store => 
-        store.toUpperCase() === selectedStore
-      );
-      if (!storeMatch) return false;
-    }
-    
-    return true;
+  // Debug: mostrar qué filtros se están generando
+  console.log('🔍 Debug filtros:', {
+    categoriasDisponibles,
+    tiendasDisponibles,
+    categorias_unicas,
+    tiendas_unicas,
+    categoriesList,
+    storesList
   });
+
+          // Aplicar filtros a los productos
+        const filteredProducts = products.filter(product => {
+          // Debug: mostrar información del producto
+          console.log('🔍 Producto en filtro:', {
+            nombre: product.nombre,
+            categoria: product.categoria,
+            product_id: product.product_id,
+            id: product.id
+          });
+          
+          // Filtro por categoría
+          if (selectedCategory !== 'Todos' && product.categoria !== selectedCategory) {
+            return false;
+          }
+          
+          // Filtro por tienda
+          if (selectedStore !== 'Todas') {
+            const storeMatch = product.tiendas_disponibles?.some(store => 
+              store.toUpperCase() === selectedStore
+            );
+            if (!storeMatch) return false;
+          }
+          
+          return true;
+        });
 
   // Datos de beneficios
   const benefits = [
@@ -254,12 +283,17 @@ const Dashboard = () => {
             Limpiar filtros
           </Button>
         </div>
+
+
       </div>
 
-      {/* Popular Products Section */}
+      
+
+
+      {/* All Products Section */}
       <div className="products-section">
         <div className="section-header">
-          <Title level={3}>Productos más populares ({filteredProducts.length})</Title>
+          <Title level={3}>Todos los Productos ({filteredProducts.length})</Title>
         </div>
 
         <div className="products-grid">
@@ -268,7 +302,23 @@ const Dashboard = () => {
               <div 
                 key={product.product_id}
                 className="product-card" 
-                onClick={() => navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`)}
+                onClick={() => {
+                  console.log('🖱️ Click en producto:', {
+                    nombre: product.nombre,
+                    product_id: product.product_id,
+                    id: product.id,
+                    categoria: product.categoria
+                  });
+                  
+                  if (product.product_id) {
+                    const url = `/detalle-producto/${encodeURIComponent(product.product_id)}`;
+                    console.log('🚀 Navegando a:', url);
+                    navigate(url);
+                  } else {
+                    console.error('❌ Producto sin ID válido para navegación:', product);
+                    message.error('Error: Producto sin ID válido');
+                  }
+                }}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="product-image">
@@ -292,18 +342,36 @@ const Dashboard = () => {
                     className="view-more-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/detalle-producto/${encodeURIComponent(product.product_id)}`);
+                      console.log('🖱️ Click en botón Ver más:', {
+                        nombre: product.nombre,
+                        product_id: product.product_id,
+                        id: product.id
+                      });
+                      
+                      if (product.product_id) {
+                        const url = `/detalle-producto/${encodeURIComponent(product.product_id)}`;
+                        console.log('🚀 Navegando a:', url);
+                        navigate(url);
+                      } else {
+                        console.error('❌ Producto sin ID válido para navegación:', product);
+                        message.error('Error: Producto sin ID válido');
+                      }
                     }}
                   >
                     Ver más <LinkOutlined />
                   </Button>
                   <div className="product-stores">
-                    <Text type="secondary">
-                      {product.tiendasCount > 1 
-                        ? `${product.tiendasCount} tiendas` 
-                        : `Disponible en: ${product.tiendas_disponibles?.join(', ') || 'N/A'}`
-                      }
-                    </Text>
+                    {product.tiendasCount > 1 ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Tag color="green" style={{ margin: 0 }}>
+                          {product.tiendasCount} tiendas
+                        </Tag>
+                      </div>
+                    ) : (
+                      <Text type="secondary">
+                        Disponible en: {product.tiendas_disponibles?.join(', ') || 'N/A'}
+                      </Text>
+                    )}
                   </div>
                 </div>
               </div>

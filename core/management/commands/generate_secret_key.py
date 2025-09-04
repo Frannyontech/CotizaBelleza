@@ -24,18 +24,18 @@ class Command(BaseCommand):
         secret_key = generate_secret_key()
         
         self.stdout.write(
-            self.style.SUCCESS(f'✅ Clave secreta generada: {secret_key}')
+            self.style.SUCCESS(f'Clave secreta generada: {secret_key}')
         )
         
         self.stdout.write(
-            self.style.WARNING('⚠️  IMPORTANTE: Guarda esta clave en tu archivo .env como EMAIL_SECRET_KEY')
+            self.style.WARNING('IMPORTANTE: Guarda esta clave en tu archivo .env como EMAIL_SECRET_KEY')
         )
         
         if options['save_to_env']:
             self.save_to_env_file(secret_key)
         
         self.stdout.write(
-            self.style.SUCCESS('✅ Clave generada exitosamente')
+            self.style.SUCCESS('Clave generada exitosamente')
         )
 
     def save_to_env_file(self, secret_key):
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 f.write(content)
             
             self.stdout.write(
-                self.style.SUCCESS(f'✅ Clave guardada en {env_file_path}')
+                self.style.SUCCESS(f'Clave guardada en {env_file_path}')
             )
             
         except Exception as e:
@@ -83,6 +83,7 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.WARNING('⚠️  Guarda manualmente la clave en tu archivo .env')
             )
+
 
 
 

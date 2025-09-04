@@ -60,8 +60,8 @@ class DashboardAPIView(APIView):
             categorias_disponibles = [{"id": i+1, "nombre": nombre, "cantidad_productos": count} 
                                      for i, (nombre, count) in enumerate(categorias.items())]
             
-            # Seleccionar productos populares balanceados por tienda
-            def seleccionar_productos_balanceados(productos, count=10):
+            # Seleccionar productos populares con prioridad en coincidencias para tesis
+            def seleccionar_productos_balanceados(productos, count=20):
                 # Agrupar productos por tienda
                 productos_por_tienda = {}
                 productos_multi_tienda = []
@@ -80,14 +80,16 @@ class DashboardAPIView(APIView):
                 # Seleccionar productos balanceados
                 seleccionados = []
                 
-                # 1. Agregar productos multi-tienda (prioridad alta)
-                seleccionados.extend(productos_multi_tienda[:3])
+                # 1. Agregar productos multi-tienda (prioridad máxima para tesis)
+                # Mostrar la mayoría de productos con coincidencias (hasta 15)
+                max_multi_tienda = min(15, len(productos_multi_tienda))
+                seleccionados.extend(productos_multi_tienda[:max_multi_tienda])
                 
-                # 2. Agregar productos de cada tienda de forma balanceada
-                tiendas_disponibles = list(productos_por_tienda.keys())
+                # 2. Agregar productos de tiendas individuales para completar los 20
                 productos_restantes = count - len(seleccionados)
                 
-                if tiendas_disponibles:
+                if productos_restantes > 0 and productos_por_tienda:
+                    tiendas_disponibles = list(productos_por_tienda.keys())
                     productos_por_tienda_cantidad = productos_restantes // len(tiendas_disponibles)
                     productos_extra = productos_restantes % len(tiendas_disponibles)
                     
@@ -98,7 +100,7 @@ class DashboardAPIView(APIView):
                 
                 return seleccionados[:count]
             
-            productos_populares = seleccionar_productos_balanceados(productos, 10)
+            productos_populares = seleccionar_productos_balanceados(productos, 20)
             
             return Response({
                 "estadisticas": {
@@ -299,6 +301,106 @@ class UnifiedProductsAPIView(APIView):
         except Exception as e:
             return Response(
                 {"error": f"Error al obtener productos unificados: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class ProductDetailAPIView(APIView):
+    """Vista unificada para obtener detalles de productos (persistentes y unificados)"""
+    permission_classes = [AllowAny]
+    
+    def get(self, request, product_id):
+        try:
+            # Primero buscar en productos unificados para obtener información completa
+            unified_data = load_unified_products()
+            productos = unified_data.get("productos", [])
+            
+            # Buscar por product_id exacto
+            producto_unificado = next((p for p in productos if p.get('product_id') == product_id), None)
+            
+            if producto_unificado:
+                # Producto encontrado en JSON unificado - usar esta información completa
+                tiendas = producto_unificado.get('tiendas', [])
+                precio_min = min([float(t.get('precio', 0)) for t in tiendas]) if tiendas else 0
+                
+                return Response({
+                    "product_id": producto_unificado.get('product_id'),
+                    "nombre": producto_unificado.get('nombre'),
+                    "marca": producto_unificado.get('marca'),
+                    "categoria": producto_unificado.get('categoria'),
+                    "imagen_url": producto_unificado.get('imagen') or (tiendas[0].get('imagen') if tiendas else ''),
+                    "precio_min": precio_min,
+                    "tiendasCount": len(tiendas),
+                    "tiendas_disponibles": [t.get('fuente', '').upper() for t in tiendas],
+                    "tiendas": tiendas,
+                    "source": "unified"
+                }, status=status.HTTP_200_OK)
+            
+            # Si no se encuentra en unificados, buscar en productos persistentes por internal_id
+            from core.models import ProductoPersistente
+            
+            producto_persistente = ProductoPersistente.objects.filter(internal_id=product_id).first()
+            
+            if producto_persistente:
+                # Producto encontrado en base de datos persistente
+                # Obtener el precio más reciente del producto persistente
+                precio_reciente = producto_persistente.precios_historicos.order_by('-fecha_scraping').first()
+                precio_actual = precio_reciente.precio if precio_reciente else 0
+                tienda_nombre = precio_reciente.tienda if precio_reciente else "GENERAL"
+                
+                return Response({
+                    "product_id": producto_persistente.internal_id,
+                    "nombre": producto_persistente.nombre_original,
+                    "marca": producto_persistente.marca,
+                    "categoria": producto_persistente.categoria,
+                    "imagen_url": producto_persistente.imagen_url or (precio_reciente.imagen_url if precio_reciente else ''),
+                    "precio_min": precio_actual,
+                    "tiendasCount": 1,
+                    "tiendas_disponibles": [tienda_nombre.upper()],
+                    "tiendas": [{
+                        "fuente": tienda_nombre,
+                        "precio": precio_actual,
+                        "stock": "En stock" if producto_persistente.activo else "Sin stock",
+                        "url": precio_reciente.url_producto if precio_reciente else "#",
+                        "imagen": precio_reciente.imagen_url if precio_reciente else producto_persistente.imagen_url
+                    }],
+                    "source": "persistent"
+                }, status=status.HTTP_200_OK)
+            
+            # Si no se encuentra en persistentes, buscar en productos unificados
+            unified_data = load_unified_products()
+            productos = unified_data.get("productos", [])
+            
+            # Buscar por product_id exacto
+            producto_unificado = next((p for p in productos if p.get('product_id') == product_id), None)
+            
+            if producto_unificado:
+                # Producto encontrado en JSON unificado
+                tiendas = producto_unificado.get('tiendas', [])
+                precio_min = min([float(t.get('precio', 0)) for t in tiendas]) if tiendas else 0
+                
+                return Response({
+                    "product_id": producto_unificado.get('product_id'),
+                    "nombre": producto_unificado.get('nombre'),
+                    "marca": producto_unificado.get('marca'),
+                    "categoria": producto_unificado.get('categoria'),
+                    "imagen_url": producto_unificado.get('imagen') or (tiendas[0].get('imagen') if tiendas else ''),
+                    "precio_min": precio_min,
+                    "tiendasCount": len(tiendas),
+                    "tiendas_disponibles": [t.get('fuente', '').upper() for t in tiendas],
+                    "tiendas": tiendas,
+                    "source": "unified"
+                }, status=status.HTTP_200_OK)
+            
+            # Si no se encuentra en ninguno de los dos, devolver 404
+            return Response(
+                {"error": f"Producto no encontrado: {product_id}"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        except Exception as e:
+            return Response(
+                {"error": f"Error al obtener producto: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -627,6 +729,7 @@ class AlertasAPIView(APIView):
             
             from core.models import AlertaPrecioProductoPersistente, ProductoPersistente
             from utils.security import encrypt_email
+            from django.db import transaction
             
             try:
                 producto = ProductoPersistente.objects.get(internal_id=producto_id)
@@ -647,30 +750,53 @@ class AlertasAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Encriptar email para la búsqueda
-            email_encrypted = encrypt_email(email)
+            # Usar hash simple para verificar duplicados (temporalmente)
+            import hashlib
+            email_hash = hashlib.md5(email.lower().encode()).hexdigest()
             
-            # Verificar si ya existe una alerta activa usando email encriptado
-            alerta_existente = AlertaPrecioProductoPersistente.objects.filter(
-                producto=producto,
-                email=email_encrypted,
-                activa=True
-            ).first()
+            print(f"DEBUG: Verificando alerta existente para producto {producto_id} y email {email}")
+            print(f"DEBUG: Email hash: {email_hash}")
             
-            if alerta_existente:
-                # Si ya existe una alerta activa, devolver error 400
-                return Response({
-                    'error': 'email_already_subscribed'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Crear nueva alerta con email encriptado
-            alerta = AlertaPrecioProductoPersistente.objects.create(
-                producto=producto,
-                email=email_encrypted,  # El modelo se encargará de la encriptación
-                precio_inicial=float(precio_actual.precio),
-                activa=True,
-                notificada=False
-            )
+            # Usar transacción atómica para evitar condiciones de carrera
+            with transaction.atomic():
+                # Verificar si ya existe una alerta para este email y producto
+                # Buscar por hash del email en lugar de email encriptado
+                alertas_existentes = AlertaPrecioProductoPersistente.objects.filter(
+                    producto=producto
+                )
+                
+                # Verificar si alguna alerta tiene el mismo hash de email
+                alerta_existente = None
+                for alerta in alertas_existentes:
+                    try:
+                        # Intentar desencriptar el email almacenado
+                        email_almacenado = alerta.get_user_email()
+                        if email_almacenado.lower() == email.lower():
+                            alerta_existente = alerta
+                            break
+                    except:
+                        continue
+                
+                print(f"DEBUG: Alerta existente encontrada: {alerta_existente}")
+                
+                if alerta_existente:
+                    print(f"DEBUG: Alerta duplicada detectada, devolviendo error 400")
+                    # Si ya existe una alerta, devolver error 400
+                    return Response({
+                        'error': 'email_already_subscribed'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Crear nueva alerta con email encriptado
+                email_encrypted = encrypt_email(email)
+                alerta = AlertaPrecioProductoPersistente.objects.create(
+                    producto=producto,
+                    email=email_encrypted,  # El modelo se encargará de la encriptación
+                    precio_inicial=float(precio_actual.precio),
+                    activa=True,
+                    notificada=False
+                )
+                
+                print(f"DEBUG: Alerta creada exitosamente con ID: {alerta.id}")
             
             # Enviar email de confirmación
             try:
@@ -730,12 +856,12 @@ class AlertasAPIView(APIView):
                 success = email_msg.send(fail_silently=False)
                 
                 if success:
-                    print(f"✅ Email de confirmación enviado a {mask_email(email)}")
+                    print(f"Email de confirmación enviado a {mask_email(email)}")
                 else:
-                    print(f"❌ Error enviando email de confirmación a {mask_email(email)}")
+                    print(f"Error enviando email de confirmación a {mask_email(email)}")
                     
             except Exception as e:
-                print(f"❌ Error en email de confirmación: {e}")
+                print(f"Error en email de confirmación: {e}")
             
             return Response({
                 'message': 'alert_created'

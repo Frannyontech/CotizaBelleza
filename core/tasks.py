@@ -142,7 +142,7 @@ def send_historical_alert_email(self, alerta_id, cambio, precio_actual, tienda_u
             # Determinar tipo de email según el cambio
             if cambio['tipo'] == 'subio':
                 tipo_email = 'price_increased'
-                asunto = f"📈 Precio Subió - {alerta.producto.nombre_original}"
+                asunto = f"Precio Subió - {alerta.producto.nombre_original}"
             elif cambio['tipo'] == 'bajo':
                 tipo_email = 'price_decreased'
                 asunto = f"📉 Precio Bajó - {alerta.producto.nombre_original}"

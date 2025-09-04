@@ -395,6 +395,44 @@ class PersistentIdManager:
         
         return productos_unicos
     
+    def buscar_producto_por_datos(self, nombre: str, marca: str, categoria: str) -> Optional[ProductoPersistente]:
+        """
+        Busca un producto persistente por nombre, marca y categoría
+        
+        Args:
+            nombre: Nombre del producto
+            marca: Marca del producto
+            categoria: Categoría del producto
+            
+        Returns:
+            ProductoPersistente si se encuentra, None en caso contrario
+        """
+        try:
+            # Normalizar datos
+            nombre_normalizado = self.normalizar_nombre(nombre)
+            marca_normalizada = self.normalizar_marca(marca)
+            categoria_normalizada = self.normalizar_categoria(categoria)
+            
+            # Mapear categorías del JSON a categorías de la BD
+            if categoria_normalizada == "skincare":
+                categoria_normalizada = "cuidado_piel"
+            
+            # Generar hash único
+            hash_unico = self.generar_hash_unico(nombre_normalizado, marca_normalizada, categoria_normalizada)
+            
+            # Buscar por hash único
+            producto = ProductoPersistente.objects.filter(hash_unico=hash_unico).first()
+            
+            if producto:
+                return producto
+            
+            # Si no se encuentra por hash, buscar por similitud
+            return self.buscar_producto_similar(nombre_normalizado, marca_normalizada, categoria_normalizada)
+            
+        except Exception as e:
+            print(f"Error buscando producto por datos: {e}")
+            return None
+    
     def preservar_productos_con_resenas_alertas(self, productos_encontrados: set) -> int:
         """
         Preserva productos con reseñas/alertas que no aparecieron en el scraping actual

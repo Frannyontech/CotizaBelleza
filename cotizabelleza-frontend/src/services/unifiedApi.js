@@ -34,7 +34,7 @@ export const unifiedProductsService = {
   // Get dashboard data from backend
   getDashboardData: async () => {
     try {
-      const response = await api.get('unified/dashboard/');
+      const response = await api.get('dashboard/');
       return response.data;
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -45,25 +45,9 @@ export const unifiedProductsService = {
   // Get product by ID (supports multiple ID formats)
   getProductById: async (productId) => {
     try {
-      const unifiedData = await unifiedProductsService.getUnifiedProducts();
-      const productos = unifiedData.productos || [];
-      
-      // Try to find by product_id first
-      let product = productos.find(p => p.product_id === productId);
-      
-      // If not found, try to find by legacy ID formats
-      if (!product) {
-        product = productos.find(p => {
-          const tiendas = p.tiendas || [];
-          return tiendas.some(tienda => {
-            // Check if the URL contains the productId
-            const url = tienda.url || '';
-            return url.includes(productId) || url.endsWith(`/${productId}`);
-          });
-        });
-      }
-      
-      return product;
+      // Usar la nueva API unificada que maneja tanto productos persistentes como unificados
+      const response = await api.get(`producto/${productId}/`);
+      return response.data;
     } catch (error) {
       console.error('Error fetching product by ID:', error);
       throw error;

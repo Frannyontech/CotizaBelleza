@@ -671,7 +671,7 @@ if __name__ == "__main__":
     try:
         resultado = scrape_maicao_all_categories(headless=headless, max_pages_per_category=max_pages)
         
-        print(f"\n🎉 SCRAPING COMPLETADO")
+        print(f"\nSCRAPING COMPLETADO")
         total = resultado.get('total_productos', 0) if isinstance(resultado, dict) else len(resultado)
         print(f"Total productos extraídos: {total}")
         
@@ -681,6 +681,6 @@ if __name__ == "__main__":
                     print(f"  {categoria}: {datos['cantidad']} productos")
         
     except Exception as e:
-        print(f"❌ Error durante el scraping: {e}")
+        print(f"Error durante el scraping: {e}")
         import traceback
         traceback.print_exc()

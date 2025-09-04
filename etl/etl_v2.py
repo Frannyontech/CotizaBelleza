@@ -108,16 +108,16 @@ def execute_command(orchestrator, command):
             # Si el ETL fue exitoso, configurar sistema de observadores
             if success:
                 print("\n" + "="*60)
-                print("🔧 CONFIGURANDO SISTEMA DE OBSERVADORES")
+                print("CONFIGURANDO SISTEMA DE OBSERVADORES")
                 print("="*60)
                 
                 try:
                     from core.services.observer_service import ObserverService
                     total_observers = ObserverService.setup_all_observers()
-                    print(f"✅ Sistema configurado: {total_observers} observadores activos")
+                    print(f"Sistema configurado: {total_observers} observadores activos")
                     print("👁️ Los productos notificarán automáticamente a las alertas")
                 except Exception as e:
-                    print(f"⚠️ Error configurando observadores: {e}")
+                    print(f"Error configurando observadores: {e}")
                     print("💡 El sistema seguirá funcionando sin notificaciones automáticas")
             
             return success
@@ -131,12 +131,12 @@ def execute_command(orchestrator, command):
         elif command == 'status':
             return orchestrator.show_status()
         else:
-            print(f"❌ Comando no reconocido: {command}")
+            print(f"Comando no reconocido: {command}")
             return False
             
     except Exception as e:
-        print(f"❌ Error ejecutando comando {command}: {e}")
-        return False
+            print(f"Error ejecutando comando {command}: {e}")
+            return False
 
 
 def show_status(orchestrator: ETLOrchestrator) -> bool:

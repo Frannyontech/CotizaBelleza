@@ -52,21 +52,21 @@ class Command(BaseCommand):
     
     def setup_observers(self):
         """Configura todos los observadores"""
-        self.stdout.write("🔧 Configurando sistema de observadores...")
+        self.stdout.write("Configurando sistema de observadores...")
         
         try:
             total_observers = ObserverService.setup_all_observers()
             
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"✅ Sistema configurado exitosamente: {total_observers} observadores activos"
+                    f"Sistema configurado exitosamente: {total_observers} observadores activos"
                 )
             )
             
             # Mostrar detalles
             stats = ObserverService.get_observer_stats()
             if stats:
-                self.stdout.write(f"\n📊 Estadísticas:")
+                self.stdout.write(f"\nEstadísticas:")
                 self.stdout.write(f"  - Productos con observadores: {stats.get('total_subjects', 0)}")
                 self.stdout.write(f"  - Observadores totales: {stats.get('total_observers', 0)}")
                 self.stdout.write(f"  - Observadores activos: {stats.get('active_observers', 0)}")
@@ -74,18 +74,18 @@ class Command(BaseCommand):
             
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f"❌ Error configurando observadores: {e}")
+                self.style.ERROR(f"Error configurando observadores: {e}")
             )
     
     def show_stats(self):
         """Muestra estadísticas del sistema"""
-        self.stdout.write("📊 Estadísticas del sistema de observadores...")
+        self.stdout.write("Estadísticas del sistema de observadores...")
         
         try:
             stats = ObserverService.get_observer_stats()
             
             if stats:
-                self.stdout.write(f"\n📈 Resumen:")
+                self.stdout.write(f"\nResumen:")
                 self.stdout.write(f"  - Productos con observadores: {stats.get('total_subjects', 0)}")
                 self.stdout.write(f"  - Observadores totales: {stats.get('total_observers', 0)}")
                 self.stdout.write(f"  - Observadores activos: {stats.get('active_observers', 0)}")
@@ -100,11 +100,11 @@ class Command(BaseCommand):
                         if observers_count > 0:
                             self.stdout.write(f"  - {subject.nombre_original}: {observers_count} observadores")
             else:
-                self.stdout.write(self.style.WARNING("⚠️ No hay estadísticas disponibles"))
+                self.stdout.write(self.style.WARNING("No hay estadísticas disponibles"))
                 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f"❌ Error obteniendo estadísticas: {e}")
+                self.style.ERROR(f"Error obteniendo estadísticas: {e}")
             )
     
     def test_notification(self, options):
@@ -115,17 +115,17 @@ class Command(BaseCommand):
         
         if not product_id:
             self.stdout.write(
-                self.style.ERROR("❌ Debes especificar --product-id para pruebas")
+                self.style.ERROR("Debes especificar --product-id para pruebas")
             )
             return
         
         if not test_price:
             self.stdout.write(
-                self.style.ERROR("❌ Debes especificar --test-price para pruebas")
+                self.style.ERROR("Debes especificar --test-price para pruebas")
             )
             return
         
-        self.stdout.write(f"🧪 Probando notificación para producto {product_id}...")
+        self.stdout.write(f"Probando notificación para producto {product_id}...")
         
         try:
             success = ObserverService.test_notification(product_id, test_price, store)
@@ -133,17 +133,17 @@ class Command(BaseCommand):
             if success:
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"✅ Notificación de prueba enviada: ${test_price} en {store}"
+                        f"Notificación de prueba enviada: ${test_price} en {store}"
                     )
                 )
             else:
                 self.stdout.write(
-                    self.style.ERROR("❌ Error enviando notificación de prueba")
+                    self.style.ERROR("Error enviando notificación de prueba")
                 )
                 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f"❌ Error en prueba: {e}")
+                self.style.ERROR(f"Error en prueba: {e}")
             )
     
     def cleanup_observers(self):
@@ -155,13 +155,13 @@ class Command(BaseCommand):
             
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"✅ Limpieza completada: {removed} observadores inactivos removidos"
+                    f"Limpieza completada: {removed} observadores inactivos removidos"
                 )
             )
             
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f"❌ Error en limpieza: {e}")
+                self.style.ERROR(f"Error en limpieza: {e}")
             )
     
     def reset_notifications(self):
@@ -173,13 +173,13 @@ class Command(BaseCommand):
             
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"✅ Reset completado: {updated} notificaciones reseteadas"
+                    f"Reset completado: {updated} notificaciones reseteadas"
                 )
             )
             
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f"❌ Error en reset: {e}")
+                self.style.ERROR(f"Error en reset: {e}")
             )
 
 

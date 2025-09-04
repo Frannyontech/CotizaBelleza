@@ -84,6 +84,30 @@ class PersistentETLProcessor:
             print(f"Error: {error_msg}")
             return []
     
+    def normalizar_categoria(self, categoria: str) -> str:
+        """
+        Normaliza categorías para consistencia
+        """
+        if not categoria:
+            return 'desconocida'
+        
+        categoria_limpia = categoria.lower().strip()
+        
+        # Mapeo de categorías para consistencia
+        mapeo_categorias = {
+            'maquillaje': 'maquillaje',
+            'makeup': 'maquillaje',
+            'skincare': 'skincare',
+            'cuidado_piel': 'skincare',
+            'cuidado de la piel': 'skincare',
+            'cuidado del rostro': 'skincare',
+            'facial': 'skincare',
+            'perfumes': 'fragancias',
+            'fragancias': 'fragancias',
+        }
+        
+        return mapeo_categorias.get(categoria_limpia, categoria_limpia)
+    
     def normalizar_producto_raw(self, producto: Dict, tienda_default: str, categoria_default: str) -> Optional[Dict]:
         """
         Normaliza un producto individual al formato del procesador unificado
@@ -93,6 +117,9 @@ class PersistentETLProcessor:
             nombre = producto.get('nombre') or producto.get('name', '')
             marca = producto.get('marca') or self.extraer_marca_del_nombre(nombre)
             categoria = producto.get('categoria') or categoria_default
+            
+            # Normalizar categoría
+            categoria = self.normalizar_categoria(categoria)
             
             if not nombre:
                 return None
@@ -223,6 +250,23 @@ class PersistentETLProcessor:
         
         # Paso 3: Generar JSON con IDs persistentes
         productos_con_ids = self.id_manager.generar_json_con_ids_persistentes(productos_unificados)
+        
+        # Asegurar que todos los productos tengan product_id basado en internal_id
+        for producto in productos_con_ids:
+            if producto.get('internal_id') and not producto.get('product_id'):
+                # Asignar internal_id como product_id
+                producto['product_id'] = producto['internal_id']
+            elif not producto.get('product_id'):
+                # Si no tiene internal_id ni product_id, buscar el producto persistente
+                nombre = producto.get('nombre', '')
+                marca = producto.get('marca', '')
+                categoria = producto.get('categoria', '')
+                
+                # Buscar el producto persistente correspondiente
+                producto_persistente = self.id_manager.buscar_producto_por_datos(nombre, marca, categoria)
+                if producto_persistente:
+                    producto['product_id'] = producto_persistente.internal_id
+                    producto['internal_id'] = producto_persistente.internal_id
         
         # Paso 4: Guardar JSON procesado
         archivo_salida = self.processed_dir / 'unified_products_with_persistent_ids.json'
@@ -424,8 +468,8 @@ if __name__ == "__main__":
     resultado = procesar_etl_con_ids_persistentes(args.base_dir)
     
     if resultado['exito']:
-        print("\n✅ Procesamiento completado exitosamente")
+        print("\nProcesamiento completado exitosamente")
         sys.exit(0)
     else:
-        print(f"\n❌ Error en procesamiento: {resultado['error']}")
+        print(f"\nError en procesamiento: {resultado['error']}")
         sys.exit(1)

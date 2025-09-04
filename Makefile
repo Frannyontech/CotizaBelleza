@@ -1,48 +1,51 @@
 # Makefile para CotizaBelleza Testing
 # Funciona en Windows (con make instalado), Linux y macOS
 
-.PHONY: test test-single verify coverage clean help
+.PHONY: help test test-specific coverage clean install migrate superuser runserver
 
-# Variables
-PYTHON = python
-DJANGO_SETTINGS = cotizabelleza.test_settings
+help:
+	@echo "Comandos disponibles:"
+	@echo "  make test          - Ejecutar todos los tests"
+	@echo "  make test-specific - Ejecutar test específico (TEST=test_name)"
+	@echo "  make coverage      - Ejecutar tests con cobertura"
+	@echo "  make clean         - Limpiar archivos temporales"
+	@echo "  make install       - Instalar dependencias"
+	@echo "  make migrate       - Aplicar migraciones"
+	@echo "  make superuser     - Crear superusuario"
+	@echo "  make runserver     - Ejecutar servidor de desarrollo"
 
-# Comando principal para ejecutar todos los tests
 test:
-	@echo "🚀 Ejecutando todos los tests..."
-	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS) $(PYTHON) run_tests.py
+	@echo "Ejecutando todos los tests..."
+	pytest tests/ -v
 
-# Ejecutar un test específico
-test-single:
-	@echo "🧪 Ejecutando test específico..."
-	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS) $(PYTHON) run_single_test.py
+test-specific:
+	@echo "Ejecutando test específico..."
+	pytest tests/ -k $(TEST) -v
 
-# Verificar configuración
-verify:
-	@echo "🔍 Verificando configuración..."
-	$(PYTHON) verify_config.py
-
-# Ejecutar tests con cobertura
 coverage:
-	@echo "📊 Ejecutando tests con cobertura..."
-	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS) $(PYTHON) -m pytest --nomigrations --cov=. --cov-report=html:htmlcov --cov-report=term-missing -v
+	@echo "Ejecutando tests con cobertura..."
+	pytest --cov=core --cov-report=html:htmlcov --cov-report=term-missing tests/
 
-# Limpiar archivos generados
 clean:
-	@echo "🧹 Limpiando archivos generados..."
+	@echo "Limpiando archivos temporales..."
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type f -name "*.log" -delete
 	rm -rf htmlcov/
 	rm -rf .coverage
-	rm -rf .pytest_cache/
-	rm -rf __pycache__/
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type f -name "*.pyc" -delete
 
-# Mostrar ayuda
-help:
-	@echo "📋 Comandos disponibles:"
-	@echo "  make test        - Ejecutar todos los tests"
-	@echo "  make test-single - Ejecutar un test específico"
-	@echo "  make verify      - Verificar configuración"
-	@echo "  make coverage    - Ejecutar tests con cobertura"
-	@echo "  make clean       - Limpiar archivos generados"
-	@echo "  make help        - Mostrar esta ayuda"
+install:
+	@echo "Instalando dependencias..."
+	pip install -r requirements.txt
+
+migrate:
+	@echo "Aplicando migraciones..."
+	python manage.py migrate
+
+superuser:
+	@echo "Creando superusuario..."
+	python manage.py createsuperuser
+
+runserver:
+	@echo "Ejecutando servidor de desarrollo..."
+	python manage.py runserver

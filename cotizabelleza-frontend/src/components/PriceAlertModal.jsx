@@ -42,51 +42,32 @@ const PriceAlertModal = ({ visible, onClose, producto }) => {
         email: values.email
       });
 
-      console.log('✅ Respuesta exitosa:', response.data);
-      console.log('📊 Status:', response.status);
-      console.log('📋 Headers:', response.headers);
-
-      // Si llegamos aquí, la alerta se creó exitosamente (201 Created)
-      console.log('🎉 Mostrando mensaje de éxito');
-      api.success({
-        message: '¡Alerta creada exitosamente!',
-        placement: 'topRight',
-        duration: 5,
-      });
-      console.log('✅ Mensaje mostrado, cerrando modal');
+             // Alerta creada exitosamente
+       api.success({
+         message: '¡Alerta creada exitosamente!',
+         placement: 'topRight',
+         duration: 5,
+       });
       form.resetFields();
       onClose();
       
     } catch (error) {
-      console.error('❌ Error al crear alerta:', error);
-      console.error('❌ Error status:', error.response?.status);
-      console.error('❌ Error data:', error.response?.data);
+      // Solo log del error principal, sin detalles técnicos
+      console.error('❌ Error al crear alerta:', error.message || 'Error desconocido');
       
       if (error.response?.status === 400 && error.response?.data?.error === 'email_already_subscribed') {
         // Email ya está suscrito
-        console.log('🔴 Mostrando mensaje: Email ya suscrito');
         api.error({
           message: '¡El correo ya está suscrito a este producto!',
           placement: 'topRight',
           duration: 5,
         });
-      } else if (error.response?.data?.error) {
-        // Otros errores del backend
-        console.log('🔴 Mostrando mensaje: Otro error del backend');
-        api.error({
-          message: 'Error',
-          description: error.response.data.error,
-          placement: 'topRight',
-          duration: 5,
-        });
       } else {
-        // Error genérico
-        console.log('🔴 Mostrando mensaje: Error genérico');
-        api.error({
-          message: 'Error al crear la alerta',
-          description: 'Por favor intenta nuevamente',
-          placement: 'topRight',
-          duration: 5,
+        // Para todos los demás errores (429, otros 400, errores de red, etc.)
+        // NO mostrar ningún mensaje al usuario, solo log en consola
+        console.log('🔴 Error detectado pero no mostrando al usuario:', {
+          status: error.response?.status,
+          error: error.response?.data?.error || error.message
         });
       }
     } finally {

@@ -65,7 +65,7 @@ class PreunicAlgoliaScraper:
             
             facet_filter = facet_mapping.get(categoria)
             if not facet_filter:
-                print(f"❌ Categoría no válida: {categoria}")
+                print(f"Categoría no válida: {categoria}")
                 return None
             
             # Construir payload de la API
@@ -92,11 +92,11 @@ class PreunicAlgoliaScraper:
                 data = response.json()
                 return data
             else:
-                print(f"❌ Error en API: {response.status_code} - {response.text}")
+                print(f"Error en API: {response.status_code} - {response.text}")
                 return None
                 
         except Exception as e:
-            print(f"❌ Error buscando productos: {e}")
+            print(f"Error buscando productos: {e}")
             return None
     
     def extract_product_data(self, product: Dict, categoria: str) -> Optional[Dict]:
@@ -151,7 +151,7 @@ class PreunicAlgoliaScraper:
             }
             
         except Exception as e:
-            print(f"❌ Error procesando producto: {e}")
+            print(f"Error procesando producto: {e}")
             return None
     
     def scrape_categoria(self, categoria: str) -> List[Dict]:
@@ -164,7 +164,7 @@ class PreunicAlgoliaScraper:
         Returns:
             Lista de productos extraídos
         """
-        print(f"\n🚀 Iniciando scraping de categoría: {categoria}")
+        print(f"\nIniciando scraping de categoría: {categoria}")
         
         todos_productos = []
         nombres_visitados = set()
@@ -176,13 +176,13 @@ class PreunicAlgoliaScraper:
             response_data = self.search_products(categoria, page)
             
             if not response_data:
-                print(f"❌ No se pudo obtener datos de la página {page + 1}")
+                print(f"No se pudo obtener datos de la página {page + 1}")
                 break
                 
             # Extraer productos de la respuesta
             results = response_data.get('results', [])
             if not results:
-                print(f"⚠️ No hay resultados en la página {page + 1}")
+                print(f"No hay resultados en la página {page + 1}")
                 break
                 
             # Procesar productos de esta página
@@ -203,18 +203,18 @@ class PreunicAlgoliaScraper:
                     nombres_visitados.add(product_name)
                     productos_nuevos += 1
             
-            print(f"✅ Página {page + 1}: {len(productos_pagina)} productos encontrados, {productos_nuevos} nuevos")
+            print(f"Página {page + 1}: {len(productos_pagina)} productos encontrados, {productos_nuevos} nuevos")
             
             # Si no hay productos nuevos, terminar
             if productos_nuevos == 0:
-                print(f"⚠️ Sin productos nuevos en página {page + 1}, finalizando")
+                print(f"Sin productos nuevos en página {page + 1}, finalizando")
                 break
             
             # Pausa entre requests para ser respetuoso con la API
             if page < self.max_pages - 1:
                 time.sleep(1)
         
-        print(f"🎉 Categoría {categoria}: {len(todos_productos)} productos únicos extraídos")
+        print(f"Categoría {categoria}: {len(todos_productos)} productos únicos extraídos")
         return todos_productos
     
     def scrape_all_categories(self) -> Dict[str, List[Dict]]:
@@ -289,7 +289,7 @@ class PreunicAlgoliaScraper:
             print(f"📦 {categoria.upper()}: {len(productos)} productos")
             total_productos += len(productos)
         
-        print(f"\n🎯 TOTAL: {total_productos} productos extraídos")
+        print(f"\nTOTAL: {total_productos} productos extraídos")
         print("="*60)
 
 
@@ -308,13 +308,13 @@ def main():
         # Mostrar resumen
         scraper.print_summary(resultados)
         
-        print(f"\n✅ SCRAPING COMPLETADO EXITOSAMENTE")
-        print(f"📁 Archivos generados:")
+        print(f"\nSCRAPING COMPLETADO EXITOSAMENTE")
+        print(f"Archivos generados:")
         for archivo in archivos:
             print(f"   - {archivo}")
         
     except Exception as e:
-        print(f"❌ Error durante el scraping: {e}")
+        print(f"Error durante el scraping: {e}")
         import traceback
         traceback.print_exc()
 

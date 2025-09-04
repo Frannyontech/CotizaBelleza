@@ -572,40 +572,23 @@ class AlertaPrecioProductoPersistente(models.Model):
             self.fecha_fin = timezone.now() + timedelta(days=7)
         super().save(*args, **kwargs)
     
-    def get_email_desencriptado(self):
-        """Obtener email del usuario (desencriptado) - método seguro"""
-        try:
-            from utils.security import decrypt_email
-            return decrypt_email(self.email)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error desencriptando email en alerta {self.id}: {e}")
-            return None
-    
-    def get_email_enmascarado(self):
-        """Obtener email enmascarado para mostrar"""
-        try:
-            from utils.security import mask_email
-            email_desencriptado = self.get_email_desencriptado()
-            if email_desencriptado:
-                return mask_email(email_desencriptado)
-            return mask_email(self.email)
-        except Exception:
-            return "***@***"
-    
     def __str__(self):
         return f"Alerta {self.id}: {self.producto.nombre_original} - ${self.precio_inicial}"
     
     def get_user_email(self):
-        """Obtener email del usuario (desencriptado) - método legacy"""
-        return self.get_email_desencriptado()
+        """Obtener email del usuario (desencriptado)"""
+        try:
+            from utils.security import decrypt_email, mask_email
+            return decrypt_email(self.email)
+        except Exception as e:
+            # Si falla la desencriptación, devolver email enmascarado
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error desencriptando email: {e}")
+            return mask_email(self.email)
     
     def _is_email_encrypted(self, email):
         """Verifica si el email está encriptado"""
-        if not email:
-            return False
-        
         try:
             from utils.security import is_valid_encrypted_email
             return is_valid_encrypted_email(email)
@@ -637,9 +620,9 @@ class MailLog(models.Model):
     
     alerta = models.ForeignKey(AlertaPrecioProductoPersistente, on_delete=models.CASCADE, related_name='mail_logs')
     producto = models.ForeignKey(ProductoPersistente, on_delete=models.CASCADE, related_name='mail_logs')
-    email = models.CharField(max_length=500)  # Email encriptado
+    user_email = models.EmailField()
     precio_actual = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_inicial = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_objetivo = models.DecimalField(max_digits=10, decimal_places=2)
     tienda_url = models.URLField(max_length=500, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     sent_at = models.DateTimeField(auto_now_add=True)
@@ -649,251 +632,10 @@ class MailLog(models.Model):
     class Meta:
         verbose_name = 'Log de Email'
         verbose_name_plural = 'Logs de Email'
-    
-    def save(self, *args, **kwargs):
-        # Encriptar email antes de guardar si no está encriptado
-        if self.email and not self._is_email_encrypted(self.email):
-            try:
-                from utils.security import encrypt_email
-                self.email = encrypt_email(self.email)
-            except Exception as e:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f"Error encriptando email en MailLog: {e}")
-        super().save(*args, **kwargs)
-    
-    def get_email_desencriptado(self):
-        """Obtener email desencriptado"""
-        try:
-            from utils.security import decrypt_email
-            return decrypt_email(self.email)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error desencriptando email en MailLog {self.id}: {e}")
-            return None
-    
-    def _is_email_encrypted(self, email):
-        """Verifica si el email está encriptado"""
-        if not email:
-            return False
-        
-        try:
-            from utils.security import is_valid_encrypted_email
-            return is_valid_encrypted_email(email)
-        except Exception:
-            return False
         ordering = ['-sent_at']
     
     def __str__(self):
         return f"Mail {self.id}: {self.user_email} - {self.producto.nombre_original}"
-
-
-class EmailVerification(models.Model):
-    """Verificación de emails para prevenir spam"""
-    email = models.CharField(max_length=500)  # Email encriptado
-    token = models.CharField(max_length=100, unique=True)
-    verified = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
-    verified_at = models.DateTimeField(null=True, blank=True)
-    
-    class Meta:
-        verbose_name = 'Verificación de Email'
-        verbose_name_plural = 'Verificaciones de Email'
-        ordering = ['-created_at']
-    
-    def save(self, *args, **kwargs):
-        # Encriptar email antes de guardar si no está encriptado
-        if self.email and not self._is_email_encrypted(self.email):
-            try:
-                from utils.security import encrypt_email
-                self.email = encrypt_email(self.email)
-            except Exception as e:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f"Error encriptando email en EmailVerification: {e}")
-        super().save(*args, **kwargs)
-    
-    def get_email_desencriptado(self):
-        """Obtener email desencriptado"""
-        try:
-            from utils.security import decrypt_email
-            return decrypt_email(self.email)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error desencriptando email en EmailVerification {self.id}: {e}")
-            return None
-    
-    def _is_email_encrypted(self, email):
-        """Verifica si el email está encriptado"""
-        if not email:
-            return False
-        
-        try:
-            from utils.security import is_valid_encrypted_email
-            return is_valid_encrypted_email(email)
-        except Exception:
-            return False
-    
-    def __str__(self):
-        email_desencriptado = self.get_email_desencriptado()
-        email_mostrar = email_desencriptado if email_desencriptado else "***@***"
-        return f"{email_mostrar} - {'Verificado' if self.verified else 'Pendiente'}"
-    
-    def is_expired(self):
-        """Verifica si el token ha expirado"""
-        from django.utils import timezone
-        return timezone.now() > self.expires_at
-    
-    def verify(self):
-        """Marca el email como verificado"""
-        from django.utils import timezone
-        self.verified = True
-        self.verified_at = timezone.now()
-        self.save()
-
-
-class EmailPreference(models.Model):
-    """Preferencias de email para usuarios"""
-    FREQUENCY_CHOICES = [
-        ('immediate', 'Inmediato'),
-        ('daily', 'Diario'),
-        ('weekly', 'Semanal'),
-        ('disabled', 'Deshabilitado'),
-    ]
-    
-    email = models.CharField(max_length=500, unique=True)  # Email encriptado
-    alerts_enabled = models.BooleanField(default=True)
-    frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default='immediate')
-    unsubscribe_token = models.CharField(max_length=100, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    last_email_sent = models.DateTimeField(null=True, blank=True)
-    
-    class Meta:
-        verbose_name = 'Preferencia de Email'
-        verbose_name_plural = 'Preferencias de Email'
-    
-    def save(self, *args, **kwargs):
-        # Encriptar email antes de guardar si no está encriptado
-        if self.email and not self._is_email_encrypted(self.email):
-            try:
-                from utils.security import encrypt_email
-                self.email = encrypt_email(self.email)
-            except Exception as e:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f"Error encriptando email en EmailPreference: {e}")
-        super().save(*args, **kwargs)
-    
-    def get_email_desencriptado(self):
-        """Obtener email desencriptado"""
-        try:
-            from utils.security import decrypt_email
-            return decrypt_email(self.email)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error desencriptando email en EmailPreference {self.id}: {e}")
-            return None
-    
-    def _is_email_encrypted(self, email):
-        """Verifica si el email está encriptado"""
-        if not email:
-            return False
-        
-        try:
-            from utils.security import is_valid_encrypted_email
-            return is_valid_encrypted_email(email)
-        except Exception:
-            return False
-    
-    def __str__(self):
-        email_desencriptado = self.get_email_desencriptado()
-        email_mostrar = email_desencriptado if email_desencriptado else "***@***"
-        return f"{email_mostrar} - {self.get_frequency_display()}"
-    
-    def can_send_email(self):
-        """Verifica si se puede enviar email según la frecuencia"""
-        if not self.alerts_enabled:
-            return False
-        
-        if self.frequency == 'immediate':
-            return True
-        
-        if not self.last_email_sent:
-            return True
-        
-        from django.utils import timezone
-        now = timezone.now()
-        if self.frequency == 'daily':
-            return (now - self.last_email_sent).days >= 1
-        elif self.frequency == 'weekly':
-            return (now - self.last_email_sent).days >= 7
-        
-        return False
-
-
-class EmailBounce(models.Model):
-    """Registro de emails que rebotaron"""
-    BOUNCE_TYPES = [
-        ('hard', 'Hard Bounce'),
-        ('soft', 'Soft Bounce'),
-        ('spam', 'Spam Report'),
-        ('unsubscribe', 'Unsubscribe'),
-    ]
-    
-    email = models.CharField(max_length=500)  # Email encriptado
-    bounce_type = models.CharField(max_length=20, choices=BOUNCE_TYPES)
-    bounce_reason = models.TextField(blank=True)
-    occurred_at = models.DateTimeField(auto_now_add=True)
-    processed = models.BooleanField(default=False)
-    
-    class Meta:
-        verbose_name = 'Email Bounce'
-        verbose_name_plural = 'Email Bounces'
-        ordering = ['-occurred_at']
-    
-    def save(self, *args, **kwargs):
-        # Encriptar email antes de guardar si no está encriptado
-        if self.email and not self._is_email_encrypted(self.email):
-            try:
-                from utils.security import encrypt_email
-                self.email = encrypt_email(self.email)
-            except Exception as e:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f"Error encriptando email en EmailBounce: {e}")
-        super().save(*args, **kwargs)
-    
-    def get_email_desencriptado(self):
-        """Obtener email desencriptado"""
-        try:
-            from utils.security import decrypt_email
-            return decrypt_email(self.email)
-        except Exception as e:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Error desencriptando email en EmailBounce {self.id}: {e}")
-            return None
-    
-    def _is_email_encrypted(self, email):
-        """Verifica si el email está encriptado"""
-        if not email:
-            return False
-        
-        try:
-            from utils.security import is_valid_encrypted_email
-            return is_valid_encrypted_email(email)
-        except Exception:
-            return False
-    
-    def __str__(self):
-        email_desencriptado = self.get_email_desencriptado()
-        email_mostrar = email_desencriptado if email_desencriptado else "***@***"
-        return f"{email_mostrar} - {self.get_bounce_type_display()}"
 
 
 class EmailTemplate(models.Model):
